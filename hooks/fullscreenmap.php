@@ -37,7 +37,7 @@ class fullscreenmap {
 			
 			Event::add('ushahidi_action.header_scripts', array($this, '_main_js'));
 			Event::add('ushahidi_action.main_footer', array($this, '_dialog'));
-			Event::add('ushahidi_action.main_filters', array($this, '_button'));
+			Event::add('ushahidi_action.map_main_filters', array($this, '_button'));
 		}
 	}
 	
