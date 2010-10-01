@@ -36,7 +36,6 @@ class fullscreenmap {
 			plugin::add_stylesheet('fullscreenmap/views/css/colorbox');
 			
 			Event::add('ushahidi_action.header_scripts', array($this, '_main_js'));
-			Event::add('ushahidi_action.main_footer', array($this, '_dialog'));
 			Event::add('ushahidi_action.map_main_filters', array($this, '_button'));
 		}
 	}
@@ -78,12 +77,6 @@ class fullscreenmap {
 		//$js->categories_view->default_map_all = Kohana::config('settings.default_map_all');
 		$js->categories_view = "";
 		$js->render(TRUE);
-	}
-	
-	public function _dialog()
-	{
-		$dialog = View::factory('fullscreenmap/dialog');
-		$dialog->render(TRUE);
 	}
 	
 	public function _button()
