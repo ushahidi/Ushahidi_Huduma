@@ -48,7 +48,7 @@ class Stats_Model extends ORM
 			{
 				$site_domain = Kohana::config('config.site_domain');
 				$slashornoslash = '';
-				if($site_domain{0} != '/') $slashornoslash = '/';
+				if (strlen($site_domain) > 0 AND $site_domain{0} != '/') $slashornoslash = '/';
 				$val = 'http://'.$_SERVER["HTTP_HOST"].$slashornoslash.$site_domain;
 				$additional_query = '&val='.base64_encode($val);
 			}
