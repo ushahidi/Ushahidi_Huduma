@@ -596,12 +596,23 @@ ul.category-filters li.child{
 
 /* additional content */
 div.additional-content{
-    padding: 15px;
-    background: #F0F0F0;
+    padding: 10px;
+    background: #00ade3;
+    color: #fff;
+}
+
+div.additional-content a, div.additional-content h5 {
+    color: #fff;
 }
 
 div.additional-content ol {
     margin-left: 2em;
+}
+
+div.additional-content li {
+    float: right;
+    display: block;
+    margin-right: 10px;
 }
 
 /* content blocks */
