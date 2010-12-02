@@ -95,9 +95,9 @@
         		<!-- content column -->
         		<div id="content" class="clearingfix">
         			<div class="floatbox">
-
+                       <?php
+                       /*
         				<!-- filters -->
-        				<!--
         				<div class="filters clearingfix">
         					<div style="float:left; width: 100%">
         						<strong><?php echo Kohana::lang('ui_main.filters'); ?></strong>
@@ -114,13 +114,65 @@
         					Event::run('ushahidi_action.map_main_filters');
         					?>
         				</div>
-        				-->
         				<!-- / filters -->
+                        */
+                        ?>
 
         				<?php
         				// Map Blocks
         				echo $div_map;
         				?>
+
+                        <!-- how to report -->
+                        <?php
+                        if (Kohana::config('settings.allow_reports')): ?>
+                        <!-- additional content -->
+                        <div class="additional-content">
+
+                            <h5><?php echo Kohana::lang('ui_main.how_to_report'); ?></h5>
+                            <div style="float: left; margin-left: 120px; margin-top: -26px;">
+                            <ol>
+        					<?php if (!empty($phone_array)): ?>
+                                <li><?php echo Kohana::lang('ui_main.sms').": "; ?>
+                                <?php
+                                foreach ($phone_array as $phone)
+                                {
+                                    echo "<strong>". $phone ."</strong>";
+                                    if ($phone != end($phone_array)) echo " or ";
+                                }
+                                ?>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (!empty($report_email)): ?>
+        					<li><?php echo Kohana::lang('ui_main.email').": "; ?> <a href="mailto:<?php echo $report_email?>"><?php echo $report_email?></a></li>
+                            <?php endif; ?>
+        					
+                            <?php if (!empty($twitter_hashtag_array)): ?>
+                            <li>
+                            <?php echo Kohana::lang('ui_main.twitter').": "; ?>
+                            <?php
+                                foreach ($twitter_hashtag_array as $twitter_hashtag)
+                                {
+                                    echo "<strong>". $twitter_hashtag ."</strong>";
+                                    if ($twitter_hashtag != end($twitter_hashtag_array)) {
+                                        echo " or ";
+                                    }
+                                }
+                            ?>
+                            </li>
+                            <?php endif; ?>
+
+                            <li><a href="<?php echo url::site() . 'reports/submit/'; ?>"><?php echo Kohana::lang('ui_main.report_option_4'); ?></a></li>
+        				</ol>
+                            </div>
+
+                    </div>
+                    <!-- /additional content -->
+                    
+                    <?php endif; ?>
+                    <!-- /how to report -->
+
         			</div>
         		</div>
         		<!-- / content column -->
