@@ -14,7 +14,7 @@
  * @license	   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 
-class Reports_Controller extends Main_Controller {
+class Reports_Controller extends Frontend_Controller {
 
 	var $logged_in;
 

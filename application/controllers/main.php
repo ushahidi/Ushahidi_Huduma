@@ -12,92 +12,28 @@
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
-class Main_Controller extends Template_Controller {
-
-	public $auto_render = TRUE;
-
-    // Main template
-	public $template = 'layout';
-
-    // Cache instance
-	protected $cache;
-
-	// Cacheable Controller
-	public $is_cachable = FALSE;
-
-	// Session instance
-	protected $session;
-
-	// Table Prefix
-	protected $table_prefix;
-
-	// Themes Helper
-	protected $themes;
+class Main_Controller extends Frontend_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
 
-        // Load cache
-		$this->cache = new Cache;
-
-		// Load Session
-		$this->session = Session::instance();
-
-        // Load Header & Footer
-		$this->template->header  = new View('header');
-		$this->template->footer  = new View('footer');
-
-		// Themes Helper
-		$this->themes = new Themes();
-		$this->themes->api_url = Kohana::config('settings.api_url');
-		$this->template->header->submit_btn = $this->themes->submit_btn();
-		$this->template->header->languages = $this->themes->languages();
-		$this->template->header->search = $this->themes->search();
-
-		// Set Table Prefix
-		$this->table_prefix = Kohana::config('database.default.table_prefix');
-
-		// Retrieve Default Settings
-		$site_name = Kohana::config('settings.site_name');
-			// Prevent Site Name From Breaking up if its too long
-			// by reducing the size of the font
-			if (strlen($site_name) > 20)
-			{
-				$site_name_style = " style=\"font-size:21px;\"";
-			}
-			else
-			{
-				$site_name_style = "";
-			}
-		$this->template->header->site_name = $site_name;
-		$this->template->header->site_name_style = $site_name_style;
-		$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
-
-		$this->template->header->this_page = "";
-
-		// Google Analytics
-		$google_analytics = Kohana::config('settings.google_analytics');
-		$this->template->footer->google_analytics = $this->themes->google_analytics($google_analytics);
-
-        // Load profiler
-        // $profiler = new Profiler;
-
-		// Get tracking javascript for stats
-		if(Kohana::config('settings.allow_stat_sharing') == 1){
-			$this->template->footer->ushahidi_stats = Stats_Model::get_javascript();
-		}else{
-			$this->template->footer->ushahidi_stats = '';
-		}
-		
-		// add copyright info
-		$this->template->footer->site_copyright_statement = '';
-		$site_copyright_statement = trim(Kohana::config('settings.site_copyright_statement'));
-		if($site_copyright_statement != '')
+        // Reset the header view for the main page
+		if (! $this->use_default_header)
 		{
-			$this->template->footer->site_copyright_statement = $site_copyright_statement;
+			$this->template->header = new View('header_main');
+
+			// Themes Helper
+			$this->themes = new Themes();
+			$this->themes->api_url = Kohana::config('settings.api_url');
+			$this->template->header->submit_btn = $this->themes->submit_btn();
+			$this->template->header->languages = $this->themes->languages();
+			$this->template->header->search = $this->themes->search();
+
+			$this->template->header->site_name = $this->site_name;
+			$this->template->header->site_name_style = $this->site_name_style;
+			$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
 		}
-		
 	}
 
     public function index()
@@ -111,12 +47,21 @@ class Main_Controller extends Template_Controller {
 		// Map and Slider Blocks
 		$div_map = new View('main_map');
 		$div_timeline = new View('main_timeline');
-			// Filter::map_main - Modify Main Map Block
-			Event::run('ushahidi_filter.map_main', $div_map);
-			// Filter::map_timeline - Modify Main Map Block
-			Event::run('ushahidi_filter.map_timeline', $div_timeline);
-		$this->template->content->div_map = $div_map;
+
+		// Filter::map_main - Modify Main Map Block
+		Event::run('ushahidi_filter.map_main', $div_map);
+
+		// Filter::map_timeline - Modify Main Map Block
+		Event::run('ushahidi_filter.map_timeline', $div_timeline);
+
+		$this->template->header->div_map = $div_map;
 		$this->template->content->div_timeline = $div_timeline;
+
+		// Render the twitter widget
+		if (! $this->use_default_header)
+		{
+			$this->template->content->twitter_view = new View('twitter');
+		}
 
 		// Check if there is a site message
 		$this->template->content->site_message = '';
@@ -201,12 +146,17 @@ class Main_Controller extends Template_Controller {
 				}
 			}
 		}
-		$this->template->content->categories = $parent_categories;
+
+		// Display the categories -
+		$this->template->header->categories = $parent_categories;
+		//$this->template->content->categories = $parent_categories;
 
 		// Get all active Layers (KMZ/KML)
 		$layers = array();
 		$config_layers = Kohana::config('map.layers'); // use config/map layers if set
-		if ($config_layers == $layers) {
+
+		if ($config_layers == $layers)
+        {
 			foreach (ORM::factory('layer')
 					  ->where('layer_visible', 1)
 					  ->find_all() as $layer)
@@ -214,9 +164,12 @@ class Main_Controller extends Template_Controller {
 				$layers[$layer->id] = array($layer->layer_name, $layer->layer_color,
 					$layer->layer_url, $layer->layer_file);
 			}
-		} else {
+		}
+		else
+		{
 			$layers = $config_layers;
 		}
+		
 		$this->template->content->layers = $layers;
 
 		// Get all active Shares
@@ -241,6 +194,7 @@ class Main_Controller extends Template_Controller {
 			->find_all();
 
 		// Get Default Color
+		$this->template->header->default_map_all = Kohana::config('settings.default_map_all');
 		$this->template->content->default_map_all = Kohana::config('settings.default_map_all');
 
 		// Get Twitter Hashtags

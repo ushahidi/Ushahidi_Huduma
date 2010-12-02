@@ -13,7 +13,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
-class Alerts_Controller extends Main_Controller {
+class Alerts_Controller extends Frontend_Controller {
     const MOBILE_ALERT = 1;
     const EMAIL_ALERT = 2;    
 

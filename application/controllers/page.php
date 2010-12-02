@@ -13,7 +13,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 
-class Page_Controller extends Main_Controller {
+class Page_Controller extends Frontend_Controller {
 
     function __construct()
     {
