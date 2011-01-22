@@ -62,6 +62,9 @@ class admin_Core {
 					'manage' => Kohana::lang('ui_admin.manage'),
 					'users' => Kohana::lang('ui_admin.users')
 				);
+
+			Event::run('ushahidi_action.nav_main_right_tabs',$main_right_tabs);
+
 			}
 			elseif ($auth AND $auth->logged_in('admin'))
 			{
