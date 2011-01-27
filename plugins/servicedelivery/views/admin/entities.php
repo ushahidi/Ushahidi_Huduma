@@ -15,24 +15,23 @@
  ?>
             <div class="bg">
                 <h2>
-                    <?php navigator::subtabs('serviceproviders'); ?>
+                    <?php navigator::subtabs('entities'); ?>
                 </h2>
 
                 <!-- tabs -->
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders" class="active"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit"><?php echo Kohana::lang('ui_servicedelivery.add_edit_provider');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/officers"><?php echo Kohana::lang('ui_servicedelivery.officers');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit_officer"><?php echo Kohana::lang('ui_servicedelivery.add_edit_officer');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/staticentity"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/staticentity/entities" class="active"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/staticentity/entity"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
                     </ul>
                     <!-- /tabset -->
 
             		<div class="tab">
             			<ul>
-            				<li><a href="#" onclick="serviceProviderAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
-            				<li><a href="#" onclick="serviceProviderAction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
+            				<li><a href="#" onclick="entityAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
+            				<li><a href="#" onclick="entityaction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
             			</ul>
             		</div>
                 </div>
@@ -54,21 +53,22 @@
             			</h3>
             		</div>
             	<?php endif; ?>
-                
+
             	<!-- report-table -->
                 <div class="report-form">
-                    <?php print form::open(NULL, array('id' => 'serviceProviderMain', 'name' => 'serviceProviderMain')); ?>
+                    <?php print form::open(NULL, array('id' => 'entityListMain', 'name' => 'entityListMain')); ?>
                         <input type="hidden" name="action" id="action" value="" />
-                        <input type="hidden" name="service_provider_id[]" id="service_provider_single" value="" />
+                        <input type="hidden" name="static_entity_id[]" id="static_entity_single" value="" />
 
                         <div class="table-holder">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th class="col-1">
-                                        <input id="checkAllServiceProviders" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'service_provider_id[]' )" /></th>
-                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.service_provider');?></th>
-                                        <th class="col-4"><?php echo Kohana::lang('ui_admin.actions');?></th>
+                                            <input id="checkAllEntities" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'static_entity_id[]' )" />
+                                        </th>
+                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.entity_name');?></th>
+                                        <th class="col-3"><?php echo Kohana::lang('ui_admin.actions');?></th>
                                     </tr>
                                 </thead>
 
@@ -92,33 +92,34 @@
                                 <?php endif; ?>
 
                                 <?php
-                                    foreach ($service_providers as $service_provider)
+                                    foreach ($entities as $entity)
                                     {
-                                        $service_provider_id = $service_provider->id;
-                                        $provider_name = $service_provider->provider_name;
-                                        $description = $service_provider->description;
+                                        // Fetch properties
+                                        $static_entity_id = $entity->id;
+                                        $entity_name = $entity_name;
+                                        $latitude = $entity->latitude;
+                                        $longitude = $entity->longitude;
                                     ?>
                                         <tr>
                                             <td class="col-1">
-                                                <input name="service_provider_id[]" id="service_provider" value="<?php echo $service_provider_id; ?>" type="checkbox" class="check-box"/>
+                                                <input name="static_entity_id[]" id="static_entity" value="<?php echo $static_entity_id; ?>" type="checkbox" class="check-box"/>
                                             </td>
 
                                             <td class="col-2">
-                                                <?php echo $provider_name; ?>
-                                                <div><?php echo $description; ?></div>
+                                                <?php echo $entity_name; ?>
                                             </td>
 
-                                            <td class="col-4">
+                                            <td class="col-3">
 
                                                 <!-- actions -->
                                                 <ul>
                                                     <li class="none-separator">
-                                                        <a href="<?php echo url::site().'admin/serviceproviders/edit/'.$service_provider_id ?>">
+                                                        <a href="<?php echo url::site().'admin/staticentity/edntity/'.$static_entity_id ?>">
                                                             <?php echo strtoupper(Kohana::lang('ui_admin.edit_action')); ?>
                                                         </a>
                                                     </li>
                                                     <li class="none-separator">
-                                                        <a href="#" class="del" onclick="serviceProviderAction('d','DELETE', '<?php echo $service_provider_id; ?>');">
+                                                        <a href="#" class="del" onclick="entityAction('d','DELETE', '<?php echo $static_entity_id; ?>');">
                                                             <?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?>
                                                         </a>
                                                     </li>

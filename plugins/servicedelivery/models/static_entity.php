@@ -20,8 +20,6 @@ class Static_Entity_Model extends ORM {
     // Relationships
     protected $belongs_to = array('static_entity_type');
 
-    protected $has_many = array('static_entity_metadata');
-
     /**
      * Gets the list of static entities for the entity type specified in @param $type_id
      * @param int $type_id
@@ -29,7 +27,7 @@ class Static_Entity_Model extends ORM {
     public static function entities($type_id)
     {
         return ORM::factory('static_entity')
-                        ->where('static_entity_type_id', $type_id)
-                        ->find_all();
+                        ->where('static_entity_type_id', $type_id);
+//                        ->find_all();
     }
 }

@@ -24,25 +24,21 @@ class navigator_Core {
         // To hold the menus for service delivery
         $menu = "";
 
-        // Service provider list
+        // Administrative boundaries
+        $menu .= ($this_sub_page == "boundaries")
+            ? Kohana::lang('ui_servicedelivery.boundaries')
+            : "<a href=\"".url::site()."admin/boundaries\">".Kohana::lang('ui_servicedelivery.boundaries')."</a>";
+
+        // Service Providers
         $menu .= ($this_sub_page == "serviceproviders")
             ? Kohana::lang('ui_servicedelivery.serviceproviders')
             : "<a href=\"".url::site()."admin/serviceproviders\">".Kohana::lang('ui_servicedelivery.serviceproviders')."</a>";
 
-        // Add/Edit service provider
-        $menu .= ($this_sub_page == "createprovider")
-            ? Kohana::lang('ui_servicedelivery.add_edit_provider')
-            : "<a href=\"".url::site()."admin/serviceproviders/edit\">".Kohana::lang('ui_servicedelivery.add_edit_provider')."</a>";
 
-        // Static Entity list
-        $menu .= ($this_sub_page == "entitytypes")
-            ? Kohana::lang("ui_servicedelivery.entitytypes")
-            : "<a href=\"".url::site()."admin/staticentity\">".Kohana::lang('ui_servicedelivery.entitytypes')."</a>";
-
-        // Add/Edit Static Entities
+        // Static Entities
         $menu .= ($this_sub_page == "entities")
-            ? Kohana::lang("ui_servicedelivery.add_edit_entity")
-            : "<a href=\"".url::site()."admin/staticentity/edit\">".Kohana::lang('ui_servicedelivery.add_edit_entity')."</a>";
+            ? Kohana::lang("ui_servicedelivery.entities")
+            : "<a href=\"".url::site()."admin/staticentity\">".Kohana::lang('ui_servicedelivery.entities')."</a>";
 
         // Output the menu
         echo $menu;

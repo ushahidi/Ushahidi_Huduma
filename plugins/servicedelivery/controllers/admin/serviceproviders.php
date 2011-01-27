@@ -15,10 +15,6 @@
  */
 class Serviceproviders_Controller extends Admin_Controller {
 
-//    public function __construct()
-//    {
-//    }
-
     public function index()
     {
         $this->template->content = new View('admin/serviceproviders');
@@ -79,7 +75,8 @@ class Serviceproviders_Controller extends Admin_Controller {
         ));
         
         // Get all the service providers
-        $service_providers = ORM::factory('service_provider')->find_all();
+        $service_providers = ORM::factory('service_provider')
+                                ->find_all((int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
 
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_error = $form_error;
@@ -91,7 +88,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         $this->template->content->total_items = $pagination->total_items;
 
         // Javascript header
-        $this->tempalte->js = new View("admin/serviceproviders_js");
+        $this->tempalte->js = new View("js/serviceproviders_js");
     }
 
 
@@ -111,7 +108,7 @@ class Serviceproviders_Controller extends Admin_Controller {
             'description' => '',
             'category_id' => '',
             'parent_id' => '',
-            'administrative_boundary_id' => ''
+            'boundary_id' => ''
         );
 
         // Copy the form as errors so that the errors are stored with the keys corresponding to the form fields names
@@ -139,7 +136,7 @@ class Serviceproviders_Controller extends Admin_Controller {
             // Add callbacks to check existence of parent ids
             $post->add_callbacks('parent_id', array($this, 'parent_id_check'));
             $post->add_callbacks('category_id', array($this, 'category_id_check'));
-            $post->add_callbacks('administrative_boundary_id', array($this, 'administrative_boundary_id_check'));
+            $post->add_callbacks('boundary_id', array($this, 'boundary_id_check'));
 
             // Check if the validation rules have held up
             if ($post->validate())
@@ -151,7 +148,7 @@ class Serviceproviders_Controller extends Admin_Controller {
                 $service_provider->description = $post->description;
                 $service_provider->category_id = $post->$category_id;
                 $service_provider->parent_id = $post->parent_id;
-                $service_provider->administrative_boundary_id = $post->administrative_boundary_id;
+                $service_provider->boundary_id = $post->boundary_id;
                 $service_provider->creation_date = date("Y-m-d H:i:s");
 
                 // Save to the database
@@ -193,7 +190,7 @@ class Serviceproviders_Controller extends Admin_Controller {
                             ->select_list('id', 'category_title');
 
         // List of administrative boundaries
-        $admin_boundaries = ORM::factory('administrative_boundary')
+        $admin_boundaries = ORM::factory('boundary')
                                 ->select_list('id', 'boundary_name');
 
         $service_provider_list[0] =  "-- Top Level Service Provider ---";
@@ -212,7 +209,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         $this->template->content->administrative_boundaries = $admin_boundaries;
 
         // Javascript header
-        $this->template->js = new View('admin/serviceprovider_edit_js');
+        $this->template->js = new View('js/serviceprovider_edit_js');
     }
 
     /**
@@ -319,7 +316,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         $this->template->content->total_items = $pagination->total_items;
 
         // Javascript header
-        $this->template->js = new View("admin/serviceprovider_officers_js");
+        $this->template->js = new View("js/serviceprovider_officers_js");
     }
 
     /**
@@ -394,7 +391,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         $pagination = new Pagination(array(
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => Service_Provider_Model::tickets($service_provider_id, $ticket_status)->find_all()->count_all()
+            'total_items' => Service_Provider_Model::tickets($service_provider_id, $ticket_status)->count_all()
         ));
 
         // Get the tickets for the service provider
@@ -475,18 +472,18 @@ class Serviceproviders_Controller extends Admin_Controller {
      * 
      * @param Validation $post
      */
-    public function administrative_boundary_id_check(Validation $post)
+    public function boundary_id_check(Validation $post)
     {
         // Check if a validation error for the admin boundary exists
         if (array_key_exists('administrative_boundary_id', $post->errors()))
             return;
 
         // Check if the specified admin boundary exists
-        $boundary_exists = ORM::factory('administrative_boundary', $post->administrative_boundary_id)->loaded;
+        $boundary_exists = ORM::factory('boundary', $post->boundary_id)->loaded;
 
         if ( ! $boundary_exists)
         {
-            $post->add_error('administrative_boundary_id', 'Invalid administrative boundary');
+            $post->add_error('boundary_id', 'Invalid administrative boundary');
         }
     }
         

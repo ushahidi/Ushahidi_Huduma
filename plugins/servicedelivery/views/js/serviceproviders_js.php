@@ -24,7 +24,7 @@
 		var statusMessage;
 		if( !isChecked( "service_provider" ) && service_provider_id =='' )
 		{
-			alert('Please select at least one api log.');
+			alert('Please select at least one service provider.');
 		} else {
 			var answer = confirm('<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> ' + confirmAction + '?')
 			if (answer){

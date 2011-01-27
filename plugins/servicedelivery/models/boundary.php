@@ -13,9 +13,9 @@
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
-class Administrative_Boundary_Model extends ORM {
+class Boundary_Model extends ORM {
     // Table name
-    protected $table_name = 'administrative_boundary';
+    protected $table_name = 'boundary';
 
     // Relationships
     protected $belongs_to = array('boundary_type');

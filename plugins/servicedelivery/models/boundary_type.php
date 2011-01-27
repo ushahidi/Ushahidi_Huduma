@@ -18,6 +18,6 @@ class Boundary_Type_Model extends ORM {
     protected $table_name = 'boundary_type';
 
     // Relationships
-    protected $has_many = array('administrative_boundary');
+    protected $has_many = array('boundary');
 }
 ?>

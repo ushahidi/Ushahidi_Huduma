@@ -17,6 +17,6 @@ class Static_Entity_Type_Model extends ORM {
     protected $table_name = 'static_entity_type';
 
     // Relationships
-    protected $has_many  = array('static_entity', 'static_entity_type_metadata');
+    protected $has_many  = array('static_entity');
 
 }

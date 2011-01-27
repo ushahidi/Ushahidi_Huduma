@@ -6,8 +6,8 @@
  * Table boundary_type
  */
 CREATE TABLE IF NOT EXISTS `boundary_type` (
-  `id` INT NOT NULL ,
-  `type_name` VARCHAR(45) NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `boundary_type_name` VARCHAR(45) NOT NULL ,
   `parent_id` INT NOT NULL DEFAULT 0 ,
   `creation_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`)
@@ -16,14 +16,14 @@ CREATE TABLE IF NOT EXISTS `boundary_type` (
 --
 -- Table adminstrative_boundary
 --
-CREATE TABLE IF NOT EXISTS `administrative_boundary` (
-  `id` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `boundary` (
+  `id` INT NOT NULL AUTO_INCREMENT,
   `boundary_name` VARCHAR(45) NOT NULL ,
   `boundary_type_id` INT NOT NULL ,
   `creation_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`) ,
-  INDEX `administrative_boundary_fk1` (`boundary_type_id` ASC) ,
-  CONSTRAINT `administrative_boundary_fk1` FOREIGN KEY (`boundary_type_id` ) REFERENCES `boundary_type` (`id` )
+  INDEX `boundary_fk1` (`boundary_type_id` ASC) ,
+  CONSTRAINT `boundary_fk1` FOREIGN KEY (`boundary_type_id` ) REFERENCES `boundary_type` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) COMMENT = 'List of administrative boundaries (specific names of the various admin boundaries)';
@@ -32,12 +32,12 @@ CREATE TABLE IF NOT EXISTS `administrative_boundary` (
 -- Table service_provider
 --
 CREATE  TABLE IF NOT EXISTS `service_provider` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `provider_name` VARCHAR(50) NOT NULL ,
   `description` VARCHAR(200) NULL ,
   `category_id` INT NOT NULL ,
   `parent_id` INT NOT NULL DEFAULT 0 ,
-  `administrative_boundary_id` INT NULL ,
+  `boundary_id` INT NULL ,
   `creation_date` DATETIME NOT NULL ,
   PRIMARY KEY (`id`)
 ) COMMENT = 'Groups for the monitors responsible for attending to tickets';
@@ -46,7 +46,7 @@ CREATE  TABLE IF NOT EXISTS `service_provider` (
 -- Table service_provider_officer
 --
 CREATE  TABLE IF NOT EXISTS `service_provider_officer` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL ,
   `full_name` VARCHAR(100) NOT NULL ,
   `email_address` VARCHAR(45) NOT NULL ,
@@ -63,7 +63,7 @@ CREATE  TABLE IF NOT EXISTS `service_provider_officer` (
 -- Table static_entity_type
 --
 CREATE  TABLE IF NOT EXISTS `static_entity_type` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `category_id` INT NOT NULL ,
   `type_name` VARCHAR(50) NOT NULL ,
   `entity_type_color` VARCHAR(15) NOT NULL ,
@@ -77,26 +77,25 @@ CREATE  TABLE IF NOT EXISTS `static_entity_type` (
 -- Table static_entity
 --
 CREATE  TABLE IF NOT EXISTS `static_entity` (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `static_entity_type_id` INT NOT NULL ,
-  `administrative_boundary_id` INT NOT NULL ,
+  `boundary_id` INT NOT NULL ,
   `entity_name` VARCHAR(45) NOT NULL ,
-  `admin_boundary_id` INT NOT NULL ,
   `latitude` DOUBLE NOT NULL ,
   `longitude` DOUBLE NOT NULL ,
   `metadata` TEXT NULL ,
   `creation_date` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `static_entity_fk1` (`static_entity_type_id` ASC) ,
-  INDEX `static_entity_fk2` (`administrative_boundary_id` ASC) ,
+  INDEX `static_entity_fk2` (`boundary_id` ASC) ,
   CONSTRAINT `static_entity_fk1`
     FOREIGN KEY (`static_entity_type_id` )
     REFERENCES `static_entity_type` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `static_entity_fk2`
-    FOREIGN KEY (`administrative_boundary_id` )
-    REFERENCES `administrative_boundary` (`id` )
+    FOREIGN KEY (`boundary_id` )
+    REFERENCES `boundary` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) COMMENT = 'List of static entities';

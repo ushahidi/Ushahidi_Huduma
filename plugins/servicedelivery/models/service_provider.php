@@ -21,7 +21,7 @@ class Service_Provider_Model extends ORM {
     // Relationships
     protected $has_many = array('service_provider_officer');
     
-    protected $belongs_to = array('administrative_boundary');
+    protected $belongs_to = array('boundary');
     
     /**
      * Helper method for fetching the tickets with status @param $ticket_status for the service provider specified in @param $service_provider_id

@@ -4,14 +4,19 @@
  */
  $lang = array(
      // Boundaries
-     'administrative_boundary'  => 'Administrative Boundary',
+     'boundary'  => 'Administrative Boundary',
      'boundaries'               => 'Administrative Boundaries',
-     'boundarytypes'            => 'Boundary Types',
+     'boundary_name'            => 'Boundary Name',
+     'boundary_type'            => 'Boundary Type',
+     'boundary_types'           => 'Boundary Types',
+     'boundary_type_name'       => 'Boundary Type Name',
 
      // Static Entities
      'entity'                   => 'Entity',
      'entities'                 => 'Static Entities',
-     'entitytypes'              => 'Static Entity Types',
+     'entity_name'              => 'Entity Name',
+     'entity_type'              => 'Entity Type',
+     'entity_types'             => 'Static Entity Types',
      'entity_type_name'         => 'Entity Type Name',
      'add_edit_entity'          => 'Add/Edit Entities',
 
@@ -28,8 +33,10 @@
      'new_provider'             => 'New Service Provider',
      'edit_provider'            => 'Edit Service Provider',
      'delete_provider'          => 'Delete Service Provider',
-     'add_edit_provider'          => 'Add/Edit Providers'
+     'add_edit_provider'        => 'Add/Edit Providers',
+     'add_edit_officer'         => 'Add/Edit Officers',
 
-     // Service Delivery plugin menus
+     // Miscellaneous
+     'parent_boundary_type'          => 'Parent Boundary Type'
  );
 ?>
