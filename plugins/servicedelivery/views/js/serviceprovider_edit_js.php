@@ -16,26 +16,26 @@
  */
 ?>
         $(document).ready(function() {
+        
+            /* Form Actions */
+            // Action on Save Only
+            $('.btn_save').live('click', function () {
+                $("#save").attr("value", "1");
+                $(this).parents("form").submit();
+                return false;
+            });
 
-			/* Form Actions */
-			// Action on Save Only
-			$('.btn_save').live('click', function () {
-				$("#save").attr("value", "1");
-				$(this).parents("form").submit();
-				return false;
-			});
+            $('.btn_save_close').live('click', function () {
+                $(this).parents("form").submit();
+                return false;
+            });
 
-			$('.btn_save_close').live('click', function () {
-				$(this).parents("form").submit();
-				return false;
-			});
-
-			// Delete Action
-			$('.btn_delete').live('click', function () {
-				var agree=confirm("<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> <?php echo Kohana::lang('ui_admin.delete_action'); ?>?");
-				if (agree){
-					$('#reportMain').submit();
-				}
-				return false;
-			});
+            // Delete Action
+            $('.btn_delete').live('click', function () {
+                var agree=confirm("<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> <?php echo Kohana::lang('ui_admin.delete_action'); ?>?");
+                if (agree){
+                    $('#reportMain').submit();
+                }
+                return false;
+            });
         });

@@ -42,7 +42,7 @@ class servicedelivery
         $main_right_tabs = Event::$data;
 
         // Generate the menu string
-        $main_right_tabs = arr::merge($main_right_tabs, array('serviceproviders' => Kohana::lang('ui_servicedelivery.servicedelivery')));
+        $main_right_tabs = arr::merge($main_right_tabs, array('boundaries' => Kohana::lang('ui_servicedelivery.servicedelivery')));
         
         // Set the event data
         Event::$data = $main_right_tabs;

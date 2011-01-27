@@ -18,35 +18,33 @@
                     <?php navigator::subtabs('serviceproviders'); ?>
                 </h2>
 
-                <!-- tabs -->
-                <div class="tabs">
-                    <!-- tabset -->
-                    <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_provider');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/officers"><?php echo Kohana::lang('ui_servicedelivery.officers');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit_officer"><?php echo Kohana::lang('ui_servicedelivery.add_edit_officer');?></a></li>
-                    </ul>
-                    <!-- /tabset -->
-
-                    <div class="tab">
-                        <ul>
-                            <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_provider'));?></a></li>
-                            <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
-
-                            <?php if($service_provider_id): ?>
-                                <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_provider')) ?></a></li>
-                            <?php endif; ?>
-
-                            <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /tabs -->
-
                 <?php print form::open(NULL, array('id'=>'serviceProviderForm', 'name'=>'serviceProviderName')); ?>
                     <input type="hidden" name="save" id="save" value="" />
                     <input type="hidden" name="action" value="a" />
+                    
+                    <!-- tabs -->
+                    <div class="tabs">
+                        <!-- tabset -->
+                        <ul class="tabset">
+                            <li><a href="<?php echo url::site() ?>admin/serviceproviders"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_provider');?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/serviceproviders/officers"><?php echo Kohana::lang('ui_servicedelivery.officers');?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/serviceproviders/edit_officer"><?php echo Kohana::lang('ui_servicedelivery.add_edit_officer');?></a></li>
+                        </ul>
+                        <!-- /tabset -->
+
+                        <div class="tab">
+                            <ul>
+                                <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_provider'));?></a></li>
+                                <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
+                                <?php if($service_provider_id): ?>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_provider')) ?></a></li>
+                                <?php endif; ?>
+                                <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
+                            </ul>
+    \                    </div>
+                    </div>
+                    <!-- /tabs -->
                     
                     <!-- service provider form -->
                     <div class="report-form">
@@ -55,9 +53,12 @@
                             <div class="red-box">
                                 <h3><?php echo Kohana::lang('ui_main.error'); ?></h3>
                                 <ul>
-                                 <?php foreach($errors as $error_item => $description): ?>
-                                    <li><?php echo $description; ?></li>
-                                 <?php endforeach; ?>
+                                 <?php 
+                                 foreach($errors as $error_item => $description)
+                                 {
+                                   print (!$description)? "" : "<li>".$description."</li>";
+                                 }
+                                 ?>
                                 </ul>
                             </div>
                         <?php endif; ?>
@@ -70,7 +71,7 @@
                         <?php endif; ?>
 
                         <!-- column -->
-                        <div class="sms_holder">
+                        <div class="f-col">
                             <div class="row">
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.provider_name'); ?></h4>
                                 <?php print form::input('provider_name', $form['provider_name'], ' class="text long2"'); ?>

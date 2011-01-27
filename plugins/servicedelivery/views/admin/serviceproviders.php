@@ -114,12 +114,12 @@
                                                 <ul>
                                                     <li class="none-separator">
                                                         <a href="<?php echo url::site().'admin/serviceproviders/edit/'.$service_provider_id ?>">
-                                                            <?php echo strtoupper(Kohana::lang('ui_admin.edit_action')); ?>
+                                                            <?php echo Kohana::lang('ui_admin.edit_action'); ?>
                                                         </a>
                                                     </li>
                                                     <li class="none-separator">
                                                         <a href="#" class="del" onclick="serviceProviderAction('d','DELETE', '<?php echo $service_provider_id; ?>');">
-                                                            <?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?>
+                                                            <?php echo Kohana::lang('ui_admin.delete_action') ;?>
                                                         </a>
                                                     </li>
                                                 </ul>

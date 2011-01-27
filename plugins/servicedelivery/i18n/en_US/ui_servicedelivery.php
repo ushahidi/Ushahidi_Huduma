@@ -19,6 +19,7 @@
      'entity_types'             => 'Static Entity Types',
      'entity_type_name'         => 'Entity Type Name',
      'add_edit_entity'          => 'Add/Edit Entities',
+     'entity_location'          => 'Entity Location',
 
      'metadata'                 => 'Metadata',
      'officers'                 => 'Officers',
@@ -31,10 +32,12 @@
      // Actions
      'save_provider'            => 'Save Provider',
      'new_provider'             => 'New Service Provider',
-     'edit_provider'            => 'Edit Service Provider',
-     'delete_provider'          => 'Delete Service Provider',
+     'edit_provider'            => 'Edit Provider',
+     'delete_provider'          => 'Delete Provider',
      'add_edit_provider'        => 'Add/Edit Providers',
      'add_edit_officer'         => 'Add/Edit Officers',
+     'save_entity'              => 'Save Entity',
+     'delete_entity'            => 'Delete Entity',
 
      // Miscellaneous
      'parent_boundary_type'          => 'Parent Boundary Type'

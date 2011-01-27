@@ -18,35 +18,34 @@
                     <?php navigator::subtabs('entities'); ?>
                 </h2>
 
-                <!-- tabs -->
-                <div class="tabs">
-                    <!-- tabset -->
-                    <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/staticentity"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/entities"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
-                    </ul>
-                    <!-- /tabset -->
-                    
-                    <div class="tab">
-                        <ul>
-                            <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_provider'));?></a></li>
-                            <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
-
-                            <?php if($static_entity_id): ?>
-                                <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_provider')) ?></a></li>
-                            <?php endif; ?>
-
-                            <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
-                        </ul>
-                    </div>
-
-                </div>
-                <!-- /tabs -->
-
                 <?php print form::open(NULL, array('id'=>'serviceProviderForm', 'name'=>'serviceProviderName')); ?>
                     <input type="hidden" name="save" id="save" value="" />
                     <input type="hidden" name="action" value="a" />
+                    
+                    <!-- tabs -->
+                    <div class="tabs">
+                        <!-- tabset -->
+                        <ul class="tabset">
+                            <li><a href="<?php echo url::site() ?>admin/staticentity"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/staticentity/entities"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/staticentity/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
+                        </ul>
+                        <!-- /tabset -->
+
+                        <div class="tab">
+                            <ul>
+                                <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_entity'));?></a></li>
+                                <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
+
+                                <?php if($static_entity_id): ?>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.delete_entity')) ?></a></li>
+                                <?php endif; ?>
+
+                                <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /tabs -->
                     
                     <!-- service provider form -->
                     <div class="report-form">
@@ -55,9 +54,12 @@
                             <div class="red-box">
                                 <h3><?php echo Kohana::lang('ui_main.error'); ?></h3>
                                 <ul>
-                                 <?php foreach($errors as $error_item => $description): ?>
-                                    <li><?php echo $description; ?></li>
-                                 <?php endforeach; ?>
+                                 <?php 
+                                 foreach($errors as $error_item => $description)
+                                 {
+                                     print (!$description)? "" : "<li>".$description."</li>";
+                                 }
+                                 ?>
                                 </ul>
                             </div>
                         <?php endif; ?>
@@ -70,7 +72,7 @@
                         <?php endif; ?>
 
                         <!-- column -->
-                        <div class="sms_holder">
+                        <div class="f-col">
                             <div class="row">
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.entity_name'); ?></h4>
                                 <?php print form::input('entity_name', $form['entity_name'], ' class="text long2"'); ?>
@@ -88,15 +90,31 @@
                         </div>
                         <!-- /column -->
 
+                        <!-- f-col-1 -->
+                        <div class="f-col-1">
+                            <div class="incident_location">
+                                <h4><?php echo Kohana::lang('ui_servicedelivery.entity_location'); ?></h4>
+                                <div class="location-info">
+                                    <span><?php echo Kohana::lang('ui_main.latitude'); ?></span>
+                                    <?php print form::input('latitude', $form['latitude'], ' class="text"'); ?>
+                                    <span><?php echo Kohana::lang('ui_main.longitude'); ?></span>
+                                    <?php print form::input('longitude', $form['longitude'], ' class="text"'); ?>
+                                </div>
+                                <div style="clear:both"></div>
+                                <div id="divMap" class="map_holder_reports"></div>
+                            </div>
+                        </div>
+                        <!-- /f-col-1 -->
+
                         <div class="simple_border"></div>
                         
                         <div class="btns">
                             <ul>
-                                <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_provider'));?></a></li>
+                                <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_entity'));?></a></li>
                                 <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
 
                                 <?php if($static_entity_id): ?>
-                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_provider')) ?></a></li>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_entity')) ?></a></li>
                                 <?php endif; ?>
 
                                 <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>

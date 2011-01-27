@@ -68,7 +68,7 @@
                                             <input id="checkAllEntities" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'static_entity_id[]' )" />
                                         </th>
                                         <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.entity_name');?></th>
-                                        <th class="col-3"><?php echo Kohana::lang('ui_admin.actions');?></th>
+                                        <th class="col-4"><?php echo Kohana::lang('ui_admin.actions');?></th>
                                     </tr>
                                 </thead>
 
@@ -96,7 +96,7 @@
                                     {
                                         // Fetch properties
                                         $static_entity_id = $entity->id;
-                                        $entity_name = $entity_name;
+                                        $entity_name = $entity->entity_name;
                                         $latitude = $entity->latitude;
                                         $longitude = $entity->longitude;
                                     ?>
@@ -108,19 +108,17 @@
                                             <td class="col-2">
                                                 <?php echo $entity_name; ?>
                                             </td>
-
-                                            <td class="col-3">
-
+                                            <td class="col-4">
                                                 <!-- actions -->
                                                 <ul>
                                                     <li class="none-separator">
-                                                        <a href="<?php echo url::site().'admin/staticentity/edntity/'.$static_entity_id ?>">
-                                                            <?php echo strtoupper(Kohana::lang('ui_admin.edit_action')); ?>
+                                                        <a href="<?php echo url::site().'admin/staticentity/entity/'.$static_entity_id ?>">
+                                                            <?php echo Kohana::lang('ui_admin.edit_action'); ?>
                                                         </a>
                                                     </li>
                                                     <li class="none-separator">
                                                         <a href="#" class="del" onclick="entityAction('d','DELETE', '<?php echo $static_entity_id; ?>');">
-                                                            <?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?>
+                                                            <?php echo Kohana::lang('ui_admin.delete_action') ;?>
                                                         </a>
                                                     </li>
                                                 </ul>

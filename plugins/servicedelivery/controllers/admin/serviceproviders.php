@@ -104,6 +104,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         
         // Set up and initalize form fields
         $form = array(
+            'service_provider_id' => '',
             'provider_name' => '',
             'description' => '',
             'category_id' => '',
@@ -129,9 +130,9 @@ class Serviceproviders_Controller extends Admin_Controller {
             $post->pre_filter('trim', TRUE);
 
             // Validation rules
-            $post->add_rules('provider_name', 'required', 'length[3,50]', 'alpha');
+            $post->add_rules('provider_name', 'required');
             $post->add_rules('category_id', 'required', 'numeric');
-            $post->add_rules('description', 'required', 'length[3,50]', 'alpha');
+            $post->add_rules('description', 'required');
 
             // Add callbacks to check existence of parent ids
             $post->add_callbacks('parent_id', array($this, 'parent_id_check'));
@@ -146,13 +147,18 @@ class Serviceproviders_Controller extends Admin_Controller {
                 // Set the service provider properties
                 $service_provider->provider_name = $post->provider_name;
                 $service_provider->description = $post->description;
-                $service_provider->category_id = $post->$category_id;
+                $service_provider->category_id = $post->category_id;
                 $service_provider->parent_id = $post->parent_id;
                 $service_provider->boundary_id = $post->boundary_id;
                 $service_provider->creation_date = date("Y-m-d H:i:s");
 
                 // Save to the database
                 $service_provider->save();
+
+                $service_provider_id = $service_provider->id;
+
+                // Clear the form values
+                array_fill_keys($form, '');
 
                 // SAVE & CLOSE
                 if ($post->save == 1)   // Save but don't close
@@ -173,15 +179,37 @@ class Serviceproviders_Controller extends Admin_Controller {
                 $form = arr::overwrite($form, $post->as_array());
 
                 // Populate the error fields if any
-                $form_errors = arr::overwrite($errors, $post->errors('edit'));
+                $errors = arr::overwrite($errors, $post->errors('edit'));
 
                 $form_error = TRUE;
+            }
+        }
+        else
+        {
+            // Check if the service provider id has been set, load data
+            if ($service_provider_id)
+            {
+                // Retrieve current service provider
+                $service_provider = ORM::factory('service_provider', $service_provider_id);
+
+                if ($service_provider->loaded == true)
+                {
+                    // Set the form values
+                    $form = array(
+                        'service_provider_id' => $service_provider->id,
+                        'provider_name' => $service_provider->provider_name,
+                        'description' => $service_provider->description,
+                        'category_id' => $service_provider->category_id,
+                        'parent_id' => $service_provider->parent_id,
+                        'boundary_id' => $service_provider->boundary_id
+                    );
+                }
             }
         }
         
         // Get the list of service providers except the one in $service_provider
         $service_provider_list = ORM::factory('service_provider')
-                                    ->where(array('parent_id' => '0', 'id !=', $service_provider_id))
+                                    ->where(array('parent_id' => '0'))
                                     ->select_list('id', 'provider_name');
         
         // Get the list of categories
@@ -441,7 +469,7 @@ class Serviceproviders_Controller extends Admin_Controller {
     public function parent_id_check(Validation $post)
     {
         // Check if a validation error for the parent id already exists
-        if (array_key_exists('parent_id', $post->errors))
+        if (array_key_exists('parent_id', $post->errors()))
             return;
 
         $parent_id = $post->parent_id;
@@ -475,7 +503,10 @@ class Serviceproviders_Controller extends Admin_Controller {
     public function boundary_id_check(Validation $post)
     {
         // Check if a validation error for the admin boundary exists
-        if (array_key_exists('administrative_boundary_id', $post->errors()))
+        if (array_key_exists('boundary_id', $post->errors()))
+            return;
+
+        if ($post->boundary_id == 0)
             return;
 
         // Check if the specified admin boundary exists

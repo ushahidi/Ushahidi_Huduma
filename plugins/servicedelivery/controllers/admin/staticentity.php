@@ -254,12 +254,16 @@ class Staticentity_Controller extends Admin_Controller {
         $pagination = new Pagination(array(
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => Static_Entity_Model::entities($type_id)->count_all()
+            'total_items' => ($type_id)
+                ? Static_Entity_Model::entities($type_id)->count_all()
+                : ORM::factory('static_entity')->count_all()
         ));
 
         // Get the list of entities from the DB
-        $entities = Static_Entity_Model::entities($type_id)->find_all();
-
+        $entities = ($type_id)
+            ? Static_Entity_Model::entities($type_id)->find_all()
+            : ORM::factory('static_entity')->find_all();
+        
         // Set the report variables
         $this->template->content->entities = $entities;
         $this->template->content->pagination = $pagination;
@@ -287,6 +291,7 @@ class Staticentity_Controller extends Admin_Controller {
 
         // Set up and initialize the form fields
         $form = array(
+            'static_entity_id' => '',
             'static_entity_type_id' => '',
             'boundary_id' => '',
             'entity_name' => '',
@@ -303,7 +308,7 @@ class Staticentity_Controller extends Admin_Controller {
         $form_action = "";
 
         // Load the static entity
-        $static_entity = ORM::factory('static_entity', $entity_id);
+        $static_entity = "";
 
         // Check if the form has been submitted
         if ($_POST)
@@ -317,16 +322,17 @@ class Staticentity_Controller extends Admin_Controller {
             // Add the fields to be validated plus callback functions to check existence of foreign keys
             $post->add_rules('static_entity_type_id', 'required', 'numeric');
             $post->add_rules('boundary_id', 'required', 'numeric');
-            $post->add_rules('entity_name', 'required', 'alpha');
+            $post->add_rules('entity_name', 'required');
             $post->add_rules('latitude', 'required', 'numeric');
             $post->add_rules('longitude', 'required', 'numeric');
 
             // Add callbacks
-//            $post->add_callbacks('static_entity_type_id', array($this, 'static_entity_type_id_check'));
-//            $post->add_callbacks('boundary_id', array($this, 'admin_boundary_id_check'));
+            $post->add_callbacks('static_entity_type_id', array($this, 'static_entity_type_id_check'));
+            $post->add_callbacks('boundary_id', array($this, 'admin_boundary_id_check'));
 
             if ($post->validate())
             {
+                $static_entity = new Static_Entity_Model($post->static_entity_id);
                 // Set the properties for the static entity
                 $static_entity->static_entity_type_id = $post->static_entity_type_id;
                 $static_entity->boundary_id = $post->boundary_id;
@@ -362,6 +368,26 @@ class Staticentity_Controller extends Admin_Controller {
                 $form_error = TRUE;
             }
         }
+        else
+        {
+            // Has the entity id been specified, load data
+            if ($entity_id)
+            {
+                $static_entity = ORM::factory('static_entity', $entity_id);
+
+                if ($static_entity->loaded == true)
+                {
+                    // Set the form data
+                    $form = array(
+                        'static_entity_type_id' => $static_entity->id,
+                        'boundary_id' => $static_entity->boundary_id,
+                        'entity_name' => $static_entity->entity_name,
+                        'latitude' => $static_entity->latitude,
+                        'longitude' => $static_entity->longitude
+                    );
+                }
+            }
+        }
 
         // Get the entity types
         $entity_types = ORM::factory('static_entity_type')->select_list('id', 'type_name');
@@ -380,6 +406,23 @@ class Staticentity_Controller extends Admin_Controller {
         $this->template->content->static_entity_id = $entity_id;
 
         // TODO Unpack the metadata on the frontend (view page)
+
+        //Javascript Header
+        $this->template->map_enabled = TRUE;
+        $this->template->js = new View('js/entity_edit_js');
+        $this->template->js->default_map = Kohana::config('settings.default_map');
+        $this->template->js->default_zoom = Kohana::config('settings.default_zoom');
+
+        if (!$form['latitude'] || !$form['latitude'])
+        {
+            $this->template->js->latitude = Kohana::config('settings.default_lat');
+            $this->template->js->longitude = Kohana::config('settings.default_lon');
+        }
+        else
+        {
+            $this->template->js->latitude = $form['latitude'];
+            $this->template->js->longitude = $form['longitude'];
+        }
     }
 
 
