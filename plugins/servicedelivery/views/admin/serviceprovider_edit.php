@@ -89,7 +89,7 @@
 
                                 <label>
                                     <span><h4><?php echo Kohana::lang('ui_servicedelivery.boundary'); ?></h4></span>
-                                    <?php print form::dropdown('boundary_id', $administrative_boundaries, $form['boundary']); ?>
+                                    <?php print form::dropdown('boundary_id', $administrative_boundaries, $form['boundary_id']); ?>
                                 </label>
                             </div>
 
