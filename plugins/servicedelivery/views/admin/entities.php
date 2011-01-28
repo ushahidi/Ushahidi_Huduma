@@ -22,9 +22,9 @@
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/staticentity"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/entities" class="active"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/entity"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities" class="active"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/types"><?php echo Kohana::lang('ui_servicedelivery.entity_types');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/edit"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
                     </ul>
                     <!-- /tabset -->
 
@@ -48,7 +48,7 @@
                 <?php if ($form_saved): ?>
             		<!-- green-box -->
             		<div class="green-box" id="submitStatus">
-            			<h3><?php echo Kohana::lang('ui_admin.service_providers');?> <?php echo $form_action; ?>
+            			<h3><?php echo Kohana::lang('ui_servicedelivery.service_provider');?> <?php echo $form_action; ?>
             			    <a href="#" id="hideMessage" class="hide"><?php echo Kohana::lang('ui_main.hide_this_message');?></a>
             			</h3>
             		</div>
@@ -112,7 +112,7 @@
                                                 <!-- actions -->
                                                 <ul>
                                                     <li class="none-separator">
-                                                        <a href="<?php echo url::site().'admin/staticentity/entity/'.$static_entity_id ?>">
+                                                        <a href="<?php echo url::site().'admin/entities/edit/'.$static_entity_id ?>">
                                                             <?php echo Kohana::lang('ui_admin.edit_action'); ?>
                                                         </a>
                                                     </li>

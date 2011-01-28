@@ -135,7 +135,7 @@ class Serviceproviders_Controller extends Admin_Controller {
             $post->add_rules('description', 'required');
 
             // Add callbacks to check existence of parent ids
-            $post->add_callbacks('parent_id', array($this, 'parent_id_check'));
+//            $post->add_callbacks('parent_id', array($this, 'parent_id_check'));
             $post->add_callbacks('category_id', array($this, 'category_id_check'));
             $post->add_callbacks('boundary_id', array($this, 'boundary_id_check'));
 

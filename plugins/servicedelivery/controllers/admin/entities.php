@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Static Entity controller
+ * Entities Controller
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -8,16 +8,104 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Service Delivery
+ * @module     Entities Controller
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
-class Staticentity_Controller extends Admin_Controller {
+class Entities_Controller extends Admin_Controller {
 
+    /**
+     * Displays the list of static entities for the type specified in @param $type_id
+     *
+     * @param int $type_id
+     */
+    public function index($type_id = FALSE)
+    {
+        // Load the content view for this page
+        $this->template->content = new View("admin/entities");
+
+        // Form submission status flags
+        $form_error = FALSE;
+        $form_saved = FALSE;
+        $form_action = "";
+
+        // Check, has the form been submitted, if so setup validation
+        if ($_POST)
+        {
+            // Set up validation
+            $post = Validation::factory($_POST);
+
+            // Add some filters
+            $post->pre_filter('trim', TRUE);
+
+            // Add some rules, the input field followed by the list of checks, in that order
+            $post->add_rules('action', 'required', 'alpha', 'length[1,1]');
+            $post->add_rules('static_entity_id.*', 'required', 'numeric');
+
+            // Test is the submission passsed the rule checks
+            if ($post->validate())
+            {
+                if ($post->action == 'd')
+                {
+                    // Delete each selected static entity
+                    foreach ($post->static_entity_id as $item)
+                    {
+                        ORM::factory('static_entity')->delete($item);
+                    }
+
+                    // Success
+                    $form_saved = TRUE;
+
+                    // Set the form action
+                    $form_action = Kohana::lang('ui_admin.deleted');
+                }
+            }
+            else // Validation failed
+            {
+                // Repopulate the form fields
+                $form = arr::overwrite($form, $post->as_array());
+
+                // Turn on the form error
+                $form_error = TRUE;
+
+            }
+            //> END validation
+
+        }
+
+        // Set up pagination
+        $pagination = new Pagination(array(
+            'query_string' => 'page',
+            'items_per_page' => (int)Kohana::config('settings.items_per_page_admin'),
+            'total_items' => ($type_id)
+                ? Static_Entity_Model::entities($type_id)->count_all()
+                : ORM::factory('static_entity')->count_all()
+        ));
+
+        // Get the list of entities from the DB
+        $entities = ($type_id)
+            ? Static_Entity_Model::entities($type_id)->find_all()
+            : ORM::factory('static_entity')
+                ->find_all((int)Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
+
+        // Set the report variables
+        $this->template->content->entities = $entities;
+        $this->template->content->pagination = $pagination;
+        $this->template->content->form_error = $form_error;
+        $this->template->content->form_saved = $form_saved;
+        $this->template->content->form_action = $form_action;
+
+        // Total items
+        $this->template->content->total_items = $pagination->total_items;
+
+        // Javascript Header
+        $this->template->js = new View("js/entities_js");
+    }
+    
     /**
      * Displays the list of static entity types
      */
-    public function index()
+    public function types()
     {
         $this->template->content = new View("admin/entity_types");
 
@@ -156,15 +244,14 @@ class Staticentity_Controller extends Admin_Controller {
         // Set up pagination
         $pagination = new Pagination(array(
             'query_string' => 'page',
-            'items_per_page' => Kohana::config('settings.items_per_page_admin'),
+            'items_per_page' => (int)Kohana::config('settings.items_per_page_admin'),
             'total_items' => ORM::factory('static_entity_type')
                                 ->count_all()
         ));
 
         // Get the entity types
-
         $entity_types = ORM::factory('static_entity_type')
-                                ->find_all();
+                                ->find_all((int)Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
 
         // Set the content for the view
         $this->template->content->form = $form;
@@ -192,102 +279,14 @@ class Staticentity_Controller extends Admin_Controller {
 
 
     /**
-     * Displays the list of static entities for the type specified in @param $type_id
-     * 
-     * @param int $type_id
-     */
-    public function entities($type_id = FALSE)
-    {
-        // Load the content view for this page
-        $this->template->content = new View("admin/entities");
-
-        // Form submission status flags
-        $form_error = FALSE;
-        $form_saved = FALSE;
-        $form_action = "";
-
-        // Check, has the form been submitted, if so setup validation
-        if ($_POST)
-        {
-            // Set up validation
-            $post = Validation::factory($_POST);
-
-            // Add some filters
-            $post->pre_filter('trim', TRUE);
-
-            // Add some rules, the input field followed by the list of checks, in that order
-            $post->add_rules('action', 'required', 'alpha', 'length[1,1]');
-            $post->add_rules('static_entity_id.*', 'required', 'numeric');
-
-            // Test is the submission passsed the rule checks
-            if ($post->validate())
-            {
-                if ($post->action == 'd')
-                {
-                    // Delete each selected static entity
-                    foreach ($post->static_entity_id as $item)
-                    {
-                        ORM::factory('static_entity')->delete($item);
-                    }
-
-                    // Success
-                    $form_saved = TRUE;
-
-                    // Set the form action
-                    $form_action = Kohana::lang('ui_admin.deleted');
-                }
-            }
-            else // Validation failed
-            {
-                // Repopulate the form fields
-                $form = arr::overwrite($form, $post->as_array());
-
-                // Turn on the form error
-                $form_error = TRUE;
-
-            }
-            //> END validation
-
-        }
-
-        // Set up pagination
-        $pagination = new Pagination(array(
-            'query_string' => 'page',
-            'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => ($type_id)
-                ? Static_Entity_Model::entities($type_id)->count_all()
-                : ORM::factory('static_entity')->count_all()
-        ));
-
-        // Get the list of entities from the DB
-        $entities = ($type_id)
-            ? Static_Entity_Model::entities($type_id)->find_all()
-            : ORM::factory('static_entity')->find_all();
-        
-        // Set the report variables
-        $this->template->content->entities = $entities;
-        $this->template->content->pagination = $pagination;
-        $this->template->content->form_error = $form_error;
-        $this->template->content->form_saved = $form_saved;
-        $this->template->content->form_action = $form_action;
-
-        // Total items
-        $this->template->content->total_items = $pagination->total_items;
-
-        // Javascript header
-        $this->template->js = new View("js/entities_js");
-
-    }
-
-    /**
      * Loads the page for editing/creating a static entity
      *
      * @param int $type_id
      * @param int $entity_id
      */
-    public function entity($entity_id = FALSE)
+    public function edit($entity_id = FALSE, $saved = FALSE)
     {
-        $this->template->content = new View("admin/staticentity_edit");
+        $this->template->content = new View("admin/entities_edit");
 
         // Set up and initialize the form fields
         $form = array(
@@ -303,7 +302,7 @@ class Staticentity_Controller extends Admin_Controller {
         $errors = $form;
 
         // Form submission status flags
-        $form_saved = FALSE;
+        $form_saved = ($saved == 'saved')? TRUE : FALSE;
         $form_error = FALSE;
         $form_action = "";
 
@@ -325,21 +324,20 @@ class Staticentity_Controller extends Admin_Controller {
             $post->add_rules('entity_name', 'required');
             $post->add_rules('latitude', 'required', 'numeric');
             $post->add_rules('longitude', 'required', 'numeric');
-
+            
             // Add callbacks
             $post->add_callbacks('static_entity_type_id', array($this, 'static_entity_type_id_check'));
-            $post->add_callbacks('boundary_id', array($this, 'admin_boundary_id_check'));
+            $post->add_callbacks('boundary_id', array($this, 'boundary_id_check'));
 
             if ($post->validate())
             {
-                $static_entity = new Static_Entity_Model($post->static_entity_id);
-                // Set the properties for the static entity
+                $static_entity = new Static_Entity_Model($entity_id);
                 $static_entity->static_entity_type_id = $post->static_entity_type_id;
                 $static_entity->boundary_id = $post->boundary_id;
                 $static_entity->entity_name = $post->entity_name;
                 $static_entity->latitude = $post->latitude;
                 $static_entity->longitude = $post->longitude;
-                
+
                 // TODO Ensure that the metadata is propetly encapsulated in a JSON strucutre
                 // before being pushed into the database
 //                $static_entity->metadata = $post->metadata;
@@ -347,14 +345,21 @@ class Staticentity_Controller extends Admin_Controller {
                 // Save the static entity
                 $static_entity->save();
 
-                // Set the $form_saved to TRUE
-                $form_saved = TRUE;
-
-                // Set the value for the save action
-                $form_action = Kohana::lang('ui_admin.added_edited');
+                // Set the entity id
+                $entity_id = $static_entity->id;
 
                 // Empty the form array
                 array_fill_keys($form, '');
+
+                // Save and close?
+                if ($post->save == 1)
+                {
+                    url::redirect('admin/entities/edit/'.$static_entity->id.'/saved');
+                }
+                else
+                {
+                    url::redirect('admin/entities');
+                }
             }
             // Validation failed
             else
@@ -379,7 +384,8 @@ class Staticentity_Controller extends Admin_Controller {
                 {
                     // Set the form data
                     $form = array(
-                        'static_entity_type_id' => $static_entity->id,
+                        'static_entity_id' => $static_entity->id,
+                        'static_entity_type_id' => $static_entity->static_entity_type_id,
                         'boundary_id' => $static_entity->boundary_id,
                         'entity_name' => $static_entity->entity_name,
                         'latitude' => $static_entity->latitude,

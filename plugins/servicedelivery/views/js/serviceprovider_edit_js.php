@@ -34,7 +34,7 @@
             $('.btn_delete').live('click', function () {
                 var agree=confirm("<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> <?php echo Kohana::lang('ui_admin.delete_action'); ?>?");
                 if (agree){
-                    $('#reportMain').submit();
+                    $('#serviceProviderMain').submit();
                 }
                 return false;
             });

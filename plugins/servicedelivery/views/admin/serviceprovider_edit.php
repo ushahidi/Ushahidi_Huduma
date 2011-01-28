@@ -42,7 +42,7 @@
                                 <?php endif; ?>
                                 <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
                             </ul>
-    \                    </div>
+                        </div>
                     </div>
                     <!-- /tabs -->
                     
@@ -54,7 +54,7 @@
                                 <h3><?php echo Kohana::lang('ui_main.error'); ?></h3>
                                 <ul>
                                  <?php 
-                                 foreach($errors as $error_item => $description)
+                                 foreach ($errors as $error_item => $description)
                                  {
                                    print (!$description)? "" : "<li>".$description."</li>";
                                  }
@@ -109,7 +109,7 @@
                                 <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
 
                                 <?php if($service_provider_id): ?>
-                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_provider')) ?></a></li>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.delete_provider')) ?></a></li>
                                 <?php endif; ?>
 
                                 <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>

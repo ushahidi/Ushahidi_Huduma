@@ -18,7 +18,7 @@
                     <?php navigator::subtabs('entities'); ?>
                 </h2>
 
-                <?php print form::open(NULL, array('id'=>'serviceProviderForm', 'name'=>'serviceProviderName')); ?>
+                <?php print form::open(NULL, array('id'=>'entityForm', 'name'=>'entityForm')); ?>
                     <input type="hidden" name="save" id="save" value="" />
                     <input type="hidden" name="action" value="a" />
                     
@@ -26,9 +26,9 @@
                     <div class="tabs">
                         <!-- tabset -->
                         <ul class="tabset">
-                            <li><a href="<?php echo url::site() ?>admin/staticentity"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
-                            <li><a href="<?php echo url::site() ?>admin/staticentity/entities"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
-                            <li><a href="<?php echo url::site() ?>admin/staticentity/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/types"><?php echo Kohana::lang('ui_servicedelivery.entity_types');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
                         </ul>
                         <!-- /tabset -->
 
@@ -67,7 +67,7 @@
                         <?php if ($form_saved): ?>
                             <!-- green-box -->
                             <div class="green-box" id="submitStatus">
-                                <h3><?php echo Kohana::lang('ui_servicedelivery.provider_saved'); ?></h3>
+                                <h3><?php echo Kohana::lang('ui_servicedelivery.entity_saved'); ?></h3>
                             </div>
                         <?php endif; ?>
 
@@ -77,7 +77,6 @@
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.entity_name'); ?></h4>
                                 <?php print form::input('entity_name', $form['entity_name'], ' class="text long2"'); ?>
                             </div>
-
                             <div class="row">
                                 <span><h4><?php echo Kohana::lang('ui_servicedelivery.entity_type'); ?></h4></span>
                                 <?php print form::dropdown('static_entity_type_id', $entity_types, $form['static_entity_type_id']); ?>
@@ -86,13 +85,14 @@
                                 <span><h4><?php echo Kohana::lang('ui_servicedelivery.boundary'); ?></h4></span>
                                 <?php print form::dropdown('boundary_id', $boundaries, $form['boundary_id']); ?>
                             </div>
-
+                            <!-- metadata -->
+                            <!-- /metadata -->
                         </div>
                         <!-- /column -->
 
                         <!-- f-col-1 -->
                         <div class="f-col-1">
-                            <div class="incident_location">
+                            <div class="incident-location">
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.entity_location'); ?></h4>
                                 <div class="location-info">
                                     <span><?php echo Kohana::lang('ui_main.latitude'); ?></span>
@@ -114,7 +114,7 @@
                                 <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
 
                                 <?php if($static_entity_id): ?>
-                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_entity')) ?></a></li>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.delete_entity')) ?></a></li>
                                 <?php endif; ?>
 
                                 <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
@@ -125,7 +125,7 @@
                 <?php
                     if ($static_entity_id)
                     {
-                        print form::open(url::site().'admin/serviceproviders/entities', array('id'=>'servceProviderMain', 'name'=>'serviceProviderMain'));
+                        print form::open(url::site().'admin/entities', array('id'=>'entityMain', 'name'=>'entityMain'));
                         print form::hidden(array('action'=>'d', 'static_entity_id[]'=>$static_entity_id));
                         print form::close();
                     }

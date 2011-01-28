@@ -38,7 +38,7 @@ class navigator_Core {
         // Static Entities
         $menu .= ($this_sub_page == "entities")
             ? Kohana::lang("ui_servicedelivery.entities")
-            : "<a href=\"".url::site()."admin/staticentity\">".Kohana::lang('ui_servicedelivery.entities')."</a>";
+            : "<a href=\"".url::site()."admin/entities\">".Kohana::lang('ui_servicedelivery.entities')."</a>";
 
         // Output the menu
         echo $menu;

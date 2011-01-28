@@ -16,14 +16,6 @@
 
 class Boundaries_Controller extends Admin_Controller {
 
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->template->this_page = 'huduma';
-//
-//    }
-
-
     public function index()
     {
         $this->template->content = new View('admin/boundary');
@@ -156,7 +148,6 @@ class Boundaries_Controller extends Admin_Controller {
     public function types()
     {
         $this->template->content = new View('admin/boundary_type');
-//        $this->template->content->title = 'Boundary Types';
 
         // setup and initialize form field names
         $form = array(

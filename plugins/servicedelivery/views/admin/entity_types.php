@@ -22,9 +22,9 @@
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/staticentity" class="active"><?php echo Kohana::lang('ui_servicedelivery.entity_types'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/entities"><?php echo Kohana::lang('ui_main.show_all');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/staticentity/entity"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/types" class="active"><?php echo Kohana::lang('ui_servicedelivery.entity_types');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/entities/edit"><?php echo Kohana::lang('ui_servicedelivery.add_edit_entity');?></a></li>
                     </ul>
                     <!-- /tabset -->
                     
@@ -163,7 +163,7 @@
 					</ul>
 					<!-- tab -->
 					<div class="tab">
-						<?php print form::open(NULL, array('id' => 'entityTypeMain', 'name' => 'entityTypeMain')); ?>
+						<?php print form::open(NULL, array('enctype' =>'multipart/form-data', 'id' => 'entityTypeMain', 'name' => 'entityTypeMain')); ?>
 						<input type="hidden" id="entity_type_id" name="entity_type_id" value="<?php echo $form['entity_type_id']; ?>" />
 						<input type="hidden" name="action" id="action" value="a"/>
 						<div class="tab_form_item2">
