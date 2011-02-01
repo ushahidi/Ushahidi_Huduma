@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * Service Provider controller
+ * Agencies controller
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license 
@@ -9,15 +9,15 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com> 
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Alert Model  
+ * @module     Agencies Controller
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
-class Serviceproviders_Controller extends Admin_Controller {
+class Agencies_Controller extends Admin_Controller {
 
     public function index()
     {
-        $this->template->content = new View('admin/serviceproviders');
+        $this->template->content = new View('admin/agencies');
 
         // Form submission status flags
         $form_error = FALSE;
@@ -35,7 +35,7 @@ class Serviceproviders_Controller extends Admin_Controller {
 
             // Add some rules, the input field, followed by some check
             $post->add_rules('action', 'required', 'alpha', 'length[1,1]');
-            $post->add_rules('service_provider_id', 'required', 'numeric');
+            $post->add_rules('agency_id', 'required', 'numeric');
 
             // Test if the validation rules passed
             if ($post->validate())
@@ -43,9 +43,9 @@ class Serviceproviders_Controller extends Admin_Controller {
                 if ($post->action == 'd')
                 {
                     // Delete each selected service provider from the database
-                    foreach ($post->service_provider_id as $item)
+                    foreach ($post->agency_id as $item)
                     {
-                        ORM::factory('service_provider')->delete($item);
+                        ORM::factory('agency')->delete($item);
                     }
 
                     // Success
@@ -71,41 +71,41 @@ class Serviceproviders_Controller extends Admin_Controller {
         $pagination = new Pagination(array(
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => ORM::factory('service_provider')->count_all()
+            'total_items' => ORM::factory('agency')->count_all()
         ));
         
-        // Get all the service providers
-        $service_providers = ORM::factory('service_provider')
+        // Get all the agencies
+        $agencies = ORM::factory('agency')
                                 ->find_all((int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
 
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_error = $form_error;
         $this->template->content->form_action = $form_action;
-        $this->template->content->service_providers = $service_providers;
+        $this->template->content->agencies = $agencies;
         $this->template->content->pagination = $pagination;
         
         // Total service providers
         $this->template->content->total_items = $pagination->total_items;
 
         // Javascript header
-        $this->tempalte->js = new View("js/serviceproviders_js");
+        $this->tempalte->js = new View("js/agencies_js");
     }
 
 
     /**
-     * Edit a service provider
+     * Edit an agency
      *
-     * @param int $service_provider_id
+     * @param int $agency_id
      */
-    public function edit($service_provider_id = FALSE, $saved = FALSE)
+    public function edit($agency_id = FALSE, $saved = FALSE)
     {
         // Set the view for editing the service provider
-        $this->template->content = new View("admin/serviceprovider_edit");
+        $this->template->content = new View("admin/agencies_edit");
         
         // Set up and initalize form fields
         $form = array(
-            'service_provider_id' => '',
-            'provider_name' => '',
+            'agency_id' => '',
+            'agency_name' => '',
             'description' => '',
             'category_id' => '',
             'parent_id' => '',
@@ -118,7 +118,7 @@ class Serviceproviders_Controller extends Admin_Controller {
         $form_saved = ($saved == 'saved')? TRUE : FALSE;
         
         // To hold the service provider reference
-        $service_provider = "";
+        $agency = "";
 
         // Check if the form has been submitted
         if ($_POST)
@@ -130,7 +130,7 @@ class Serviceproviders_Controller extends Admin_Controller {
             $post->pre_filter('trim', TRUE);
 
             // Validation rules
-            $post->add_rules('provider_name', 'required');
+            $post->add_rules('agency_name', 'required');
             $post->add_rules('category_id', 'required', 'numeric');
             $post->add_rules('description', 'required');
 
@@ -142,20 +142,20 @@ class Serviceproviders_Controller extends Admin_Controller {
             // Check if the validation rules have held up
             if ($post->validate())
             {
-                $service_provider = new Service_Provider_Model($service_provider_id);
+                $agency = new Agency_Model($agency_id);
 
                 // Set the service provider properties
-                $service_provider->provider_name = $post->provider_name;
-                $service_provider->description = $post->description;
-                $service_provider->category_id = $post->category_id;
-                $service_provider->parent_id = $post->parent_id;
-                $service_provider->boundary_id = $post->boundary_id;
-                $service_provider->creation_date = date("Y-m-d H:i:s");
+                $agency->agency_name = $post->provider_name;
+                $agency->description = $post->description;
+                $agency->category_id = $post->category_id;
+                $agency->parent_id = $post->parent_id;
+                $agency->boundary_id = $post->boundary_id;
+                $agency->creation_date = date("Y-m-d H:i:s");
 
                 // Save to the database
-                $service_provider->save();
+                $agency->save();
 
-                $service_provider_id = $service_provider->id;
+                $agency_id = $agency->id;
 
                 // Clear the form values
                 array_fill_keys($form, '');
@@ -164,11 +164,11 @@ class Serviceproviders_Controller extends Admin_Controller {
                 if ($post->save == 1)   // Save but don't close
                 {
                     // Redirect to the index page of this controller
-                    url::redirect('/admin/serviceproviders/edit/'.$service_provider->id.'/saved');
+                    url::redirect('/admin/agencies/edit/'.$agency->id.'/saved');
                 }
                 else
                 {
-                    url::redirect('admin/serviceproviders/');
+                    url::redirect('admin/agencies/');
                 }
 
             }
@@ -187,30 +187,30 @@ class Serviceproviders_Controller extends Admin_Controller {
         else
         {
             // Check if the service provider id has been set, load data
-            if ($service_provider_id)
+            if ($agency_id)
             {
                 // Retrieve current service provider
-                $service_provider = ORM::factory('service_provider', $service_provider_id);
+                $agency = ORM::factory('agency', $agency_id);
 
-                if ($service_provider->loaded == true)
+                if ($agency->loaded == true)
                 {
                     // Set the form values
                     $form = array(
-                        'service_provider_id' => $service_provider->id,
-                        'provider_name' => $service_provider->provider_name,
-                        'description' => $service_provider->description,
-                        'category_id' => $service_provider->category_id,
-                        'parent_id' => $service_provider->parent_id,
-                        'boundary_id' => $service_provider->boundary_id
+                        'agency_id' => $agency->id,
+                        'agency_name' => $agency->provider_name,
+                        'description' => $agency->description,
+                        'category_id' => $agency->category_id,
+                        'parent_id' => $agency->parent_id,
+                        'boundary_id' => $agency->boundary_id
                     );
                 }
             }
         }
         
-        // Get the list of service providers except the one in $service_provider
-        $service_provider_list = ORM::factory('service_provider')
+        // Get the list of agencies except the one in $agency
+        $agencies_list = ORM::factory('agency')
                                     ->where(array('parent_id' => '0'))
-                                    ->select_list('id', 'provider_name');
+                                    ->select_list('id', 'agency_name');
         
         // Get the list of categories
         $categories_list = ORM::factory('category')
@@ -221,51 +221,32 @@ class Serviceproviders_Controller extends Admin_Controller {
         $admin_boundaries = ORM::factory('boundary')
                                 ->select_list('id', 'boundary_name');
 
-        $service_provider_list[0] =  "-- Top Level Service Provider ---";
+        $agencies_list[0] =  "-- Top Level Agency ---";
         
         // Put  "--- Top Level Service Provider ---" at the top of the list
-        ksort($service_provider_list);
+        ksort($agencies_list);
         
         // Set the content for the view
-        $this->template->content->service_provider_id = $service_provider_id;
+        $this->template->content->agency_id = $agency_id;
         $this->template->content->form = $form;
         $this->template->content->errors = $errors;
         $this->template->content->form_error = $form_error;
         $this->template->content->form_saved = $form_saved;
         $this->template->content->categories = $categories_list;
-        $this->template->content->service_providers = $service_provider_list;
+        $this->template->content->agencies = $agencies_list;
         $this->template->content->administrative_boundaries = $admin_boundaries;
 
         // Javascript header
-        $this->template->js = new View('js/serviceprovider_edit_js');
+        $this->template->js = new View('js/agencies_edit_js');
     }
 
-    /**
-     * Shows the metadata about a service provider, no. of service officers, issues assigned, ticket statistics
-     *
-     * @param int $service_provider_id Database id of the service provider to be view
-     */
-    public function view($service_provider_id)
-    {
-        $this->template->content = new View("admin/serviceprovider_view");
-        
-        // Retrive the basic info from the database
-        $service_provider = ORM::factory('service_provider', $service_provider_id);
-        
-        // Show basic information about the service provider
-        $this->template->content->service_provider = $service_provider;
-        
-        // Show officers for this service provider
-        
-        // Ticket queue information - statistics
-    }
     
     /**
-     * Show the list of officers for the service provider specified in @param $service_provider_id
+     * Show the list of officers for the service provider specified in @param $agency_id
      * 
-     * @param int $service_provider_id 
+     * @param int $agency_id
      */
-    public function officers($service_provider_id)
+    public function officers($agency_id)
     {
         $this->template->content = new View('admin/serviceprovider_officers');
 
@@ -323,20 +304,20 @@ class Serviceproviders_Controller extends Admin_Controller {
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
             'total_items' => ORM::factory('service_provider_officer')
-                                ->where('service_provider_id', $service_provider_id)
+                                ->where('agency_id', $agency_id)
                                 ->count_all()
         ));
 
         // Get the officers for the service provider
         $officers = ORM::factory('service_provider_officer')
-                                ->where('service_provider_id', $service_provider_id)
+                                ->where('agency_id', $agency_id)
                                 ->find_all();
 
 
         $this->template->content->form_error = $form_error;
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_action = $form_action;
-        $this->template->content->service->provider = ORM::factory('service_provider', $service_provider_id);
+        $this->template->content->service->provider = ORM::factory('service_provider', $agency_id);
         $this->tempalte->content->officers = $officers;
         $this->template->content->pagination = $pagination;
 
@@ -356,12 +337,12 @@ class Serviceproviders_Controller extends Admin_Controller {
     }
 
     /**
-     * Displays the tickets with status @param $ticket_status for the service provider specified in @param $service_provider_id
+     * Displays the tickets with status @param $ticket_status for the service provider specified in @param $agency_id
      *
-     * @param int $service_provider_id
+     * @param int $agency_id
      * @param int $ticket_status
      */
-    public function tickets($service_provider_id, $ticket_status = FALSE)
+    public function tickets($agency_id, $ticket_status = FALSE)
     {
 //        $this->template->title = "Tickets";
         $this->template->content = new View('admin/serviceprovider_tickets');
@@ -419,16 +400,16 @@ class Serviceproviders_Controller extends Admin_Controller {
         $pagination = new Pagination(array(
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => Service_Provider_Model::tickets($service_provider_id, $ticket_status)->count_all()
+            'total_items' => Service_Provider_Model::tickets($agency_id, $ticket_status)->count_all()
         ));
 
         // Get the tickets for the service provider
-        $tickets = Service_Provider_Model::tickets($service_provider_id, $ticket_status);
+        $tickets = Service_Provider_Model::tickets($agency_id, $ticket_status);
 
         $this->template->content->form_error = $form_error;
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_action = $form_action;
-        $this->template->content->service->provider = ORM::factory('service_provider', $service_provider_id);
+        $this->template->content->service->provider = ORM::factory('agency', $agency_id);
         $this->template->content->ticket = $tickets;
         $this->tempalte->content->pagination = $pagination;
 
@@ -462,7 +443,7 @@ class Serviceproviders_Controller extends Admin_Controller {
     }
 
     /**
-     * Validates the parent id of the service provider
+     * Validates the parent id of the agency
      * 
      * @param Validation $post
      */
@@ -473,24 +454,24 @@ class Serviceproviders_Controller extends Admin_Controller {
             return;
 
         $parent_id = $post->parent_id;
-        $service_provider_id = $post->service_provider_id;
+        $agency_id = $post->agency_id;
 
         // Check if it is a parent service provider
         if ($parent_id == 0)
             return;
 
         // Check if the parent id exists
-        $parent_exists = ORM::factory('service_provider', $parent_id)->loaded;
+        $parent_exists = ORM::factory('agency', $parent_id)->loaded;
 
         if ( ! $parent_exists)
         {
-            $post->add_error('parent_id', 'The specified parent service provider does not exist');
+            $post->add_error('parent_id', 'The specified parent agency does not exist');
         }
 
         // Check if the parent and the service provider id are the same
-        if ( ! empty($service_provider_id) AND $service_provider_id == $parent_id)
+        if ( ! empty($agency_id) AND $agency_id == $parent_id)
         {
-            $post->add_error('parent_id', 'The service provider is the same as the parent');
+            $post->add_error('parent_id', 'The agency is the same as the parent');
         }
 
     }

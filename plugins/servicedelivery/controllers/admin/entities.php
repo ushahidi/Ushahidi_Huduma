@@ -293,6 +293,7 @@ class Entities_Controller extends Admin_Controller {
             'static_entity_id' => '',
             'static_entity_type_id' => '',
             'boundary_id' => '',
+            'agency_id' => '',
             'entity_name' => '',
             'latitude' => '',
             'longitude' => ''
@@ -387,6 +388,7 @@ class Entities_Controller extends Admin_Controller {
                         'static_entity_id' => $static_entity->id,
                         'static_entity_type_id' => $static_entity->static_entity_type_id,
                         'boundary_id' => $static_entity->boundary_id,
+                        'agency_id' => $static_entity->agency_id,
                         'entity_name' => $static_entity->entity_name,
                         'latitude' => $static_entity->latitude,
                         'longitude' => $static_entity->longitude
@@ -400,6 +402,10 @@ class Entities_Controller extends Admin_Controller {
 
         // Get the administatrative boundaries
         $boundaries = ORM::factory('boundary')->select_list('id', 'boundary_name');
+        $boundaries[0] = "-- National --";
+        ksort($boundaries);
+
+        $agencies = ORM::factory('agency')->select_list('id', 'agency_name');
 
         $this->template->content->form = $form;
         $this->template->content->errors = $errors;
@@ -409,6 +415,7 @@ class Entities_Controller extends Admin_Controller {
         $this->template->content->entity = $static_entity;
         $this->template->content->entity_types = $entity_types;
         $this->template->content->boundaries = $boundaries;
+        $this->template->content->agencies = $agencies;
         $this->template->content->static_entity_id = $entity_id;
 
         // TODO Unpack the metadata on the frontend (view page)
@@ -485,6 +492,10 @@ class Entities_Controller extends Admin_Controller {
     {
         // Check if an error for the admin boundary already exists/has been set
         if (array_key_exists('administative_boundary_id', $post->errors()))
+            return;
+
+        // If the national boundary has been specified, exit
+        if ($post->boundary_id == 0)
             return;
 
         $admin_boundary_exists = ORM::factory('boundary', $post->boundary_id)->loaded;

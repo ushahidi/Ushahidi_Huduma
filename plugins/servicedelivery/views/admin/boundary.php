@@ -70,6 +70,7 @@
                                             <input type="checkbox" id="checkAllBoundaries" class="check-box" onclick="CheckAll(this.id, 'boundary_id[]')"
                                         </th>
                                         <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.boundary');?></th>
+                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.hierarchy'); ?></th>
                                         <th class="col-3"><?php echo Kohana::lang('ui_servicedelivery.boundary_type');?></th>
                                         <th class="col-4"><?php echo Kohana::lang('ui_admin.actions');?></th>
                                     </tr>
@@ -92,24 +93,27 @@
                                 {
                                     $boundary_id = $boundary->id;
                                     $boundary_type_id = $boundary->boundary_type_id;
-                                    $boundary_type_name = $boundary_array[$boundary->boundary_type_id];
+                                    $boundary_type_name = $boundary->boundary_type->boundary_type_name;
                                     $boundary_name = $boundary->boundary_name;
-
+                                    $parent_id = $boundary->parent_id;
                                 ?>
                                     <tr>
                                         <td class="col-1">
                                             <input type="checkbox" class="check-box" id="boundary" name="boundary_id" value="<?php echo $boundary_id?>" />
                                         </td>
-                                        <td class="col-2">
-                                            <div class="post"><h4><?php echo $boundary_name; ?></h4></div>
-                                        </td>
+                                        <td class="col-2"><span><?php echo $boundary_name; ?></span></td>
+                                        <td class="col-2"><?php echo navigator::boundary_breadcrumb($boundary_id); ?></td>
                                         <td class="col-3"><?php echo $boundary_type_name; ?></td>
                                         <td class="col-4">
                                             <ul>
-                                                <li class="none-separator"><a href="#add"
-                                                    onClick="fillFields('<?php echo(rawurlencode($boundary_id)); ?>',
-                                                    '<?php echo(rawurlencode($boundary_name)); ?>',
-                                                    '<?php echo(rawurlencode($boundary_type_id)); ?>')">Edit</a></li>
+                                                <li class="none-separator">
+                                                    <a href="#add" onClick="fillFields('<?php echo(rawurlencode($boundary_id)); ?>',
+                                                        '<?php echo (rawurlencode($boundary_name)); ?>',
+                                                        '<?php echo (rawurlencode($boundary_type_id)); ?>',
+                                                        '<?php echo (rawurlencode($parent_id)); ?>')">
+                                                        Edit
+                                                    </a>
+                                                </li>
                                                 <li><a href="javascript:boundaryAction('d','DELETE','<?php echo(rawurlencode($boundary_id)); ?>')"
                                                     class="del">Delete</a></li>
                                             </ul>
@@ -143,7 +147,11 @@
                             </div>
                             <div class="tab_form_item">
                                 <?php echo Kohana::lang('ui_servicedelivery.boundary_type');?><br />
-                                <span class="my-sel-holder"><?php print form::dropdown('boundary_type_id', $boundary_array, $form['boundary_type_id']); ?></span>
+                                <span class="my-sel-holder"><?php print form::dropdown('boundary_type_id', $boundary_types, $form['boundary_type_id']); ?></span>
+                            </div>
+                            <div class="tab_form_item">
+                                <?php echo Kohana::lang('ui_servicedelivery.parent_boundary');?><br />
+                                <span class="my-sel-holder"><?php print form::dropdown('parent_id', $parent_boundaries, $form['parent_id']); ?></span>
                             </div>
                             <div style="clear: both"></div>
                             <div class="tab_form_item">

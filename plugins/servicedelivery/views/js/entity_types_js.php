@@ -19,11 +19,12 @@
 <?php require SYSPATH.'../application/views/admin/form_utils_js.php' ?>
 
     // Entity types JS
-    function fillFields(id, type_name, entity_type_color)
+    function fillFields(id, type_name, category_id, entity_type_color)
     {
         show_addedit();
         $("#entity_type_id").attr("value", unescape(id));
         $("#type_name").attr("value", unescape(type_name));
+        $("#category_id").attr("value", unescape(category_id));
         $("#entity_type_color").attr("value", unescape(entity_type_color));
     }
 

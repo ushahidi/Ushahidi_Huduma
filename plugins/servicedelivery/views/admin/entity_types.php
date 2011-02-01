@@ -107,7 +107,7 @@
                                     $type_name = $type->type_name;
                                     $entity_type_color = $type->entity_type_color;
                                     $entity_type_image = $type->entity_type_image;
-
+                                    $category_id = $type->category_id;
                                 ?>
                                     <tr>
                                         <td class="col-1">
@@ -132,7 +132,7 @@
                                             <!-- actions -->
                                             <ul>
                                                 <li class="none-separator">
-                                                    <a href="#add" onclick="fillFields('<?php echo rawurlencode($entity_type_id)?>', '<?php echo rawurlencode($type_name)?>', '<?php echo rawurlencode($entity_type_color)?>');">
+                                                    <a href="#add" onclick="fillFields('<?php echo rawurlencode($entity_type_id)?>', '<?php echo rawurlencode($type_name)?>', '<?php echo rawurlencode($category_id) ?>', '<?php echo rawurlencode($entity_type_color)?>');">
                                                         <?php echo Kohana::lang('ui_admin.edit_action'); ?>
                                                     </a>
                                                 </li>

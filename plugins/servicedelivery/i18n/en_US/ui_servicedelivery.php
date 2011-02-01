@@ -4,12 +4,13 @@
  */
  $lang = array(
      // Boundaries
-     'boundary'  => 'Administrative Boundary',
+     'boundary'                 => 'Administrative Boundary',
      'boundaries'               => 'Administrative Boundaries',
      'boundary_name'            => 'Boundary Name',
      'boundary_type'            => 'Boundary Type',
      'boundary_types'           => 'Boundary Types',
      'boundary_type_name'       => 'Boundary Type Name',
+     'parent_boundary'          => 'Parent Boundary',
 
      // Static Entities
      'entity'                   => 'Entity',
@@ -23,23 +24,25 @@
 
      'metadata'                 => 'Metadata',
      'officers'                 => 'Officers',
-     'provider_name'            => 'Provider Name',
+     'agency_name'              => 'Agency Name',
      'servicedelivery'          => 'Service Delivery',
-     'service_provider'         => 'Service Provider',
-     'serviceproviders'         => 'Service Providers',
+     'agency'                   => 'Agency',
+     'agencies'                 => 'Agencies',
+     'parent_agency'            => 'Parent/Governing Agency',
      'tickets'                  => 'Tickets',
 
      // Actions
-     'save_provider'            => 'Save Provider',
-     'new_provider'             => 'New Service Provider',
-     'edit_provider'            => 'Edit Provider',
-     'delete_provider'          => 'Delete Provider',
-     'add_edit_provider'        => 'Add/Edit Providers',
+     'save_agency'              => 'Save Agency',
+     'new_agency'               => 'New Agency',
+     'edit_agency'              => 'Edit Agency',
+     'delete_agency'            => 'Delete Agency',
+     'add_edit_agency'          => 'Add/Edit Agencies',
      'add_edit_officer'         => 'Add/Edit Officers',
      'save_entity'              => 'Save Entity',
      'delete_entity'            => 'Delete Entity',
 
      // Miscellaneous
-     'parent_boundary_type'          => 'Parent Boundary Type'
+     'parent_boundary_type'     => 'Parent Boundary Type',
+     'hierarchy'                => 'Hierarchy'
  );
 ?>

@@ -27,12 +27,12 @@ class navigator_Core {
         // Administrative boundaries
         $menu .= ($this_sub_page == "boundaries")
             ? Kohana::lang('ui_servicedelivery.boundaries')
-            : "<a href=\"".url::site()."admin/boundaries\">".Kohana::lang('ui_servicedelivery.boundaries')."</a>";
+            : "<a href=\"".url::site()."admin/servicedelivery\">".Kohana::lang('ui_servicedelivery.boundaries')."</a>";
 
         // Service Providers
-        $menu .= ($this_sub_page == "serviceproviders")
-            ? Kohana::lang('ui_servicedelivery.serviceproviders')
-            : "<a href=\"".url::site()."admin/serviceproviders\">".Kohana::lang('ui_servicedelivery.serviceproviders')."</a>";
+        $menu .= ($this_sub_page == "agencies")
+            ? Kohana::lang('ui_servicedelivery.agencies')
+            : "<a href=\"".url::site()."admin/agencies\">".Kohana::lang('ui_servicedelivery.agencies')."</a>";
 
 
         // Static Entities
@@ -42,6 +42,34 @@ class navigator_Core {
 
         // Output the menu
         echo $menu;
+    }
+
+    /**
+     * Generates the breadcrumb for the boundary specified in @param $boundary_id
+     *
+     * @param int $boundary_id
+     */
+    public static function boundary_breadcrumb($boundary_id)
+    {
+        // Get the boundary name and parent id
+        $boundary = ORM::factory('boundary', $boundary_id);
+
+        // Get the boundary
+        $breadcrumb = "";
+
+        // Get the boundary type name
+        $boundary_type_name = $boundary->boundary_type->boundary_type_name;
+        
+        if ($boundary->parent_id > 0)
+        {
+            $breadcrumb = $boundary->boundary_name." ".$boundary_type_name;
+            $breadcrumb = self::boundary_breadcrumb($boundary->parent_id)."&rarr;".$breadcrumb;
+        }
+        else
+        {
+            $breadcrumb = $boundary->boundary_name." ".$boundary_type_name.$breadcrumb;
+        }
+        return $breadcrumb;
     }
 }
 ?>

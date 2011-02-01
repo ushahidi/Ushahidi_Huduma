@@ -19,31 +19,31 @@
 <?php require SYSPATH.'../application/views/admin/form_utils_js.php' ?>
 
 	// Ajax Submission
-	function serviceProviderAction( action, confirmAction, service_provider_id )
+	function agencyAction( action, confirmAction, agency_id )
 	{
 		var statusMessage;
-		if( !isChecked( "service_provider" ) && service_provider_id =='' )
+		if( !isChecked( "agency" ) && agency_id =='' )
 		{
-			alert('Please select at least one service provider.');
+			alert('Please select at least one agency.');
 		} else {
 			var answer = confirm('<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> ' + confirmAction + '?')
 			if (answer){
 				// Set Submit Type
 				$("#action").attr("value", action);
 
-				if (service_provider_id != '')
+				if (agency_id != '')
 				{
 					// Submit Form For Single Item
-					$("#service_provider_single").attr("value", service_provider_id);
-					$("#serviceProviderMain").submit();
+					$("#agency_single").attr("value", agency_id);
+					$("#agencyMain").submit();
 				}
 				else
 				{
 					// Set Hidden form item to 000 so that it doesn't return server side error for blank value
-					$("#api_log_single").attr("value", "000");
+					$("#agency_single").attr("value", "000");
 
 					// Submit Form For Multiple Items
-					$("#serviceProviderMain").submit();
+					$("#agencyMain").submit();
 				}
 
 			} else {

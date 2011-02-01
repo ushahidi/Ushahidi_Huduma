@@ -19,10 +19,11 @@
  <?php require SYSPATH.'../application/views/admin/form_utils_js.php' ?>
 
      // Boundaries JS
-     function fillFields(id,boundary_name,boundary_type_id) {
+     function fillFields(id, boundary_name, boundary_type_id, parent_id) {
         $("#boundary_id").attr("value", unescape(id));
         $("#boundary_name").attr("value", unescape(boundary_name));
         $("#boundary_type_id").attr("value", unescape(boundary_type_id));
+        $("#parent_id").attr("value", unescape(parent_id));
     }
 
 	// Ajax Submission

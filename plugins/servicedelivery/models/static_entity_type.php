@@ -18,5 +18,8 @@ class Static_Entity_Type_Model extends ORM {
 
     // Relationships
     protected $has_many  = array('static_entity');
+    
+    // A static entity type must be associated with a category
+    protected $belongs_to = array('category');
 
 }

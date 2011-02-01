@@ -33,6 +33,7 @@
                         <!-- /tabset -->
 
                         <div class="tab">
+                            <div class="btns">
                             <ul>
                                 <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_entity'));?></a></li>
                                 <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
@@ -43,6 +44,7 @@
 
                                 <li><a href="<?php echo url::site().'admin/serviceproviders/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
                             </ul>
+                            </div>
                         </div>
                     </div>
                     <!-- /tabs -->
@@ -82,6 +84,10 @@
                                 <?php print form::dropdown('static_entity_type_id', $entity_types, $form['static_entity_type_id']); ?>
                             </div>
                             <div class="row">
+                                <span><h4><?php echo Kohana::lang('ui_servicedelivery.parent_agency'); ?></h4></span>
+                                <?php print form::dropdown('agency_id', $agencies, $form['agency_id']); ?>
+                            </div>
+                            <div class="row">
                                 <span><h4><?php echo Kohana::lang('ui_servicedelivery.boundary'); ?></h4></span>
                                 <?php print form::dropdown('boundary_id', $boundaries, $form['boundary_id']); ?>
                             </div>
@@ -95,9 +101,9 @@
                             <div class="incident-location">
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.entity_location'); ?></h4>
                                 <div class="location-info">
-                                    <span><?php echo Kohana::lang('ui_main.latitude'); ?></span>
+                                    <span><?php echo Kohana::lang('ui_main.latitude'); ?>:</span>
                                     <?php print form::input('latitude', $form['latitude'], ' class="text"'); ?>
-                                    <span><?php echo Kohana::lang('ui_main.longitude'); ?></span>
+                                    <span><?php echo Kohana::lang('ui_main.longitude'); ?>:</span>
                                     <?php print form::input('longitude', $form['longitude'], ' class="text"'); ?>
                                 </div>
                                 <div style="clear:both"></div>

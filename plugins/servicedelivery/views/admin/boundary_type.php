@@ -92,6 +92,7 @@
                                 {
                                     $boundary_type_id = $boundary_type->id;
                                     $boundary_type_name = $boundary_type->boundary_type_name;
+                                    $parent_id = $boundary_type->parent_id;
                                 ?>
                                     <tr>
                                         <td class="col-1">
@@ -103,7 +104,7 @@
                                         <td class="col-4">
                                             <ul>
                                                 <li class="none-separator">
-                                                    <a href="#add" onClick="fillFields('<?php echo(rawurlencode($boundary_type_id)); ?>','<?php echo(rawurlencode($boundary_type_name)); ?>')">Edit</a>
+                                                    <a href="#add" onClick="fillFields('<?php echo(rawurlencode($boundary_type_id)); ?>','<?php echo(rawurlencode($boundary_type_name)); ?>', '<?php echo rawurlencode($parent_id)?>')">Edit</a>
                                                 </li>
                                                 <li class="none-separator">
                                                     <a href="javascript:boundaryTypeAction('d','DELETE','<?php echo(rawurlencode($boundary_type_id)); ?>')" class="del">Delete</a>

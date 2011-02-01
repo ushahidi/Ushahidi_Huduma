@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `boundary_type` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `boundary_type_name` VARCHAR(45) NOT NULL ,
   `parent_id` INT NOT NULL DEFAULT 0 ,
-  `creation_date` DATETIME NOT NULL,
+  `creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) COMMENT = 'Types of administrative boundaries e.g. province, district, ward, constituency etc';
 
@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS `boundary` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `boundary_name` VARCHAR(45) NOT NULL ,
   `boundary_type_id` INT NOT NULL ,
-  `creation_date` DATETIME NOT NULL,
+  `parent_id` INT NOT NULL DEFUALT 0,
+  `creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) ,
   INDEX `boundary_fk1` (`boundary_type_id` ASC) ,
   CONSTRAINT `boundary_fk1` FOREIGN KEY (`boundary_type_id` ) REFERENCES `boundary_type` (`id` )
@@ -29,32 +30,32 @@ CREATE TABLE IF NOT EXISTS `boundary` (
 ) COMMENT = 'List of administrative boundaries (specific names of the various admin boundaries)';
 
 --
--- Table service_provider
+-- Table agency
 --
-CREATE  TABLE IF NOT EXISTS `service_provider` (
+CREATE  TABLE IF NOT EXISTS `agency` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `provider_name` VARCHAR(50) NOT NULL ,
+  `agency_name` VARCHAR(50) NOT NULL ,
   `description` VARCHAR(200) NULL ,
   `category_id` INT NOT NULL ,
   `parent_id` INT NOT NULL DEFAULT 0 ,
   `boundary_id` INT NULL ,
-  `creation_date` DATETIME NOT NULL ,
+  `creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) COMMENT = 'Groups for the monitors responsible for attending to tickets';
 
 --
--- Table service_provider_officer
+-- Table agency_staff
 --
-CREATE  TABLE IF NOT EXISTS `service_provider_officer` (
+CREATE  TABLE IF NOT EXISTS `agency_staff` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL ,
   `full_name` VARCHAR(100) NOT NULL ,
   `email_address` VARCHAR(45) NOT NULL ,
   `phone_number` VARCHAR(45) NOT NULL ,
-  `service_provider_id` INT NOT NULL ,
+  `agency_id` INT NOT NULL ,
   PRIMARY KEY (`id`) ,
-  CONSTRAINT `service_provider_officer_fk1` FOREIGN KEY (`service_provider_id` )
-    REFERENCES `service_provider` (`id` )
+  CONSTRAINT `agency_staff_fk1` FOREIGN KEY (`agency_id` )
+    REFERENCES `agency` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
@@ -80,11 +81,12 @@ CREATE  TABLE IF NOT EXISTS `static_entity` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `static_entity_type_id` INT NOT NULL ,
   `boundary_id` INT NOT NULL ,
+  `agency_id` INT,
   `entity_name` VARCHAR(45) NOT NULL ,
   `latitude` DOUBLE NOT NULL ,
   `longitude` DOUBLE NOT NULL ,
   `metadata` TEXT NULL ,
-  `creation_date` DATETIME NOT NULL ,
+  `creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) ,
   INDEX `static_entity_fk1` (`static_entity_type_id` ASC) ,
   INDEX `static_entity_fk2` (`boundary_id` ASC) ,
