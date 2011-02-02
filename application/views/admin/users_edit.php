@@ -15,7 +15,7 @@
 ?>
 			<div class="bg">
 				<h2>
-					<?php admin::user_subtabs("users_edit"); ?>
+					<?php admin::user_subtabs("users_edit", $display_roles); ?>
 				</h2>
 				<?php
 				if ($form_error) {
@@ -76,7 +76,7 @@
 							<h4><?php echo Kohana::lang('ui_main.password');?></h4>
 							<?php print form::password('password', $form['password'], ' class="text"'); ?>
 							<div style="clear:both;"></div>
-							<?php echo Kohana::lang('ui_main.password_again');?>:<br />
+							<h4><?php echo Kohana::lang('ui_main.password_again');?>:</h4>
 							<?php print form::password('password_again', $form['password_again'], ' class="text"'); ?>
 						</div>
 						<div class="row">

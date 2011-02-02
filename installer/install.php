@@ -431,13 +431,15 @@ class Install
 				'CREATE TABLE IF NOT EXISTS `',
 				'INSERT INTO `',
 				'ALTER TABLE `',
-				'UPDATE `'
+				'UPDATE `',
+				'DELETE FROM `'
 				);
 			$replace = array(
 				'CREATE TABLE IF NOT EXISTS `'.$table_prefix.'_',
 				'INSERT INTO `'.$table_prefix.'_',
 				'ALTER TABLE `'.$table_prefix.'_',
-				'UPDATE `'.$table_prefix.'_'
+				'UPDATE `'.$table_prefix.'_',
+				'DELETE FROM `'.$table_prefix.'_'
 				);
 			$db_schema = str_replace($find, $replace, $db_schema);
 		}
@@ -685,14 +687,16 @@ class Install
 			OR ! $modules->isLoaded('iconv')
 			OR ! $modules->isLoaded('mcrypt')
 			OR ! $modules->isLoaded('SPL')
+			OR ! $modules->isLoaded('mysql')
 		) {
 			$form->set_error('modules',
 			"<strong>Oops!</strong> Send an email to your system administrator or web host saying: \"I'm installing an application which requires  
 			<a href=\"http://php.net/curl\" target=\"_blank\">cURL</a>, 
 			<a href=\"http://php.net/pcre\" target=\"_blank\">PCRE</a>, 
 			<a href=\"http://php.net/iconv\" target=\"_blank\">iconv</a>, 
-			<a href=\"http://php.net/mcrypt\" target=\"_blank\">mcrypt</a> and 
-			<a href=\"http://php.net/spl\" target=\"_blank\">SPL</a>. 
+			<a href=\"http://php.net/mcrypt\" target=\"_blank\">mcrypt</a>, 
+			<a href=\"http://php.net/spl\" target=\"_blank\">SPL</a> and
+			<a href=\"http://php.net/mysql\" target=\"_blank\">MySQL</a>.
 			Can you ensure that these PHP libraries are installed?\"");
 		}
 		
@@ -739,6 +743,10 @@ class Install
 			"<strong>Oops!</strong> Ushahidi needs <a href=\"http://php.net/spl\" target=\"_blank\">SPL</a> for several core libraries. ");
 		}
 		
+		if ( ! $modules->isLoaded('mysql')) {
+		    $form->set_error('mysql',
+		    "<strong>Oops!</strong> Ushahidi needs <a href=\"http://php.net/mysql\" target=\"_blank\">MySQL</a> for database access. ");
+		}
 		/**
 		 * error exists, have user correct them.
 		 */
@@ -762,7 +770,7 @@ class Install
 			<head>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 				<title>Database Connections / Ushahidi Web Installer</title>
-				<link href="../media/css/admin/login.css" rel="stylesheet" type="text/css" />
+				<link href="../media/css/login.css" rel="stylesheet" type="text/css" />
 			</head>
 			<script src="../media/js/jquery.js" type="text/javascript" charset="utf-8"></script>
 			<script src="../media/js/login.js" type="text/javascript" charset="utf-8"></script>

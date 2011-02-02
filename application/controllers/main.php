@@ -18,8 +18,90 @@ class Main_Controller extends Frontend_Controller {
 	{
 		parent::__construct();
 
-        // Reset the header view for the main page
-		if (! $this->use_default_header)
+		if (Kohana::config('settings.private_deployment'))
+		{
+			$this->auth = new Auth();
+			$this->session = Session::instance();
+			$this->auth->auto_login();
+	
+			if ( ! $this->auth->logged_in('login'))
+			{
+				url::redirect('login/front');
+			}
+		}
+		
+        // Load cache
+		$this->cache = new Cache;
+
+		// Load Session
+		$this->session = Session::instance();
+
+        // Load Header & Footer
+		$this->template->header  = new View('header');
+		$this->template->footer  = new View('footer');
+
+		// Themes Helper
+		$this->themes = new Themes();
+		$this->themes->api_url = Kohana::config('settings.api_url');
+		$this->template->header->submit_btn = $this->themes->submit_btn();
+		$this->template->header->languages = $this->themes->languages();
+		$this->template->header->search = $this->themes->search();
+
+		// Set Table Prefix
+		$this->table_prefix = Kohana::config('database.default.table_prefix');
+
+		// Retrieve Default Settings
+		$site_name = Kohana::config('settings.site_name');
+			// Prevent Site Name From Breaking up if its too long
+			// by reducing the size of the font
+			if (strlen($site_name) > 20)
+			{
+				$site_name_style = " style=\"font-size:21px;\"";
+			}
+			else
+			{
+				$site_name_style = "";
+			}
+			
+		$this->template->header->private_deployment = Kohana::config('settings.private_deployment');
+		$this->template->header->loggedin_username = FALSE;
+		$this->template->header->loggedin_userid = FALSE;
+		
+		if( isset(Auth::instance()->get_user()->username) AND isset(Auth::instance()->get_user()->id) )
+		{
+			$this->template->header->loggedin_username = html::specialchars(Auth::instance()->get_user()->username);
+			$this->template->header->loggedin_userid = Auth::instance()->get_user()->id;
+		}
+		
+		$this->template->header->site_name = $site_name;
+		$this->template->header->site_name_style = $site_name_style;
+		$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
+
+		$this->template->header->this_page = "";
+
+		// Google Analytics
+		$google_analytics = Kohana::config('settings.google_analytics');
+		$this->template->footer->google_analytics = $this->themes->google_analytics($google_analytics);
+
+        // Load profiler
+        // $profiler = new Profiler;
+
+		// Get tracking javascript for stats
+		if(Kohana::config('settings.allow_stat_sharing') == 1){
+			$this->template->footer->ushahidi_stats = Stats_Model::get_javascript();
+		}else{
+			$this->template->footer->ushahidi_stats = '';
+		}
+		
+		// add copyright info
+		$this->template->footer->site_copyright_statement = '';
+		$site_copyright_statement = trim(Kohana::config('settings.site_copyright_statement'));
+		if ($site_copyright_statement != '')
+		{
+			$this->tempalte->footer->site_copyright_statement = $site_copyright_statement;
+		}
+
+		if ( ! $this->use_default_header)
 		{
 			$this->template->header = new View('header_main');
 
@@ -34,6 +116,21 @@ class Main_Controller extends Frontend_Controller {
 			$this->template->header->site_name_style = $this->site_name_style;
 			$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
 		}
+	}
+
+	/**
+	 * Retrieves Categories
+	 */
+	protected function get_categories($selected_categories)
+	{
+	  $categories = ORM::factory('category')
+	    ->where('category_visible', '1')
+	    ->where('parent_id', '0')
+	    ->where('category_trusted != 1')
+	    ->orderby('category_title', 'ASC')
+	    ->find_all();
+
+	  return $categories;
 	}
 
     public function index()
@@ -120,10 +217,12 @@ class Main_Controller extends Frontend_Controller {
 
 			$translated_title = Category_Lang_Model::category_title($category->id,$l);
 
-			if($translated_title)
+			if ($translated_title)
 			{
 				$display_title = $translated_title;
-			}else{
+			}
+			else
+			{
 				$display_title = $category->category_title;
 			}
 
@@ -233,7 +332,7 @@ class Main_Controller extends Frontend_Controller {
 
 		$db = new Database();
         // Next, Get the Range of Years
-		$query = $db->query('SELECT DATE_FORMAT(incident_date, \'%Y-%c\') AS dates FROM incident WHERE incident_active = 1 GROUP BY DATE_FORMAT(incident_date, \'%Y-%c\') ORDER BY incident_date');
+		$query = $db->query('SELECT DATE_FORMAT(incident_date, \'%Y-%c\') AS dates FROM '.$this->table_prefix.'incident WHERE incident_active = 1 GROUP BY DATE_FORMAT(incident_date, \'%Y-%c\') ORDER BY incident_date');
 
 		$first_year = date('Y');
 		$last_year = date('Y');

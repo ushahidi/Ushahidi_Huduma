@@ -1,5 +1,5 @@
 -- Ushahidi Engine
--- version 39
+-- version 45
 -- http://www.ushahidi.com
 
 
@@ -385,7 +385,8 @@ CREATE TABLE IF NOT EXISTS `incident` (                                         
     `incident_dateadd` datetime default NULL,                                       -- field description
     `incident_dateadd_gmt` datetime default NULL,                                   -- field description
     `incident_datemodify` datetime default NULL,                                    -- field description
-    `incident_alert_status` TINYINT NOT NULL DEFAULT '0' COMMENT '0 - Not Tagged for Sending, 1 - Tagged for Sending, 2 - Alerts Have Been Sent',    -- field description
+    `incident_alert_status` TINYINT NOT NULL DEFAULT '0' COMMENT '0 - Not Tagged for Sending, 1 - Tagged for Sending, 2 - Alerts Have Been Sent',
+	`incident_zoom` tinyint NULL DEFAULT NULL,
   PRIMARY KEY  (`id`),
   KEY `location_id` (`location_id`),
   KEY `incident_active` (`incident_active`),
@@ -399,7 +400,7 @@ CREATE TABLE IF NOT EXISTS `incident` (                                         
 
 LOCK TABLES `incident` WRITE;
 /*!40000 ALTER TABLE `incident` DISABLE KEYS */;
-INSERT INTO `incident` VALUES (1,1,1,'en_US',1,'Hello Ushahidi!','Welcome to Ushahidi. Please replace this report with a valid incident','2010-01-01 12:00:00',1,1,1,'0','2010-01-01 12:00:00','0',NULL,NULL,NULL,'0');
+INSERT INTO `incident` VALUES (1,1,1,'en_US',1,'Hello Ushahidi!','Welcome to Ushahidi. Please replace this report with a valid incident','2010-01-01 12:00:00',1,1,1,'0','2010-01-01 12:00:00','0',NULL,NULL,NULL,'0',NULL);
 /*!40000 ALTER TABLE `incident` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -677,7 +678,7 @@ CREATE TABLE IF NOT EXISTS `message`                                            
     `message_to` VARCHAR(100) DEFAULT NULL,                                         -- field description
     `message` TEXT default NULL,                                                    -- field description
     `message_detail` text default NULL,                                             -- field description
-    `message_type` TINYINT default 1 COMMENT '1 - INBOX, 2 - OUTBOX (From Admin)',  -- field description
+    `message_type` TINYINT default 1 COMMENT '1 - INBOX, 2 - OUTBOX (From Admin), 3 - DELETED',
     `message_date` DATETIME default NULL,                                           -- field description
     `message_level` TINYINT NULL DEFAULT 0 COMMENT '0 - UNREAD, 1 - READ, 99 - SPAM',                                         -- field description
 PRIMARY KEY (`id`)
@@ -735,6 +736,7 @@ CREATE TABLE IF NOT EXISTS `roles` (                                            
 	`settings` tinyint(4) NOT NULL default '0',
 	`manage` tinyint(4) NOT NULL default '0',
 	`users` tinyint(4) NOT NULL default '0',
+	`manage_roles` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uniq_name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -743,10 +745,10 @@ CREATE TABLE IF NOT EXISTS `roles` (                                            
 
 -- Dumping data for table `roles`
 
-INSERT INTO `roles` (`id`, `name`, `description`, `reports_view`, `reports_edit`, `reports_evaluation`, `reports_comments`, `reports_download`, `reports_upload`, `messages`, `messages_reporters`, `stats`, `settings`, `manage`, `users`) VALUES
-(1, 'login', 'Login privileges, granted after account confirmation', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(2, 'admin', 'Administrative user, has access to almost everything.', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-(3, 'superadmin','Super administrative user, has access to everything.', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+INSERT INTO `roles` (`id`, `name`, `description`, `reports_view`, `reports_edit`, `reports_evaluation`, `reports_comments`, `reports_download`, `reports_upload`, `messages`, `messages_reporters`, `stats`, `settings`, `manage`, `users`, `manage_roles`) VALUES
+(1, 'login', 'Login privileges, granted after account confirmation', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(2, 'admin', 'Administrative user, has access to almost everything.', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+(3, 'superadmin','Super administrative user, has access to everything.', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
 
 /**
@@ -814,6 +816,7 @@ CREATE TABLE IF NOT EXISTS `settings` (                                         
     `allow_clustering` tinyint(4) NOT NULL default '0',                             -- field description
     `cache_pages` tinyint(4) NOT NULL DEFAULT '0',
     `cache_pages_lifetime` int(4) NOT NULL DEFAULT '1800',
+    `private_deployment` tinyint(4) NOT NULL DEFAULT '0',
     `default_map` varchar(100) NOT NULL DEFAULT 'google_normal',
     `default_map_all` varchar(20) NOT NULL default 'CC0000',                        -- field description
     `api_google` varchar(200) default NULL,                                         -- field description
@@ -1332,13 +1335,13 @@ CREATE TABLE IF NOT EXISTS `layer` (                                            
 -- Definition of table `api_settings`
 --
 
-CREATE TABLE  IF NOT EXISTS `api_settings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `default_record_limit` int(11) NOT NULL DEFAULT '20',
-  `max_record_limit` int(11) DEFAULT NULL,
-  `max_requests_per_ip_address` int(11) DEFAULT NULL,
-  `max_requests_quota_basis` int(11) DEFAULT NULL,
-  `modification_date` datetime NOT NULL,
+CREATE TABLE IF NOT EXISTS `api_settings` (                                         -- table description
+  `id` int(11) NOT NULL AUTO_INCREMENT,	                                            -- field description
+  `default_record_limit` int(11) NOT NULL DEFAULT '20',                             -- field description
+  `max_record_limit` int(11) DEFAULT NULL,                                          -- field description
+  `max_requests_per_ip_address` int(11) DEFAULT NULL,                               -- field description
+  `max_requests_quota_basis` int(11) DEFAULT NULL,                                  -- field description
+  `modification_date` datetime NOT NULL,                                            -- field description
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='For storing API logging settings';
 
@@ -1355,6 +1358,19 @@ CREATE TABLE IF NOT EXISTS `api_banned` (                                       
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='For logging banned API IP addresses' AUTO_INCREMENT=8 ;
 
 
+/**
+* Table structure for table 'alert_category'
+*
+*/
+CREATE TABLE IF NOT EXISTS `alert_category` (
+  `id` int(11) NOT NULL auto_increment,
+  `alert_id` int(11),
+  `category_id` int(11),
+  PRIMARY KEY (`id`),
+  KEY `alert_id` (`alert_id`),
+  KEY `category_id` (`category_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
 
 /**
 * Table structure for table `api_log`
@@ -1364,7 +1380,7 @@ CREATE TABLE IF NOT EXISTS `api_banned` (                                       
 CREATE TABLE IF NOT EXISTS `api_log` (                                              -- table description
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT,                                  -- field description
     `api_task` varchar(10) NOT NULL,                                                -- field description
-    `api_parameters` varchar(50) NOT NULL,                                          -- field description
+    `api_parameters` varchar(100) NOT NULL,                                          -- field description
     `api_records` tinyint(11) NOT NULL,                                             -- field description
     `api_ipaddress` varchar(50) NOT NULL,                                           -- field description
     `api_date` datetime NOT NULL,                                                   -- field description
@@ -1390,20 +1406,30 @@ CREATE TABLE IF NOT EXISTS `plugin` (
 
 
 /**
+* Table structure for table `geometry`
+*/
+CREATE TABLE IF NOT EXISTS `geometry` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `incident_id` bigint(20) NOT NULL,
+  `geometry` geometry NOT NULL,
+  `geometry_color` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  SPATIAL KEY `geometry` (`geometry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+/**
 * Constraints for dumped tables
 * 
 */
 
 /**
 * Constraints for table `form_field`
-* 
 */
 ALTER TABLE `form_field`
   ADD CONSTRAINT `form_field_ibfk_1` FOREIGN KEY (`form_id`) REFERENCES `form` (`id`) ON DELETE CASCADE;
 
 /**
 * Constraints for table `form_response`
-* 
 */
 ALTER TABLE `form_response`
   ADD CONSTRAINT `form_response_ibfk_1` FOREIGN KEY (`form_field_id`) REFERENCES `form_field` (`id`) ON DELETE CASCADE;
@@ -1413,4 +1439,4 @@ ALTER TABLE `form_response`
 * 
 */
 UPDATE `settings` SET `ushahidi_version` = '2.0.1' WHERE `id`=1 LIMIT 1;
-UPDATE `settings` SET `db_version` = '40' WHERE `id`=1 LIMIT 1;
+UPDATE `settings` SET `db_version` = '45' WHERE `id`=1 LIMIT 1;

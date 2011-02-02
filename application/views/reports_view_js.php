@@ -28,7 +28,7 @@
 			var proj_900913 = new OpenLayers.Projection('EPSG:900913');
 			var options = {
 				units: "dd",
-				numZoomLevels: 16,
+				numZoomLevels: 18,
 				controls:[],
 				projection: proj_900913,
 				'displayProjection': proj_4326
@@ -50,30 +50,45 @@
 			
 			
 			// Set Feature Styles
-			style = new OpenLayers.Style({
+			style1 = new OpenLayers.Style({
 				pointRadius: "8",
-				fillColor: "${color}",
-				fillOpacity: "1",
-				strokeColor: "#000000",
-				strokeWidth: 1,
-				strokeOpacity: 0.8
+				fillColor: "#ffcc66",
+				fillOpacity: "0.7",
+				strokeColor: "#CC0000",
+				strokeOpacity: "0.7",
+				strokeWidth: 4,
+				graphicZIndex: 1,
+				externalGraphic: "${graphic}",
+				graphicOpacity: 1,
+				graphicWidth: 21,
+				graphicHeight: 25,
+				graphicXOffset: -14,
+				graphicYOffset: -27
 			},
 			{
 				context: 
 				{
-					color: function(feature)
+					graphic: function(feature)
 					{
 						if ( typeof(feature) != 'undefined' && 
 							feature.data.id == <?php echo $incident_id; ?>)
 						{
-							return "#CC0000";
+							return "<?php echo url::base().'media/img/openlayers/marker.png' ;?>";
 						}
 						else
 						{
-							return "#FF9933";
+							return "<?php echo url::base().'media/img/openlayers/marker-gold.png' ;?>";
 						}
 					}
 				}
+			});
+			style2 = new OpenLayers.Style({
+				pointRadius: "8",
+				fillColor: "#30E900",
+				fillOpacity: "0.7",
+				strokeColor: "#197700",
+				strokeWidth: 3,
+				graphicZIndex: 1
 			});
 			
 			// Create the single marker layer
@@ -81,16 +96,25 @@
 			{
 				format: OpenLayers.Format.GeoJSON,
 				projection: map.displayProjection,
-				styleMap: new OpenLayers.StyleMap({"default":style, "select": style})
+				styleMap: new OpenLayers.StyleMap({"default":style1, "select": style1, "temporary": style2})
 			});
 			
 			map.addLayer(markers);
 			
-			selectControl = new OpenLayers.Control.SelectFeature(markers,
-															{onSelect: onFeatureSelect, onUnselect: onFeatureUnselect});			
+			selectCtrl = new OpenLayers.Control.SelectFeature(markers, {
+				onSelect: onFeatureSelect, 
+				onUnselect: onFeatureUnselect
+			});
+			highlightCtrl = new OpenLayers.Control.SelectFeature(markers, {
+			    hover: true,
+			    highlightOnly: true,
+			    renderIntent: "temporary"
+			});		
 
-			map.addControl(selectControl);
-			selectControl.activate();
+			map.addControl(selectCtrl);
+			map.addControl(highlightCtrl);
+			selectCtrl.activate();
+			//highlightCtrl.activate();
 
 			// create a lat/lon object
 			myPoint = new OpenLayers.LonLat(<?php echo $longitude; ?>, <?php echo $latitude; ?>);
@@ -98,7 +122,7 @@
 			
 			// display the map centered on a latitude and longitude (Google zoom levels)
 
-			map.setCenter(myPoint, 10);
+			map.setCenter(myPoint, <?php echo ($incident_zoom) ? $incident_zoom : 10; ?>);
 		});
 		
 		$(document).ready(function(){
@@ -162,7 +186,7 @@
 				{
 					case "wider-map":
 						$('.report-map').insertBefore($('.left-col'));
-						$('.map-holder').css({"height":"300px", "width": "900px"});
+						$('.map-holder').css({"height":"350px", "width": "900px"});
 						$('a[href=#report-map]').parent().hide();
 						$('a.taller-map').parent().show();
 						$('a.smaller-map').parent().show();
@@ -173,7 +197,7 @@
 						$('a.smaller-map').parent().show();
 						break;
 					case "shorter-map":
-						$('.map-holder').css("height","300px");
+						$('.map-holder').css("height","350px");
 						$('a.taller-map').parent().show();
 						$('a.smaller-map').parent().show();
 						break;
@@ -184,18 +208,18 @@
 						$('a.tab-item').parent().removeClass("report-tab-selected");
 						$('.report-media-box-content > div').hide(); // hide everything incase video/images were showing
 						$('a[href=#report-map]').parent().addClass('report-tab-selected').show();
-						$('.report-map').show()
+						$('.report-map').show();
 						break;
 				};
 				
-				map.setCenter(myPoint, 10);
+				map.setCenter(myPoint, map.getZoom());
 				
 				return false;
 			});
 		});
 		
 		function onPopupClose(evt) {
-            selectControl.unselect(selectedFeature);
+            selectCtrl.unselect(selectedFeature);
         }
 
         function onFeatureSelect(feature) {

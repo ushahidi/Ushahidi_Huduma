@@ -563,7 +563,7 @@ class Reports_Controller extends Frontend_Controller {
 		$this->template->content->errors = $errors;
 		$this->template->content->form_error = $form_error;
 
-		$categories = $this->_get_categories($form['incident_category']);
+		$categories = $this->get_categories($form['incident_category']);
 		$this->template->content->categories = $categories;
 
 		// Retrieve Custom Form Fields Structure
@@ -878,6 +878,7 @@ class Reports_Controller extends Frontend_Controller {
 		$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
 		$this->themes->js->latitude = $incident->location->latitude;
 		$this->themes->js->longitude = $incident->location->longitude;
+		$this->themes->js->incident_zoom = $incident->incident_zoom;
 		$this->themes->js->incident_photos = $incident_photo;
 
 		// Initialize custom field array
@@ -1044,21 +1045,6 @@ class Reports_Controller extends Frontend_Controller {
 		}
 
 		return $city_select;
-	}
-
-	/**
-	 * Retrieves Categories
-	 */
-	private function _get_categories($selected_categories)
-	{
-		$categories = ORM::factory('category')
-			->where('category_visible', '1')
-			->where('parent_id', '0')
-			->where('category_trusted != 1')
-			->orderby('category_title', 'ASC')
-			->find_all();
-
-		return $categories;
 	}
 
 	/**

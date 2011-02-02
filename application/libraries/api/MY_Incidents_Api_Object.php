@@ -187,6 +187,11 @@ class Incidents_Api_Object extends Api_Object_Core {
                 }
             break;
             
+            // Get incidents based on a box using two lat,lon coords
+            case "bounds":
+                $this->response_data = $this->_get_incidents_by_bounds($this->request['sw'],$this->request['ne'],$this->request['c']);
+            break;
+            
             // Error therefore set error message 
             default:
                 $this->set_error_message(array(
@@ -362,7 +367,7 @@ class Incidents_Api_Object extends Api_Object_Core {
             if (count($media_items) > 0)
             {
                 $xml->startElement('mediaItems');
-                
+
                 foreach ($media_items as $media_item)
                 {
 	                if ($media_item->mediatype != 1)
@@ -370,19 +375,34 @@ class Incidents_Api_Object extends Api_Object_Core {
                         $upload_path = "";
                     }
 
+					$url_prefix = url::base().Kohana::config('upload.relative_directory').'/';
                     if($this->response_type == 'json')
-                    {	
+                    {
                         $json_report_media[$item->incidentid][] = array(
                             "id" => $media_item->mediaid,
                             "type" => $media_item->mediatype,
                             "link" => $upload_path.$media_item->medialink,
                             "thumb" => $upload_path.$media_item->mediathumb,
                         );
+
+                        // If we are look at certain types of media, add some fields
+                        if($media_item->mediatype == 1)
+                        {
+                        	// Grab that last key up there
+                        	$add_to_key = key($json_report_media[$item->incidentid]) + 1;
+
+                        	// Give a full absolute URL to the image 
+                        	$json_report_media[$item->incidentid][$add_to_key]["thumb_url"] = 
+                        		$url_prefix.$upload_path.$media_item->mediathumb;
+
+                        	$json_report_media[$item->incidentid][$add_to_key]["link_url"] = 
+                        		$url_prefix.$upload_path.$media_item->medialink;
+                        }
                     } 
                     else 
                     {
                         $xml->startElement('media');
-                        
+
                         if( $media_item->mediaid != "" )
                         {
                             $xml->writeElement('id',$media_item->mediaid);
@@ -410,6 +430,16 @@ class Incidents_Api_Object extends Api_Object_Core {
                         {
                             $xml->writeElement('thumb',
                                 $upload_path.$media_item->mediathumb);
+                        }
+
+                        if( $media_item->mediathumb != "" AND $media_item->mediatype == 1 )
+                        {
+                        	$add_to_key = key($json_report_media[$item->incidentid]) + 1;
+                        	$xml->writeElement('thumb_url',
+                                $url_prefix.$upload_path.$media_item->mediathumb);
+
+                            $xml->writeElement('link_url',
+                                $url_prefix.$upload_path.$media_item->medialink);
                         }
 
                         $xml->endElement();
@@ -624,6 +654,62 @@ class Incidents_Api_Object extends Api_Object_Core {
         $limit = "\nLIMIT 0, $this->list_limit";
         
         return $this->_get_incidents($where.$sortby, $limit);
+        
+    }
+    
+    /**
+     * Get incidents within a certain lat,lon bounding box
+     *
+     * @param sw is the southwest lat,lon of the box
+     * @param ne is the northeast lat,lon of the box
+     * @param c is the categoryid
+     */
+    private function _get_incidents_by_bounds($sw,$ne,$c=NULL)
+    {
+		// Get location_ids if we are to filter by location
+		$location_ids = array();
+
+		// Break apart location variables, if necessary
+		$southwest = array();
+		if (isset($sw))
+		{
+			$southwest = explode(",",$sw);
+		}
+
+		$northeast = array();
+		if (isset($ne))
+		{
+			$northeast = explode(",",$ne);
+		}
+
+		if ( count($southwest) == 2 AND count($northeast) == 2 )
+		{
+			$lon_min = (float) $southwest[0];
+			$lon_max = (float) $northeast[0];
+			$lat_min = (float) $southwest[1];
+			$lat_max = (float) $northeast[1];
+
+			$query = 'SELECT id FROM '.$this->table_prefix.'location WHERE latitude >='.$lat_min.' AND latitude <='.$lat_max.' AND longitude >='.$lon_min.' AND longitude <='.$lon_max;
+
+			$query = $this->db->query($query);
+
+			foreach ( $query as $items )
+			{
+				$location_ids[] =  $items->id;
+			}
+		}
+
+		$location_id_in = '1=1';
+		if (count($location_ids) > 0)
+		{
+			$location_id_in = 'l.id IN ('.implode(',',$location_ids).')';
+		}
+		
+		$where = ' WHERE i.incident_active = 1 AND '.$location_id_in.' ';
+		$sortby = " GROUP BY i.id ORDER BY $this->order_field $this->sort";
+        $limit = " LIMIT 0, $this->list_limit";
+		
+		return $this->_get_incidents($where.$sortby, $limit);
         
     }
 
