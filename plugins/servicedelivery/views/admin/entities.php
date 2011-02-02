@@ -67,7 +67,8 @@
                                         <th class="col-1">
                                             <input id="checkAllEntities" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'static_entity_id[]' )" />
                                         </th>
-                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.entity_name');?></th>
+                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.entity_name'); ?></th>
+                                        <th class="col-3"><?php echo Kohana::lang('ui_servicedelivery.entity_type'); ?></th>
                                         <th class="col-4"><?php echo Kohana::lang('ui_admin.actions');?></th>
                                     </tr>
                                 </thead>
@@ -75,7 +76,7 @@
                                 <!-- table footer -->
                                 <tfoot>
                                     <tr class="foot">
-                                        <td colspan="3">
+                                        <td colspan="4">
                                             <?php echo $pagination; ?>
                                         </td>
                                     </tr>
@@ -96,7 +97,7 @@
                                     {
                                         // Fetch properties
                                         $static_entity_id = $entity->id;
-                                        $entity_name = $entity->entity_name;
+                                        $entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
                                         $latitude = $entity->latitude;
                                         $longitude = $entity->longitude;
                                     ?>
@@ -105,9 +106,8 @@
                                                 <input name="static_entity_id[]" id="static_entity" value="<?php echo $static_entity_id; ?>" type="checkbox" class="check-box"/>
                                             </td>
 
-                                            <td class="col-2">
-                                                <?php echo $entity_name; ?>
-                                            </td>
+                                            <td class="col-2"><?php echo $entity_name; ?></td>
+                                            <td class="col-3"><?php echo $entity->static_entity_type->type_name; ?></td>
                                             <td class="col-4">
                                                 <!-- actions -->
                                                 <ul>

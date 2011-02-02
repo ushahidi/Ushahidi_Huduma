@@ -67,11 +67,11 @@ class servicedelivery
      */
     public function generate_cluster_markers()
     {
-
         // Database instance
         $db = new Database();
 
-        // TODO Get/set the color for the static entities
+
+        // TODO Get/set the color for the static entities from the plugin settings
         $color = '31576b';
 
         // TODO Get entity id from the URL variable data
@@ -81,15 +81,26 @@ class servicedelivery
         $zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
             (int) $_GET['z'] : 8;
 
-        // Get the selected category and filter by entities for that category
-
         // Define the cluster radius, $distance, as a function of the zoom value
         $distance = (10000000 >> $zoomLevel) / 100000;
+        
+        // For adding predicates to the WHERE clause
+        $filter = "";
+
+        // Get the selected category and filter by entities for that category
+        $category_id = (isset($_GET['c']) AND !empty($_GET['c']) &&
+            is_numeric($_GET['c']) AND $_GET['c'] != 0) ?
+            (int) $_GET['c'] : 0;
+
+        $filter = ($category_id > 0)? ' AND se.category_id = '.$category_id : '';
+
 
         // Build SQL to fetch the entities from the database
         $sql = 'SELECT e.id, e.static_entity_type_id, se.category_id, e.entity_name, e.latitude, e.longitude ';
         $sql .= 'FROM '.$this->table_prefix.'static_entity e ';
-        $sql .= 'INNER JOIN '.$this->table_prefix.'static_entity_type se ON (e.static_entity_type_id = se.id)';
+        $sql .= 'INNER JOIN '.$this->table_prefix.'static_entity_type se ON (e.static_entity_type_id = se.id) ';
+        $sql .= 'WHERE 1=1 ';
+        $sql .= $filter;
 
         // Execute query
         $entities = $db->query($sql);
@@ -158,17 +169,17 @@ class servicedelivery
             // Calculate the cluster center
             $bounds = $this->_calculate_cluster_center($cluster);
             $cluster_center = $bounds['center'];
-            $southwest = $bounds['sw'];
-            $northeast = $bounds['ne'];
+//            $southwest = $bounds['sw'];
+//            $northeast = $bounds['ne'];
 
             // Number of items in cluster
             $cluster_count = count($cluster);
-            $cluster_info = $this->_get_entity_cluster_info($cluster);
+            $cluster_info = $this->_get_entity_cluster_info($cluster, $bounds);
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "entities/index/?e=".$entity_id."&sw=".$southwest."&ne=".$northeast.">" . $cluster_info ."</a>")) . "\",";
-            $json_item .= "\"link\": \"".url::base()."entities/index/?c=".$entity_id."&sw=".$southwest."&ne=".$northeast."\", ";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', $cluster_info))."\",";
+//            $json_item .= "\"link\": \"".url::base()."entities/index/?c=".$entity_id."&sw=".$southwest."&ne=".$northeast."\", ";
             $json_item .= "\"entity\":[0], ";
             $json_item .= "\"color\": \"".$color."\", ";
             $json_item .= "\"icon\": \"".$icon."\", ";
@@ -284,8 +295,9 @@ class servicedelivery
      *  - Distribution of the items i.e. per category, per entity type
      * 
      * @param array $cluster
+     * @param array $bounds
      */
-    private function _get_entity_cluster_info($cluster)
+    private function _get_entity_cluster_info($cluster, $bounds)
     {
         $item_count = count($cluster);
         $categories = array();
@@ -315,6 +327,10 @@ class servicedelivery
 
         }
 
+        // Get the sw and ne bounds
+        $southwest = $bounds['sw'];
+        $northeast = $bounds['ne'];
+
         // Create the cluster info HTML
         $info_html = "<h5>".$item_count." Entities </h5>";
         
@@ -326,6 +342,9 @@ class servicedelivery
             $category_image = $category_model->category_image;
             $category_color = $category_model->category_color;
 
+            // URL for filtering the entities by category
+            $category_url = url::base().'entities/index/?c='.$category.'&sw='.$southwest.'&ne='.$northeast;
+
             $info_html .= "<div>";
             if ( ! empty($category_image))
             {
@@ -334,12 +353,13 @@ class servicedelivery
             }
             else
             {
-                $swatch_url = url::base()."swatch/?c=".$category_color."&w=25&h=25";
-                $info_html .= "<img src='".$swatch_url."' />";
+                $swatch_url = url::base()."swatch/?c=".$category_color."&w=16&h=16";
+                $info_html .= "<img src='".$swatch_url."' border='0' />";
             }
 
             $info_html .= "<span style='padding-left:3px; position:relative; top:-3px; font-weight:bold;'>";
-            $info_html .= $category_model->category_title."</span>";
+            $info_html .= "<a href='".$category_url."'>".$category_model->category_title."</a>";
+            $info_html .= "</span>";
             $info_html .= "</div>";
             
             // Breakdown table for each categegory
@@ -348,15 +368,20 @@ class servicedelivery
             foreach ($category_data as $key => $value)
             {
                 $entity_type = ORM::factory('static_entity_type', $key);
+
+                // Construct the entity type URL - for filtering entities by type
+                $entity_type_url = url::base().'entities/index/?e='.$key.'&sw='.$southwest.'&ne='.$northeast;
+
                 $info_html .= "<tr>";
-                $info_html .= "<td>". $entity_type->type_name ."</td>";
+                $info_html .= "<td><a href='".$entity_type_url."'>". $entity_type->type_name ."</a></td>";
                 $info_html .= "<td align='right'><strong>". $value ."</strong></td>";
                 $info_html .= "</tr>";
             }
 
-            $info_html .= count($category_data) > 0 ? "</table>" : "";
+            $info_html .= count($category_data) > 0 ? "</table><br/>" : "";
         }
-        
+
+        // Destroy the $categories reference
         unset($categories);
         
         return $info_html;
