@@ -128,7 +128,7 @@ class Servicedelivery_Controller extends Admin_Controller {
         $pagination = new Pagination(array(
                         'query_string' => 'page',
                         'items_per_page' => (int)Kohana::config('settings.items_per_page_admin'),
-                        'total_items'    => ORM::factory('boundary')->count_all()
+                        'total_items'    => ORM::factory('boundary')->where('parent_id',0)->count_all()
         ));
 
         // Boundaries
@@ -166,7 +166,7 @@ class Servicedelivery_Controller extends Admin_Controller {
         $this->template->content->form_action = $form_action;
         $this->template->content->pagination = $pagination;
         $this->template->content->total_items = $pagination->total_items;
-        $this->template->content->boundaries = $boundaries;
+        $this->template->content->top_level_boundaries = ORM::factory('boundary')->where('parent_id', 0)->find_all();
         $this->template->content->boundary_types = $boundary_types;
         $this->template->content->parent_boundaries = $parent_boundaries;
 

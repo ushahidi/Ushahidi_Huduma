@@ -71,5 +71,27 @@ class navigator_Core {
         }
         return $breadcrumb;
     }
+
+    public static function child_boundaries($boundary_id)
+    {
+        // To hold the hierarchy
+        $hierarchy = '';
+
+        // Get the child boundaries
+        $children  = ORM::factory('boundary')->where('parent_id', $boundary_id)->find_all();
+        if (count($children) > 0)
+        {
+            $hierarchy .= '<ul>';
+            foreach ($children as $child)
+            {
+                $hierarchy .= '<li>';
+                $hierarchy .= '<a href="#">'.$child->boundary_name.' '.$child->boundary_type->boundary_type_name.'</a>';
+                $hierarchy .= self::child_boundaries($child->id);
+                $hierarchy .= '</li>';
+            }
+            $hierarchy .= '</ul>';
+        }
+        return $hierarchy;
+    }
 }
 ?>

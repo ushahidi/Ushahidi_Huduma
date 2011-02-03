@@ -82,7 +82,7 @@ CREATE  TABLE IF NOT EXISTS `static_entity` (
   `static_entity_type_id` INT NOT NULL ,
   `boundary_id` INT NOT NULL ,
   `agency_id` INT,
-  `entity_name` VARCHAR(45) NOT NULL ,
+  `entity_name` VARCHAR(150) NOT NULL ,
   `latitude` DOUBLE NOT NULL ,
   `longitude` DOUBLE NOT NULL ,
   `metadata` TEXT NULL ,

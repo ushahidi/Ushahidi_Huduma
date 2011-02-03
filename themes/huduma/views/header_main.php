@@ -95,10 +95,10 @@
         		<!-- content column -->
         		<div id="content" class="clearingfix">
         			<div class="floatbox">
-                       <?php
-                       /*
         				<!-- filters -->
         				<div class="filters clearingfix">
+                            <?php
+                            /*
         					<div style="float:left; width: 100%">
         						<strong><?php echo Kohana::lang('ui_main.filters'); ?></strong>
         						<ul>
@@ -109,14 +109,14 @@
         							<li><a id="media_3" href="#"><span><?php echo Kohana::lang('ui_main.all'); ?></span></a></li>
         						</ul>
         					</div>
+                            */
+                            ?>
         					<?php
         					// Action::main_filters - Add items to the main_filters
         					Event::run('ushahidi_action.map_main_filters');
         					?>
         				</div>
         				<!-- / filters -->
-                        */
-                        ?>
 
         				<?php
         				// Map Blocks
