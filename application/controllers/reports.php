@@ -552,7 +552,7 @@ class Reports_Controller extends Frontend_Controller {
 				$form_error = TRUE;
 			}
 		}
-
+        
 		// Retrieve Country Cities
 		$default_country = Kohana::config('settings.default_country');
 		$this->template->content->cities = $this->_get_cities($default_country);

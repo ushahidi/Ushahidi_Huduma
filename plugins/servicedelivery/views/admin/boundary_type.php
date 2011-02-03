@@ -21,8 +21,8 @@
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/boundaries"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/boundaries/types" class="active"><?php echo Kohana::lang('ui_servicedelivery.boundary_types');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/servicedelivery"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/servicedelivery/types" class="active"><?php echo Kohana::lang('ui_servicedelivery.boundary_types');?></a></li>
                     </ul>
                     <!-- /tabset -->
 
