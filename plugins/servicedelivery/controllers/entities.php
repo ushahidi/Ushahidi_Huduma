@@ -106,30 +106,50 @@ class Entities_Controller extends Frontend_Controller {
         $this->template->header->header_block = $this->themes->header_block();
     }
 
-    /**
-     * View the entity specified in @param $entity_id
-     * @param  $entity_id
-     */
-    public function view($entity_id)
+	public function view($entity_id = FALSE, $saved = FALSE)
     {
-        // To hold the $entity specified in @param $entity_id
-        $entity = "";
+        $this->template->content = new View("frontend/entity_view");
+		// Load Akismet API Key (Spam Blocker)
 
-        // Verify that $entity_id is numeric, else
-        if (is_int($entity_id) AND $entity_id > 0)
-        {
-            $entity = ORM::factory('static_entity', $entity_id);
-        }
-        else
-        {
-            // Redirect to the entities list page
-            url::redirect('entities/');
-        }
+        $api_akismet = Kohana::config('settings.api_akismet');
 
-        // TODO Set up forms array with keys corresponding to the input field names
-        
-        // Check if the form has been submitted, setup validation
-        if ($_POST)
+        if ( !$entity_id )
+        {
+
+            url::redirect('entities');
+
+        }else
+		{
+            $entity = ORM::factory('static_entity')
+                ->where('id',$entity_id)
+                ->find();
+            if ( $entity->id == 0 )   // Not Found
+            {
+                url::redirect('frontend/entities/');
+            }
+
+	
+		$form = array
+            (    
+                'comment_author' => '',
+                'comment_description' => '',
+                'comment_email' => '',
+                'comment_ip' => '',
+                'captcha' => ''
+            );   
+
+
+        // Copy the forms as erros so that the errors are stored with keys corresponding for the field names	
+        $errors = $form;
+
+        // Form submission status flags
+		$captcha = Captcha::factory();
+        $form_saved = ($saved == 'saved')? TRUE : FALSE;
+        $form_error = FALSE;
+        $form_action = "";
+
+        // Check if the form has been submitted
+        if ($_POST AND Kohana::config('settings.allow_comments'))
         {
             // Set up validation
             $post = Validation::factory($_POST);
@@ -137,19 +157,157 @@ class Entities_Controller extends Frontend_Controller {
             // Add some filters
             $post->pre_filter('trim', TRUE);
 
-            // Add validation rules, the input field, followed by some checks in that order
+			$post->add_rules('comment_author', 'required','length[3,100]');
+            $post->add_rules('comment_description', 'required');
+            $post->add_rules('comment_email', 'required','email','length[4,100]');
 
-            // Validation passed?
+
+            if ($post->validate())
+            {
+
+				    // Yes! everything is valid
+
+                    if ($api_akismet != "")
+                    {
+                        // Run Akismet Spam Checker
+
+                        $akismet = new Akismet();
+
+                        // Comment data
+
+                        $comment = array(
+                            'author' => $post->comment_author,
+                            'email' => $post->comment_email,
+                            'website' => "",
+                            'body' => $post->comment_description,
+                            'user_ip' => $_SERVER['REMOTE_ADDR']
+                        );
+
+                        $config = array(
+                            'blog_url' => url::site(),
+                            'api_key' => $api_akismet,
+                            'comment' => $comment
+                        );
+
+                        $akismet->init($config);
+						
+						if ($akismet->errors_exist())
+                        {
+                            if ($akismet->is_error('AKISMET_INVALID_KEY'))
+                            {
+                                // throw new
+                                // Kohana_Exception('akismet.api_key');
+
+                            }elseif($akismet->is_error('AKISMET_RESPONSE_FAILED')){
+
+                                // throw new
+                                // Kohana_Exception('akismet.server_failed');
+
+                            }elseif($akismet->is_error('AKISMET_SERVER_NOT_FOUND')){
+
+                                // throw new
+                                // Kohana_Exception('akismet.server_not_found');
+
+                            }
+
+                            // If the server is down, we have to post
+                            // the comment :(
+                            // $this->_post_comment($comment);
+
+                            $comment_spam = 0;
+                        }else{
+
+                            if ($akismet->is_spam())
+                            {
+                                $comment_spam = 1;
+                            }else{
+                                $comment_spam = 0;
+                            }
+                        }
+					}else{
+
+                        // No API Key!!
+
+                        $comment_spam = 0;
+                    }
+			
+				//TODO CREATE COMMENTS MODEL
+				/*	
+                    $comment = new Comment_Model();
+                    $comment->incident_id = $id;
+                    $comment->comment_author = strip_tags($post->comment_author);
+                    $comment->comment_description = strip_tags($post->comment_description);
+                    $comment->comment_email = strip_tags($post->comment_email);
+                    $comment->comment_ip = $_SERVER['REMOTE_ADDR'];
+                    $comment->comment_date = date("Y-m-d H:i:s",time());
+				*/
+                    // Activate comment for now
+                    if ($comment_spam == 1)
+                    {
+                        $comment->comment_spam = 1;
+                        $comment->comment_active = 0;
+                    }
+                    else
+                    {
+                        $comment->comment_spam = 0;
+                        if (Kohana::config('settings.allow_comments') == 1)
+                        { // Auto Approve
+                            $comment->comment_active = 1;
+                        }
+                        else
+                        { // Manually Approve
+                            $comment->comment_active = 0;
+                        }
+                    }
+                    $comment->save();
+            }
+            // Validation failed
+            else
+            {
+                // Repopulate the form fields
+                $form = arr::overwrite($form, $post->as_array());
+
+                // Populate the form errors if any
+                $errors = arr::overwrite($errors, $post->errors('entity'));
+
+                $form_error = TRUE;
+            }
+        }
+		
+		$this->template->content->form = $form;
+		$this->template->content->errors = $errors;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->form_saved = $form_saved;
+		$this->template->content->entity_id = $entity->id;
+        $this->template->content->entity_name = $entity->entity_name;
+		$this->template->content->boundary_id = $entity->boundary_id;
+        $this->template->content->latitude = $entity->latitude;
+        $this->template->content->longitude = $entity->longitude;
+
+
+        // TODO Unpack the metadata on the frontend (view page)
+
+        //Javascript Header
+        $this->template->map_enabled = TRUE;
+        $this->template->js = new View('js/entity_edit_js');
+        $this->template->js->default_map = Kohana::config('settings.default_map');
+        $this->template->js->default_zoom = Kohana::config('settings.default_zoom');
+
+        if (!$entity->longitude || !$entity->latitude)
+        {
+            $this->template->js->latitude = Kohana::config('settings.default_lat');
+            $this->template->js->longitude = Kohana::config('settings.default_lon');
+        }
+        else
+        {
+            $this->template->js->latitude = $entity->latitude;
+            $this->template->js->longitude = $entity->longitude;
         }
 
-        // Load the view
-        $this->template->content = new View('frontend/entity_view');
+        $this->template->header->header_block = $this->themes->header_block();
 
-
-        $this->template->content->$entity = $entity;
-
-        // Javascript header
-//        $this->temaplate->js = new View('frontend/js/entity_view_js');
     }
+
+}
 }
 ?>
