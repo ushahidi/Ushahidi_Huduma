@@ -72,7 +72,7 @@ class navigator_Core {
         return $breadcrumb;
     }
 
-    public static function child_boundaries($boundary_id)
+    public static function child_boundaries($boundary_id, $recursive = FALSE)
     {
         // To hold the hierarchy
         $hierarchy = '';
@@ -81,15 +81,23 @@ class navigator_Core {
         $children  = ORM::factory('boundary')->where('parent_id', $boundary_id)->find_all();
         if (count($children) > 0)
         {
-            $hierarchy .= '<ul>';
+            $hierarchy .= "<ul>";
             foreach ($children as $child)
             {
-                $hierarchy .= '<li>';
-                $hierarchy .= '<a href="#">'.$child->boundary_name.' '.$child->boundary_type->boundary_type_name.'</a>';
-                $hierarchy .= self::child_boundaries($child->id);
-                $hierarchy .= '</li>';
+                $parent_css_id = 'boundary_'.$child->id;
+                $hierarchy .= "<li>";
+                $hierarchy .= "<a href=\"javascript:showHierarchy(".$child->id.", '".$parent_css_id."')\">".$child->boundary_name." ".$child->boundary_type->boundary_type_name."</a>";
+                $hierarchy .= "<div id=\"".$parent_css_id."\" style=\"visibility:hidden;\"></div>";
+                
+                // Check if the boundaries are to be recursively fetched
+                if ($recursive)
+                {
+                    $hierarchy .= self::child_boundaries($child->id);
+                }
+
+                $hierarchy .= "</li>";
             }
-            $hierarchy .= '</ul>';
+            $hierarchy .= "</ul>";
         }
         return $hierarchy;
     }

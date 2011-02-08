@@ -59,3 +59,52 @@
 			}
 		}
 	}
+
+    /**
+     * Shows the hierarchy of the boundary specified in @param boundary_id
+     * The child items are appended to the element with id @param element_id
+     */
+    function showHierarchy(boundary_id, parent_element_id)
+    {
+        // Hide the element to contain the children
+        var parent_css_id = '#'+parent_element_id;
+        
+        // Hide the parent element if visible
+        if ($(parent_css_id).css('visibility') != 'hidden')
+        {
+            $(parent_css_id).slideUp();
+            $(parent_css_id).html("");
+            $('#arrow_'+boundary_id).html("&rarr;");
+            $(parent_css_id).css('visibility', 'hidden');
+            return;
+        }
+
+        $.getJSON('./json/boundaries/children/'+boundary_id,
+                function(data){
+                    if (data != null && data.content != null) {
+                        // Iterate over the response content and generate the HTML
+                        var html = "<ul class=\"boundary-list\">";
+                        
+                        $.each(data.content, function(key, value){
+                            // Generate the CSS id for the element to hold the children for te current item
+                            var element_css_id = "boundary_"+key;
+                            var href_value = "javascript:showHierarchy('"+key+"','"+element_css_id+"')";
+
+                            html += "<li>";
+                            html += "<span id=\"arrow_"+key+"\">&rarr;</span>";
+                            html += "<span><a href=\""+href_value+"\">"+value+"</a></span>";
+                            html += "<div id=\""+element_css_id+"\" style=\"visibility:hidden\"></div>";
+                            html += "</li>";
+                        });
+                        
+                        html += "</ul>";
+
+                        $(parent_css_id).html(html);
+                        $('#arrow_'+boundary_id).html("&darr;");
+                        $(parent_css_id).css('visibility', 'visible');
+                        $(parent_css_id).hide();
+                        $(parent_css_id).slideDown();
+                    }
+                }
+        );
+    }

@@ -23,13 +23,14 @@
      'entity_location'          => 'Entity Location',
 
      'metadata'                 => 'Metadata',
-     'officers'                 => 'Officers',
+     'view_staff'               => 'View Staff',
      'agency_name'              => 'Agency Name',
      'servicedelivery'          => 'Service Delivery',
      'agency'                   => 'Agency',
      'agencies'                 => 'Agencies',
      'parent_agency'            => 'Parent/Governing Agency',
      'tickets'                  => 'Tickets',
+     'agency_staff_name'        => 'Staff Name',
 
      // Actions
      'save_agency'              => 'Save Agency',
@@ -37,12 +38,19 @@
      'edit_agency'              => 'Edit Agency',
      'delete_agency'            => 'Delete Agency',
      'add_edit_agency'          => 'Add/Edit Agencies',
-     'add_edit_officer'         => 'Add/Edit Officers',
+     'add_edit_staff'           => 'Add/Edit Staff',
      'save_entity'              => 'Save Entity',
      'delete_entity'            => 'Delete Entity',
+     'save_staff'               => 'Save Staff',
+     'delete_staff'             => 'Deelte Staff',
+     'view_agencies'            => 'View Agencies',
 
      // Miscellaneous
      'parent_boundary_type'     => 'Parent Boundary Type',
-     'hierarchy'                => 'Hierarchy'
+     'hierarchy'                => 'Hierarchy',
+     'agency_saved'             => 'Agency Saved',
+     'agency_deleted'           => 'Agency Deleted',
+     'agency_staff_saved'       => 'Agency Staff Saved',
+     'agency_staff_deleted'     => 'Agency Staff Deleted'
  );
 ?>

@@ -26,10 +26,10 @@
                     <div class="tabs">
                         <!-- tabset -->
                         <ul class="tabset">
-                            <li><a href="<?php echo url::site() ?>admin/agencies"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/agencies"><?php echo Kohana::lang('ui_servicedelivery.view_agencies'); ?></a></li>
                             <li><a href="<?php echo url::site() ?>admin/agencies/edit" class="active"><?php echo Kohana::lang('ui_servicedelivery.add_edit_agency');?></a></li>
-                            <li><a href="<?php echo url::site() ?>admin/agencies/officers"><?php echo Kohana::lang('ui_servicedelivery.officers');?></a></li>
-                            <li><a href="<?php echo url::site() ?>admin/agencies/edit_officer"><?php echo Kohana::lang('ui_servicedelivery.add_edit_officer');?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/agencies/staff"><?php echo Kohana::lang('ui_servicedelivery.view_staff');?></a></li>
+                            <li><a href="<?php echo url::site() ?>admin/agencies/edit_staff"><?php echo Kohana::lang('ui_servicedelivery.add_edit_staff');?></a></li>
                         </ul>
                         <!-- /tabset -->
 
@@ -38,7 +38,7 @@
                                 <li><a href="#" class="btn_save"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.save_agency'));?></a></li>
                                 <li><a href="#" class="btn_save_close"><?php echo strtoupper(Kohana::lang('ui_main.save_close'));?></a></li>
                                 <?php if($agency_id): ?>
-                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_main.delete_agency')) ?></a></li>
+                                    <li><a href="#" class="btn_delete btns_red"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.delete_agency')) ?></a></li>
                                 <?php endif; ?>
                                 <li><a href="<?php echo url::site().'admin/agencies/';?>" class="btns_red"><?php echo strtoupper(Kohana::lang('ui_main.cancel'));?></a></li>
                             </ul>
@@ -71,7 +71,7 @@
                         <?php endif; ?>
 
                         <!-- column -->
-                        <div class="f-col">
+                        <div class="sms_holder">
                             <div class="row">
                                 <h4><?php echo Kohana::lang('ui_servicedelivery.agency_name'); ?></h4>
                                 <?php print form::input('agency_name', $form['agency_name'], ' class="text long2"'); ?>

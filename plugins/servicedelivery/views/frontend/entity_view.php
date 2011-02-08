@@ -26,7 +26,7 @@
                             <div class="red-box">
                                 <h3><?php echo Kohana::lang('ui_main.error'); ?></h3>
                                 <ul>
-                                 <?php 
+                                 <?php
                                  foreach($errors as $error_item => $description)
                                  {
                                      print (!$description)? "" : "<li>".$description."</li>";
@@ -52,30 +52,13 @@
                         </div>
                         <!-- /column -->
 
-                        <!-- f-col-1 -->
-                        <div class="f-col-1">
-                            <div class="incident-location">
-                                <div class="location-info">
-                                    <span><?php echo $latitude ?>:</span>
-                                    <span><?php echo $longitude; ?>:</span>
-                                </div>
+                        <div style="float:right;width:350px;">
+                            <div id="report-map" class="report-map">
+                                <div class="map-holder" id="map"></div>
                                 <div style="clear:both"></div>
-                                <div id="divMap" class="map_holder_reports"></div>
                             </div>
                         </div>
-                        <!-- /f-col-1 -->
-
-                        <div class="simple_border"></div>
-                        
+                        <div style="clear:both"></div>
                     </div>
                 <?php print form::close(); ?>
-                <?php
-                    if ($entity_id)
-                    {
-                        print form::open(url::site().'admin/entities', array('id'=>'entityMain', 'name'=>'entityMain'));
-                        print form::hidden(array('action'=>'d', 'static_entity_id[]'=>$entity_id));
-                        print form::close();
-                    }
-
-                ?>
             </div>

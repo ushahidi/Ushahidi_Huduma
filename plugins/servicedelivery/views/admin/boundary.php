@@ -91,17 +91,18 @@
                                 {
                                     $boundary_id = $boundary->id;
                                     $boundary_type_id = $boundary->boundary_type_id;
-                                    $boundary_type_name = $boundary->boundary_type->boundary_type_name;
-                                    $boundary_name = $boundary->boundary_name;
+                                    $boundary_name = strtoupper($boundary->boundary_name." ".$boundary->boundary_type->boundary_type_name);
                                     $parent_id = $boundary->parent_id;
+                                    $parent_css_id = 'boundary_'.$boundary_id;
                                 ?>
                                     <tr>
                                         <td class="col-1">
                                             <input type="checkbox" class="check-box" id="boundary" name="boundary_id" value="<?php echo $boundary_id?>" />
                                         </td>
                                         <td class="col-2">
-                                            <span><?php echo $boundary_name." ".$boundary_type_name; ?></span>
-                                            <div><?php echo navigator::child_boundaries($boundary_id); ?></div>
+                                            <span id="arrow_<?php echo $boundary_id; ?>">&rarr;</span>
+                                            <span><a href="javascript:showHierarchy('<?php echo$boundary_id; ?>','<?php echo $parent_css_id; ?>')"><?php echo $boundary_name; ?></a></span>
+                                            <div id="<?php echo $parent_css_id; ?>" style="visibility:hidden;"></div>
                                         </td>
                                         <td class="col-4">
                                             <ul>

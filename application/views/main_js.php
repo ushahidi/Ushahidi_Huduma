@@ -392,27 +392,26 @@
 			map = new OpenLayers.Map('map', options);
 			map.addControl( new OpenLayers.Control.LoadingPanel({minSize: new OpenLayers.Size(573, 366)}) );
 			
-			<?php echo map::layers_js(FALSE); ?>
-			map.addLayers(<?php echo map::layers_array(FALSE); ?>);
-			
+            <?php echo map::layers_js(FALSE); ?>
+            map.addLayers(<?php echo map::layers_array(FALSE); ?>);
 			
 			// Add Controls
-			map.addControl(new OpenLayers.Control.Navigation());
-			map.addControl(new OpenLayers.Control.Attribution());
-			map.addControl(new OpenLayers.Control.PanZoomBar());
-			map.addControl(new OpenLayers.Control.MousePosition(
-				{
-					div: document.getElementById('mapMousePosition'),
-					numdigits: 5
-				}));    
-			map.addControl(new OpenLayers.Control.Scale('mapScale'));
+            map.addControl(new OpenLayers.Control.Navigation());
+            map.addControl(new OpenLayers.Control.Attribution());
+            map.addControl(new OpenLayers.Control.PanZoomBar());
+            map.addControl(new OpenLayers.Control.MousePosition(
+            {
+                div: document.getElementById('mapMousePosition'),
+                numdigits: 5
+            }));
+            map.addControl(new OpenLayers.Control.Scale('mapScale'));
             map.addControl(new OpenLayers.Control.ScaleLine());
-			map.addControl(new OpenLayers.Control.LayerSwitcher());
+            map.addControl(new OpenLayers.Control.LayerSwitcher());
 			
-			// display the map projection
-			document.getElementById('mapProjection').innerHTML = map.projection;
-				
-			gMap = map;
+            // display the map projection
+            document.getElementById('mapProjection').innerHTML = map.projection;
+
+            gMap = map;
 			
 			// Category Switch Action
 			$("a[id^='cat_']").click(function()
@@ -464,7 +463,10 @@
 				$.getJSON("<?php echo url::site()."json/timeline/"?>"+currentCat, function(data) {
 					allGraphData = data[0];
 				});
-				
+
+                // Run map overlay event
+                <?php Event::run('ushahidi_action.main_map_overlay'); ?>
+
 				return false;
 			});
 			
@@ -618,16 +620,7 @@
 					gMap.getCenter(),null,null,null,null,"json");
 				gTimeline.playOrPause('raindrops');
 			});
-		});
-		
-		/*		
-		d = $('#startDate > optgroup > option').map(function()
-		{
-			return $(this).val();
-		});
 
-		$.grep(d, function(n,i)
-		{
-			return n > '1183240800';
-		})[0];
-*/
+            // Run map overlay event
+            <?php Event::run('ushahidi_action.main_map_overlay'); ?>
+		});

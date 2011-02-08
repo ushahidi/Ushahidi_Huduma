@@ -446,45 +446,48 @@ class Main_Controller extends Frontend_Controller {
 		$lonTo = Kohana::config('map.lonTo');
 		$latTo = Kohana::config('map.latTo');
 
-		$this->themes->js = new View('main_js');
-		$this->themes->js->json_url = ($clustering == 1) ?
-			"json/cluster" : "json";
-		$this->themes->js->marker_radius =
-			($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
-		$this->themes->js->marker_opacity =
-			($marker_opacity >=1 && $marker_opacity <= 10 )
-			? $marker_opacity * 0.1  : 0.9;
-		$this->themes->js->marker_stroke_width =
-			($marker_stroke_width >=1 && $marker_stroke_width <= 5 ) ? $marker_stroke_width : 2;
-		$this->themes->js->marker_stroke_opacity =
-			($marker_stroke_opacity >=1 && $marker_stroke_opacity <= 10 )
-			? $marker_stroke_opacity * 0.1  : 0.9;
+        $this->themes->js = new View('main_js');
+        $this->themes->js->json_url = ($clustering == 1) ?
+            "json/cluster" : "json";
+        $this->themes->js->marker_radius =
+            ($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
+        $this->themes->js->marker_opacity =
+            ($marker_opacity >=1 && $marker_opacity <= 10 )
+            ? $marker_opacity * 0.1  : 0.9;
+        $this->themes->js->marker_stroke_width =
+            ($marker_stroke_width >=1 && $marker_stroke_width <= 5 ) ? $marker_stroke_width : 2;
+        $this->themes->js->marker_stroke_opacity =
+            ($marker_stroke_opacity >=1 && $marker_stroke_opacity <= 10 )
+            ? $marker_stroke_opacity * 0.1  : 0.9;
 
-		// pdestefanis - allows to restrict the number of zoomlevels available
-		$this->themes->js->numZoomLevels = $numZoomLevels;
-		$this->themes->js->minZoomLevel = $minZoomLevel;
-		$this->themes->js->maxZoomLevel = $maxZoomLevel;
+        // pdestefanis - allows to restrict the number of zoomlevels available
+        $this->themes->js->numZoomLevels = $numZoomLevels;
+        $this->themes->js->minZoomLevel = $minZoomLevel;
+        $this->themes->js->maxZoomLevel = $maxZoomLevel;
 
-		// pdestefanis - allows to limit the extents of the map
-		$this->themes->js->lonFrom = $lonFrom;
-		$this->themes->js->latFrom = $latFrom;
-		$this->themes->js->lonTo = $lonTo;
-		$this->themes->js->latTo = $latTo;
+        // pdestefanis - allows to limit the extents of the map
+        $this->themes->js->lonFrom = $lonFrom;
+        $this->themes->js->latFrom = $latFrom;
+        $this->themes->js->lonTo = $lonTo;
+        $this->themes->js->latTo = $latTo;
 
-		$this->themes->js->default_map = Kohana::config('settings.default_map');
-		$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
-		$this->themes->js->latitude = Kohana::config('settings.default_lat');
-		$this->themes->js->longitude = Kohana::config('settings.default_lon');
-		$this->themes->js->default_map_all = Kohana::config('settings.default_map_all');
+        $this->themes->js->default_map = Kohana::config('settings.default_map');
+        $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
+        $this->themes->js->latitude = Kohana::config('settings.default_lat');
+        $this->themes->js->longitude = Kohana::config('settings.default_lon');
+        $this->themes->js->default_map_all = Kohana::config('settings.default_map_all');
 
-		$this->themes->js->active_startDate = $display_startDate;
-		$this->themes->js->active_endDate = $display_endDate;
+        $this->themes->js->active_startDate = $display_startDate;
+        $this->themes->js->active_endDate = $display_endDate;
+        
+        // Run the header_scripts event - Modifies the JavaScript Header
+        Event::run('ushahidi_action.header_scripts', $this->themes->js);
+        
+        //$myPacker = new javascriptpacker($js , 'Normal', false, false);
+        //$js = $myPacker->pack();
 
-		//$myPacker = new javascriptpacker($js , 'Normal', false, false);
-		//$js = $myPacker->pack();
-
-		// Rebuild Header Block
-		$this->template->header->header_block = $this->themes->header_block();
+        // Rebuild Header Block
+        $this->template->header->header_block = $this->themes->header_block();
 	}
 
 } // End Main

@@ -1,0 +1,16 @@
+/*
+ * Service delivery plugin stylesheet
+ */
+
+ ul.boundary-list li {
+    list-style-type: none;
+}
+
+ul.boundary-list li a {
+    padding-left: 5px;
+    text-decoration: none;
+}
+
+.popup-table {
+    font-size:12px;
+}

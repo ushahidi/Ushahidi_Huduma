@@ -145,7 +145,7 @@ class Agencies_Controller extends Admin_Controller {
                 $agency = new Agency_Model($agency_id);
 
                 // Set the service provider properties
-                $agency->agency_name = $post->provider_name;
+                $agency->agency_name = $post->agency_name;
                 $agency->description = $post->description;
                 $agency->category_id = $post->category_id;
                 $agency->parent_id = $post->parent_id;
@@ -186,10 +186,10 @@ class Agencies_Controller extends Admin_Controller {
         }
         else
         {
-            // Check if the service provider id has been set, load data
+            // Check if the agency id has been set, load data
             if ($agency_id)
             {
-                // Retrieve current service provider
+                // Retrieve current agency
                 $agency = ORM::factory('agency', $agency_id);
 
                 if ($agency->loaded == true)
@@ -197,7 +197,7 @@ class Agencies_Controller extends Admin_Controller {
                     // Set the form values
                     $form = array(
                         'agency_id' => $agency->id,
-                        'agency_name' => $agency->provider_name,
+                        'agency_name' => $agency->agency_name,
                         'description' => $agency->description,
                         'category_id' => $agency->category_id,
                         'parent_id' => $agency->parent_id,
@@ -221,10 +221,13 @@ class Agencies_Controller extends Admin_Controller {
         $admin_boundaries = ORM::factory('boundary')
                                 ->select_list('id', 'boundary_name');
 
+        $admin_boundaries[0] = "-- National Level --";
+
         $agencies_list[0] =  "-- Top Level Agency ---";
         
         // Put  "--- Top Level Service Provider ---" at the top of the list
         ksort($agencies_list);
+        ksort($admin_boundaries);
         
         // Set the content for the view
         $this->template->content->agency_id = $agency_id;
@@ -246,9 +249,9 @@ class Agencies_Controller extends Admin_Controller {
      * 
      * @param int $agency_id
      */
-    public function officers($agency_id)
+    public function staff($agency_id = FALSE)
     {
-        $this->template->content = new View('admin/serviceprovider_officers');
+        $this->template->content = new View('admin/agency_staff');
 
         // Form submission status flags
         $form_error = FALSE;
@@ -266,7 +269,7 @@ class Agencies_Controller extends Admin_Controller {
 
             // Add some rules, the input field, followed by some checks in that order
             $post->add_rules('action', 'required', 'alpha', 'length[1,1]');
-            $post->add_rules('service_provider_officer_id', 'required', 'numeric');
+            $post->add_rules('agency_staff_id', 'required', 'numeric');
 
             // Test is the validation has passed
             if ($post->validate())
@@ -277,7 +280,7 @@ class Agencies_Controller extends Admin_Controller {
                     foreach ($post->service_provider_officer_id as $item)
                     {
                         // Delete
-                        ORM::factory('service_provider_officer')->delete($item);
+                        ORM::factory('agency_staff')->delete($item);
                     }
 
                     // Success
@@ -299,41 +302,149 @@ class Agencies_Controller extends Admin_Controller {
 
         }
 
+        // Generate the where clause
+        $where_clause = ($agency_id)? 'agency_id = '.$agency_id : '1=1';
+
         // Pagination
         $pagination = new Pagination(array(
             'query_string' => 'page',
             'items_per_page' => Kohana::config('settings.items_per_page_admin'),
-            'total_items' => ORM::factory('service_provider_officer')
-                                ->where('agency_id', $agency_id)
+            'total_items' => ORM::factory('agency_staff')
+                                ->where($where_clause)
                                 ->count_all()
         ));
 
         // Get the officers for the service provider
-        $officers = ORM::factory('service_provider_officer')
-                                ->where('agency_id', $agency_id)
+        $staff = ORM::factory('agency_staff')
+                                ->where($where_clause)
                                 ->find_all();
 
 
         $this->template->content->form_error = $form_error;
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_action = $form_action;
-        $this->template->content->service->provider = ORM::factory('service_provider', $agency_id);
-        $this->tempalte->content->officers = $officers;
+        $this->template->content->staff = $staff;
         $this->template->content->pagination = $pagination;
 
         // Total items
         $this->template->content->total_items = $pagination->total_items;
 
         // Javascript header
-        $this->template->js = new View("js/serviceprovider_officers_js");
+//        $this->template->js = new View("js/agency_staff_js");
     }
 
-    /**
-     * Adds a service provider officer
-     */
-    public function officer($officer_id = FALSE)
+    public function edit_staff($agency_staff_id = FALSE, $saved = FALSE)
     {
+        $this->template->content = new View('admin/agency_staff_edit');
+        $form = array(
+            'agency_staff_id' => '',
+            'agency_id' => '',
+            'full_name' => '',
+            'email_address' => '',
+            'phone_number' => ''
+        );
+
+        // Copy the form as errors so that the errors are stored using the same keys as the input fields
+        $errors = $form;
         
+        $form_error = FALSE;
+        $form_saved = ($saved == 'saved')? TRUE : FALSE;
+        $form_action = "";
+        
+        // Check if the form has been submitted, set up validatino
+        if ($_POST)
+        {
+            // Set up validation
+            $post = Validation::factory($_POST);
+            
+            // Add some filters
+            $post->pre_filter('trim', TRUE);
+            
+            // Add some rules, the input field, followed by some checks in that order
+            if ($post->action == 'a')
+            {
+                $post->add_rules('full_name', 'required');
+                $post->add_rules('email_address', 'required', 'email');
+                $post->add_rules('agency_id', 'required', 'numeric');
+
+                // Add some callback functions to check existence of foreign keys
+                $post->add_callbacks('agency_id', array($this, 'agency_id_check'));
+            }
+            
+            // Validation passed?
+            if ($post->validate())
+            {
+                if ($post->action == 'a')
+                {
+                    $staff = new Agency_Staff_Model($agency_staff_id);
+                    $staff->full_name = $post->full_name;
+                    $staff->email_address = $post->email_address;
+                    $staff->agency_id = $post->agency_id;
+                    $staff->phone_number = $post->phone_number;
+
+                    $staff->save();
+
+                    // Clear the form values
+                    array_fill_keys($form, '');
+
+                    if ($post->save == 1)   // Save but don't close
+                    {
+                        url::redirect('admin/agencies/edit_staff/'.$staff->id.'/saved');
+                    }
+                    else
+                    {
+                        url::redirect('admin/agencies/staff');
+                    }
+                }
+            }
+            else // Validation failed
+            {
+                // Populate the form fields
+                $form = arr::overwrite($form, $post->as_array());
+                
+                //Populate the errors, if any
+                $errors = arr::overwrite($errors, $post->errors('Edit Staff'));
+                
+                // Turn on the form error
+                $form_error = TRUE;
+            }
+        }
+        else
+        {
+            // Check if the agency id has been set, load data
+            if ($agency_staff_id)
+            {
+                // Retrieve current agency
+                $staff = ORM::factory('agency_staff', $agency_staff_id);
+
+                if ($staff->loaded == true)
+                {
+                    // Set the form values
+                    $form = array(
+                        'agency_staff_id' => $staff->id,
+                        'full_name' => $staff->full_name,
+                        'email_address' => $staff->email_address,
+                        'agency_id' => $staff->agency_id,
+                        'phone_number' => $staff->phone_number
+                    );
+                }
+            }
+            
+        }
+
+        // Get the list of agencies
+        $agency_array = ORM::factory('agency')->select_list('id', 'agency_name');
+
+        $this->template->content->form = $form;
+        $this->template->content->errors = $errors;
+        $this->template->content->form_saved = $form_saved;
+        $this->template->content->form_error = $form_error;
+        $this->template->content->form_action = $form_action;
+        $this->template->content->agency_array =  $agency_array;
+        $this->template->content->agency_staff_id = $agency_staff_id;
+
+        // Javascript Header
+        $this->template->js = new View('js/agency_staff_edit_js');
     }
 
     /**
@@ -345,7 +456,7 @@ class Agencies_Controller extends Admin_Controller {
     public function tickets($agency_id, $ticket_status = FALSE)
     {
 //        $this->template->title = "Tickets";
-        $this->template->content = new View('admin/serviceprovider_tickets');
+        $this->template->content = new View('admin/agency_tickets');
 
         // Form submission status flags
         $form_error = FALSE;
@@ -417,7 +528,7 @@ class Agencies_Controller extends Admin_Controller {
         $this->template->content->total_items = $pagination->total_items;
 
         // Javascript header
-        $this->template->js = new View("admin/serviceprovider_tickets_js");
+        $this->template->js = new View("js/agency_tickets_js");
     }
 
 //> VALIDATION CALLBACK FUNCTIONS
@@ -496,6 +607,26 @@ class Agencies_Controller extends Admin_Controller {
         if ( ! $boundary_exists)
         {
             $post->add_error('boundary_id', 'Invalid administrative boundary');
+        }
+    }
+
+    /**
+     * Checks if the agency id contained in @param $post exists in the database
+     * 
+     * @param Validation $post
+     */
+    public function agency_id_check(Validation $post)
+    {
+        // Check if a validation error for the agency_id already exists
+        if (array_key_exists('agency_id', $post->errors()))
+            return;
+
+        // Check if the specified agency id exists
+        $agency_exists = ORM::factory('agency', $post->agency_id)->loaded;
+
+        if ( ! $agency_exists)
+        {
+            $post->add_error('agency_id', 'Invalid service agency');
         }
     }
         

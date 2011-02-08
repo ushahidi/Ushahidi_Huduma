@@ -419,9 +419,6 @@ class Json_Controller extends Template_Controller
             array_push($json_array, $json_item);
         }
 
-        // Run event, push extra cluster points to the JSON array before generating the JSON string
-        Event::run('ushahidi_action.markers_main_map_cluster', $json_array);
-
         $json = implode(",", $json_array);
 
          header('Content-type: application/json; charset=utf-8');
