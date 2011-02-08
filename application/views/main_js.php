@@ -49,182 +49,186 @@
 							 markerOpacity: markerOpacity,
 							 protocolFormat: OpenLayers.Format.GeoJSON};
 							
-		/*
-		Create the Markers Layer
-		*/
-		function addMarkers(catID,startDate,endDate, currZoom, currCenter,
-			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
-		{
-			activeZoom = currZoom;
+        /**
+         * Create the Markers Layer
+         */
+        function addMarkers(catID,startDate,endDate, currZoom, currCenter,
+            mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
+        {
+            activeZoom = currZoom;
+
+            if(activeZoom == '') {
+                // Run the map overlay event
+                <?php Event::run('ushahidi_action.main_map_overlay'); ?>
+                return $.timeline({categoryId: catID,
+                           startTime: new Date(startDate * 1000),
+                           endTime: new Date(endDate * 1000),
+                           mediaType: mediaType
+                          }).addMarkers(
+                            startDate, endDate, gMap.getZoom(),
+                            gMap.getCenter(), thisLayerID, thisLayerType,
+                            thisLayerUrl, thisLayerColor, json_url);
+            }
 			
-			if(activeZoom == ''){
-				return $.timeline({categoryId: catID,
-		                   startTime: new Date(startDate * 1000),
-		                   endTime: new Date(endDate * 1000),
-						   mediaType: mediaType
-						  }).addMarkers(
-							startDate, endDate, gMap.getZoom(),
-							gMap.getCenter(), thisLayerID, thisLayerType, 
-							thisLayerUrl, thisLayerColor, json_url);
-			}
-			
-			setTimeout(function(){
-				if(currZoom == activeZoom){
-					return $.timeline({categoryId: catID,
-		                   startTime: new Date(startDate * 1000),
-		                   endTime: new Date(endDate * 1000),
-						   mediaType: mediaType
-						  }).addMarkers(
-							startDate, endDate, gMap.getZoom(),
-							gMap.getCenter(), thisLayerID, thisLayerType, 
-							thisLayerUrl, thisLayerColor, json_url);
-				}else{
-					return true;
-				}
-			}, 2000);
-		}
-
-		/*
-		Display loader as Map Loads
-		*/
-		function onMapStartLoad(event)
-		{
-			if ($("#loader"))
-			{
-				$("#loader").show();
-			}
-
-			if ($("#OpenLayers\\.Control\\.LoadingPanel_4"))
-			{
-				$("#OpenLayers\\.Control\\.LoadingPanel_4").show();
-			}
-		}
-
-		/*
-		Hide Loader
-		*/
-		function onMapEndLoad(event)
-		{
-			if ($("#loader"))
-			{
-				$("#loader").hide();
-			}
-
-			if ($("#OpenLayers\\.Control\\.LoadingPanel_4"))
-			{
-				$("#OpenLayers\\.Control\\.LoadingPanel_4").hide();
-			}
-		}
-
-		/*
-		Close Popup
-		*/
-		function onPopupClose(evt)
-		{
-            // selectControl.unselect(selectedFeature);
-			for (var i=0; i<map.popups.length; ++i)
-			{
-				map.removePopup(map.popups[i]);
-			}
+            setTimeout(function() {
+                if(currZoom == activeZoom){
+                    // Run the map overlay event
+                    <?php Event::run('ushahidi_action.main_map_overlay'); ?>
+                    return $.timeline({categoryId: catID,
+                           startTime: new Date(startDate * 1000),
+                           endTime: new Date(endDate * 1000),
+                           mediaType: mediaType
+                          }).addMarkers(
+                            startDate, endDate, gMap.getZoom(),
+                            gMap.getCenter(), thisLayerID, thisLayerType,
+                            thisLayerUrl, thisLayerColor, json_url);
+                }else{
+                    return true;
+                }
+            }, 2000);
         }
 
-		/*
-		Display popup when feature selected
-		*/
+        /**
+         * Display loader as Map Loads
+         */
+        function onMapStartLoad(event)
+        {
+            if ($("#loader"))
+            {
+                $("#loader").show();
+            }
+
+            if ($("#OpenLayers\\.Control\\.LoadingPanel_4"))
+            {
+                $("#OpenLayers\\.Control\\.LoadingPanel_4").show();
+            }
+        }
+
+        /**
+         * Hide Loader
+         */
+        function onMapEndLoad(event)
+        {
+            if ($("#loader"))
+            {
+                $("#loader").hide();
+            }
+
+            if ($("#OpenLayers\\.Control\\.LoadingPanel_4"))
+            {
+                $("#OpenLayers\\.Control\\.LoadingPanel_4").hide();
+            }
+        }
+
+        /**
+         * Close Popup
+         */
+        function onPopupClose(evt)
+        {
+            // selectControl.unselect(selectedFeature);
+            for (var i=0; i<map.popups.length; ++i)
+            {
+                map.removePopup(map.popups[i]);
+            }
+        }
+
+        /**
+         * Display popup when feature selected
+         */
         function onFeatureSelect(event)
-		{
+        {
             selectedFeature = event;
             // Since KML is user-generated, do naive protection against
             // Javascript.
 
-			zoom_point = event.feature.geometry.getBounds().getCenterLonLat();
-			lon = zoom_point.lon;
-			lat = zoom_point.lat;
+            zoom_point = event.feature.geometry.getBounds().getCenterLonLat();
+            lon = zoom_point.lon;
+            lat = zoom_point.lat;
 
-			var content = "<div class=\"infowindow\"><div class=\"infowindow_list\">"+event.feature.attributes.name+"<div style=\"clear:both;\"></div></div>";
-		    content = content + "\n<div class=\"infowindow_meta\"><a href='"+event.feature.attributes.link+"'><?php echo Kohana::lang('ui_main.more_information');?></a><br/><a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", 1)'><?php echo Kohana::lang('ui_main.zoom_in');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", -1)'><?php echo Kohana::lang('ui_main.zoom_out');?></a></div>";
-			content = content + "</div>";			
+            var content = "<div class=\"infowindow\"><div class=\"infowindow_list\">"+event.feature.attributes.name+"<div style=\"clear:both;\"></div></div>";
+            content = content + "\n<div class=\"infowindow_meta\"><a href='"+event.feature.attributes.link+"'><?php echo Kohana::lang('ui_main.more_information');?></a><br/><a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", 1)'><?php echo Kohana::lang('ui_main.zoom_in');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", -1)'><?php echo Kohana::lang('ui_main.zoom_out');?></a></div>";
+            content = content + "</div>";
 
-			if (content.search("<script") != -1)
-			{
+            if (content.search("<script") != -1)
+            {
                 content = "Content contained Javascript! Escaped content below.<br />" + content.replace(/</g, "&lt;");
             }
-            popup = new OpenLayers.Popup.FramedCloud("chicken", 
-				event.feature.geometry.getBounds().getCenterLonLat(),
-				new OpenLayers.Size(100,100),
-				content,
-				null, true, onPopupClose);
+            popup = new OpenLayers.Popup.FramedCloud("chicken",
+                event.feature.geometry.getBounds().getCenterLonLat(),
+                new OpenLayers.Size(100,100),
+                content,
+                null, true, onPopupClose);
             event.feature.popup = popup;
             map.addPopup(popup);
         }
 
-		/*
-		Destroy Popup Layer
-		*/
+        /**
+         * Destroy Popup Layer
+         */
         function onFeatureUnselect(event)
-		{
+        {
             map.removePopup(event.feature.popup);
             event.feature.popup.destroy();
             event.feature.popup = null;
         }
 
-		// Refactor Clusters On Zoom
-		// *** Causes the map to load json twice on the first go
-		// *** Need to fix this!
-		function mapZoom(event)
-		{
-			// Prevent this event from running on the first load
-			if (mapLoad > 0)
-			{
-				// Get Current Category
-				currCat = $("#currentCat").val();
+        // Refactor Clusters On Zoom
+        // *** Causes the map to load json twice on the first go
+        // *** Need to fix this!
+        function mapZoom(event)
+        {
+            // Prevent this event from running on the first load
+            if (mapLoad > 0)
+            {
+                // Get Current Category
+                currCat = $("#currentCat").val();
 
-				// Get Current Start Date
-				currStartDate = $("#startDate").val();
+                // Get Current Start Date
+                currStartDate = $("#startDate").val();
 
-				// Get Current End Date
-				currEndDate = $("#endDate").val();
+                // Get Current End Date
+                currEndDate = $("#endDate").val();
 
-				// Get Current Zoom
-				currZoom = map.getZoom();
+                // Get Current Zoom
+                currZoom = map.getZoom();
 
-				// Get Current Center
-				currCenter = map.getCenter();
+                // Get Current Center
+                currCenter = map.getCenter();
 
-				// Refresh Map
-				addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
-			}
-		}
+                // Refresh Map
+                addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
+            }
+        }
 
-		function mapMove(event)
-		{
-			// Prevent this event from running on the first load
-			if (mapLoad > 0)
-			{
-				// Get Current Category
-				currCat = $("#currentCat").val();
+        function mapMove(event)
+        {
+            // Prevent this event from running on the first load
+            if (mapLoad > 0)
+            {
+                // Get Current Category
+                currCat = $("#currentCat").val();
 
-				// Get Current Start Date
-				currStartDate = $("#startDate").val();
+                // Get Current Start Date
+                currStartDate = $("#startDate").val();
 
-				// Get Current End Date
-				currEndDate = $("#endDate").val();
+                // Get Current End Date
+                currEndDate = $("#endDate").val();
 
-				// Get Current Zoom
-				currZoom = map.getZoom();
+                // Get Current Zoom
+                currZoom = map.getZoom();
 
-				// Get Current Center
-				currCenter = map.getCenter();
+                // Get Current Center
+                currCenter = map.getCenter();
 
-				// Refresh Map
-				addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
-			}
-		}
+                // Refresh Map
+                addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
+            }
+        }
 
 
-		/*
-		Refresh Graph on Slider Change
-		*/
+		/**
+		 * Refresh Graph on Slider Change
+		 */
 		function refreshGraph(startDate, endDate)
 		{
 			var currentCat = gCategoryId;
@@ -464,9 +468,6 @@
 					allGraphData = data[0];
 				});
 
-                // Run map overlay event
-                <?php Event::run('ushahidi_action.main_map_overlay'); ?>
-
 				return false;
 			});
 			
@@ -584,7 +585,7 @@
 			// Initialize Map
 			addMarkers(gCategoryId, startTime, endTime, '', '', gMediaType);
 			refreshGraph(startTime, endTime);
-			
+
 			// Media Filter Action
 			$('.filters li a').click(function()
 			{
@@ -621,6 +622,4 @@
 				gTimeline.playOrPause('raindrops');
 			});
 
-            // Run map overlay event
-            <?php Event::run('ushahidi_action.main_map_overlay'); ?>
 		});

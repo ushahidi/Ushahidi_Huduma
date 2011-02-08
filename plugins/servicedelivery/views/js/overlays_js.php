@@ -273,9 +273,12 @@
             var point = new OpenLayers.Geometry.Point(feature.geometry.x, feature.geometry.y);
             OpenLayers.Projection.transform(point, proj_4326, proj_900913);
         };
+        
+        // Set the zoom level
+        zoomLevel = (map.getZoom() == 0 || activeZoom == null || activeZoom == '')? defaultZoom : activeZoom;
 
         // Create the overlay markers
-        overlayMarkers = new OpenLayers.Layer.GML(o_layerName, overlayURL + '?z=' + map.getZoom() + '&c=' + categoryId,
+        overlayMarkers = new OpenLayers.Layer.GML(o_layerName, overlayURL + '?z=' + zoomLevel + '&c=' + categoryId,
             {
                 preFeatureInsert: preFeatureInsert,
                 format: OpenLayers.Format.GeoJSON,
