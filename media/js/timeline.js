@@ -716,18 +716,13 @@
 				});
 
 			map.addLayer(markers);
-
 			
-//			if (!newlayer)
-//			{ // Keep the Base Layer in Focus
-				selectControl = new OpenLayers.Control.SelectFeature(markers);
-				map.addControl(selectControl);
-				selectControl.activate();
-				markers.events.on({
-					"featureselected": onFeatureSelect,
-					"featureunselected": onFeatureUnselect
-				});
-//			}
+            // Add incident markers to the feature selection list
+            addSelectFeatureItem(markers);
+            markers.events.on({
+                "featureselected": onFeatureSelect,
+                "featureunselected": onFeatureUnselect
+            });
 
 			return markers;
 		};

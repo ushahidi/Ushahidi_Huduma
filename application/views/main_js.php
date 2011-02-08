@@ -48,7 +48,10 @@
 							 markerRadius: markerRadius,
 							 markerOpacity: markerOpacity,
 							 protocolFormat: OpenLayers.Format.GeoJSON};
-							
+
+         var selectFeatureItems = [];
+         var selectControl = null;
+
         /**
          * Create the Markers Layer
          */
@@ -369,7 +372,53 @@
 				$("#"+link).text("<?php echo Kohana::lang('ui_main.show'); ?>");
 			}
 			$('#'+layer).toggle(500);
-		}							
+		}
+
+        /**
+         * Adds feature items (contained in vector layers) to the list
+         * of feature selection items. This method should be called by all
+         * JS functions overlaying data on the main map so that the feature
+         * selection control can be used for selection on multiple layers
+         */
+        function addSelectFeatureItem(featureItem)
+        {
+            // No layers in feature selection list, safe to push
+            if (selectFeatureItems.length == 0)
+            {
+                selectFeatureItems.push(featureItem);
+            }
+            else    // Check if layer already exists in feature selection list
+            {
+                // Name of the layer being added
+                var overlayName = featureItem.name;
+                var tempArray = [];
+                
+                // Check if layer exists exists
+                for (var i = 0; i < selectFeatureItems.length; i++)
+                {
+                    item = selectFeatureItems[i];
+                    if (item.name != overlayName)
+                    {
+                        tempArray.push(item);
+                    }
+                }
+                // Recreate the list of layers for the map control
+                tempArray.push(featureItem);
+                selectFeatureItems = tempArray;
+            }
+
+            // Only initialize feature selection control if the map is loaded
+            if (mapLoad > 0)
+            {
+                if (selectControl != null) map.removeControl(selectControl);
+
+                // Initialize the feature selection control
+                selectControl = new OpenLayers.Control.SelectFeature(selectFeatureItems);
+                map.addControl(selectControl);
+                selectControl.activate();
+            }
+        }
+        
 
 		jQuery(function() {
 			var map_layer;

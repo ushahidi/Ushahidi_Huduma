@@ -297,10 +297,9 @@
         // Add the markers layer to the map
         map.addLayer(overlayMarkers);
 
-        // Feature selection events for the overlay markers
-        selectControl = new OpenLayers.Control.SelectFeature(overlayMarkers);
-        map.addControl(selectControl);
-        selectControl.activate();
+        // Add overlay markers to the list of feature selection items
+        addSelectFeatureItem(overlayMarkers);
+
         overlayMarkers.events.on({
             "featureselected": onFeatureSelect,
             "featureunselected": onFeatureUnselect
