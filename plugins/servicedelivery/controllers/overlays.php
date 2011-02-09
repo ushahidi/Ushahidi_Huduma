@@ -44,7 +44,8 @@ class Overlays_Controller extends Template_Controller {
 
         $marker = ORM::factory('static_entity', $entity_id);
 
-        if ($marker->loaded)
+        // Check if the marker exists and belongs to a visible category
+        if ($marker->loaded AND $marker->static_entity_type->category->category_visible == 1)
         {
             // Get all neighbouring entities
             $latitude = $marker->latitude;
@@ -159,7 +160,9 @@ class Overlays_Controller extends Template_Controller {
         $sql = 'SELECT e.id, e.static_entity_type_id, se.category_id, e.entity_name, e.latitude, e.longitude ';
         $sql .= 'FROM '.$this->table_prefix.'static_entity e ';
         $sql .= 'INNER JOIN '.$this->table_prefix.'static_entity_type se ON (e.static_entity_type_id = se.id) ';
-        $sql .= 'WHERE 1=1 ';
+        $sql .= 'INNER JOIN '.$this->table_prefix.'category c ON (se.category_id = c.id) ';
+        $sql .= 'WHERE c.category_visible = 1 ';
+        $sql .= 'AND 1=1 ';
         $sql .= $filter;
 
         // Execute query

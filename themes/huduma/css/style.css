@@ -235,24 +235,6 @@ div#timeline-header {
 	position: relative;
 }
 
-/* footer */
-div#footer{
-	width: 960px;
-	height: 70px;
-	position: relative;
-    color: #fff;
-	margin: auto;
-	background: #5c5c5c url(../images/footer-bg-1.jpg) left top no-repeat;
-    padding-bottom: 20px;
-}
-
-div#footer-right {
-	float: right;
-	background: #5c5c5c url(../images/footer-bg-2.jpg) no-repeat;
-	height: 70px;
-	width: 5px;
-}
-
 /* clearing & floating */
 .clearingfix:after{
     content: ".";
@@ -647,6 +629,44 @@ div.content-block-right{
     float: right;
 }
 
+/* Footer Section */
+#footer{
+    overflow: hidden;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+    z-index: 100;
+    height: 190px;
+    background: #00ADE2  url(../images/roadpath.png) 40% 0 no-repeat;
+}
+
+#footer a{
+    text-decoration: none;
+    color: #fff;
+    font-family: "Trebuchet MS";
+    font-weight: bold;
+    text-align: left;
+    font-size: 13px;
+}
+
+#footer-holder{
+    width: 960px;
+    height: 100px;
+    position: relative;
+    margin: 0 auto;
+    padding: 0px;
+}
+
+#footer-main {
+    float: left;
+    width: 30%;
+    height: auto;
+    margin: 80px 0 0 20px;
+    position: relative;
+    color: #fff;
+    font-family: "Trebuchet MS";
+}
+
 /* site footer */
 div.site-footer{
     padding: 15px 15px 0 15px;
@@ -655,8 +675,10 @@ div.site-footer{
 
 /* footer menu */
 div.footermenu{
+    /*
     margin: 30px 10px;
     float: left;
+    */
 }
 
 div.footermenu ul{
@@ -688,11 +710,17 @@ div.footermenu ul li a:hover{
 
 /* footer credits */
 div.footer-credits{
-    /*float: right; */
+    float: left;
     font-size: 70%;
     font-weight: bold;
     text-transform: uppercase;
-    margin: 35px 0px 25px -220px;
+}
+
+div#footer-text {
+    float: left;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 5px;
 }
 
 /* reports */

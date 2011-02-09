@@ -98,7 +98,7 @@ class Main_Controller extends Frontend_Controller {
 		$site_copyright_statement = trim(Kohana::config('settings.site_copyright_statement'));
 		if ($site_copyright_statement != '')
 		{
-			$this->tempalte->footer->site_copyright_statement = $site_copyright_statement;
+			$this->template->footer->site_copyright_statement = $site_copyright_statement;
 		}
 
 		if ( ! $this->use_default_header)
