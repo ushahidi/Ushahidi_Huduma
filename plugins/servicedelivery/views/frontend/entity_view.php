@@ -47,6 +47,7 @@
                         <div class="f-col">
                             <div class="row">
                                 <h1><?php echo $entity_name; ?></h1>
+                            </div>
                             <!-- metadata -->
                             <!-- /metadata -->
                         </div>
