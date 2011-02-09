@@ -36,6 +36,87 @@ class Overlays_Controller extends Template_Controller {
         $this->is_cacheable = TRUE;
     }
 
+    public function single($entity_id = 0)
+    {
+        $json = "";
+        $json_item = "";
+        $json_array = array();
+
+        $marker = ORM::factory('static_entity', $entity_id);
+
+        if ($marker->loaded)
+        {
+            // Get all neighbouring entities
+            $latitude = $marker->latitude;
+            $longitude = $marker->longitude;
+            $entity_type_id = $marker->static_entity_type_id;
+
+            // Database
+            $db = new Database();
+
+            // Get neighbouring entities within 50KM
+            $sql = "SELECT DISTINCT e.id, e.entity_name, e.`latitude`, e.`longitude`, ";;
+            $sql .= "((ACOS(SIN($latitude * PI() / 180) * SIN(e.`latitude` * PI() / 180) + COS($latitude * PI() / 180) * COS(e.`latitude` * PI() / 180) * COS(($longitude - e.`longitude`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance ";
+            $sql .= "FROM `".$this->table_prefix."static_entity` e ";
+            $sql .= "WHERE e.static_entity_type_id = ".$entity_type_id." ";
+            $sql .= "HAVING distance <= '10' ";
+            $sql .= "ORDER BY e.`entity_name` DESC LIMIT 100 ";
+
+            /**
+             *  // Leave out display of neighbouring entities for now
+            $rows = $db->query($sql);
+            
+            foreach ($rows as $row)
+            {
+                $json_item = "{";
+                $json_item .= "\"type\":\"Feature\",";
+                $json_item .= "\"properties\": {";
+                $json_item .= "\"id\": \"".$row->id."\", ";
+
+				$encoded_name = utf8tohtml::convert($row->entity_name,TRUE);
+				$encoded_name = str_ireplace('"','&#34;',$encoded_name);
+				$encoded_name = json_encode($encoded_name);
+				$encoded_name = str_ireplace('"','',$encoded_name);
+
+                $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "entities/view/" . $row->id . "'>".$encoded_name."</a>")) . "\",";
+                $json_item .= "\"link\": \"".url::base()."entities/view/".$row->id."\" ";
+                $json_item .= "},";
+                $json_item .= "\"geometry\": {";
+                $json_item .= "\"type\":\"Point\", ";
+                $json_item .= "\"coordinates\":[" . $row->longitude . ", " . $row->latitude . "]";
+                $json_item .= "}";
+                $json_item .= "}";
+
+                array_push($json_array, $json_item);
+            }
+             */
+            
+			// Single Main Entity
+			$json_single = "{";
+			$json_single .= "\"type\":\"Feature\",";
+			$json_single .= "\"properties\": {";
+			$json_single .= "\"id\": \"".$marker->id."\", ";
+
+			$encoded_name = utf8tohtml::convert($marker->entity_name,TRUE);
+
+			$json_single .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "entities/view/" . $marker->id . "'>".$encoded_name."</a>")) . "\",";
+			$json_single .= "\"link\": \"".url::base()."entities/view/".$marker->id."\" ";
+			$json_single .= "},";
+            $json_single .= "\"geometry\": {";
+            $json_single .= "\"type\":\"Point\", ";
+            $json_single .= "\"coordinates\":[" . $marker->longitude . ", " . $marker->latitude . "]";
+            $json_single .= "}";
+            $json_single .= "}";
+
+            array_push($json_array, $json_single);
+        }
+        
+        $json = implode(",", $json_array);
+
+        header('Content-type: application/json; charset=utf-8');
+        $this->template->json = $json;
+    }
+
     /**
      * Generates JSON in cluster mode
      */

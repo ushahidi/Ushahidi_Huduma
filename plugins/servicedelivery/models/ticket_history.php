@@ -15,7 +15,7 @@
  */
 class Ticket_History_Model extends ORM {
     // Relationships
-    protected $belongs_to = array('ticket', 'service_provider_officer');
+    protected $belongs_to = array('ticket', 'agency_staff');
     
     // Database table name
     protected $table_name = 'ticket_history';

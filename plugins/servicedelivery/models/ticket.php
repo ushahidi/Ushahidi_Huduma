@@ -16,7 +16,7 @@
 class Ticket_Model extends ORM {
 
     // Relationships
-    protected $belongs_to = array('service_provider_officer');
+    protected $belongs_to = array('agency_staff');
     
     protected $has_many = array('ticket_history');
     

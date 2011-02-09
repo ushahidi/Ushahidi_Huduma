@@ -256,6 +256,7 @@
 
         // Check if the layer contained in o_layerName already exists, remove and redraw
         overlayMarkers = map.getLayersByName(o_layerName);
+        
         if (overlayMarkers && overlayMarkers.length > 0)
         {
             for (var i=0; i < overlayMarkers.length; i++)
@@ -299,7 +300,6 @@
 
         // Add overlay markers to the list of feature selection items
         addSelectFeatureItem(overlayMarkers);
-
         overlayMarkers.events.on({
             "featureselected": onFeatureSelect,
             "featureunselected": onFeatureUnselect

@@ -143,7 +143,6 @@
             selectedFeature = event;
             // Since KML is user-generated, do naive protection against
             // Javascript.
-
             zoom_point = event.feature.geometry.getBounds().getCenterLonLat();
             lon = zoom_point.lon;
             lat = zoom_point.lat;
@@ -410,12 +409,23 @@
             // Only initialize feature selection control if the map is loaded
             if (mapLoad > 0)
             {
-                if (selectControl != null) map.removeControl(selectControl);
+                // Remove all SelectFeature controls from the map
+                controls = map.getControlsByClass("OpenLayers.Control.SelectFeature");
+                if (selectControl != null & controls.length > 0)
+                {
+                    for (var i=0; i < controls.length; i++)
+                    {
+                        map.removeControl(controls[i]);
+                    }
+                    selectControl = null;
+                }
 
                 // Initialize the feature selection control
+                // TODO Fix selection of features across different layers
                 selectControl = new OpenLayers.Control.SelectFeature(selectFeatureItems);
                 map.addControl(selectControl);
                 selectControl.activate();
+                selectControl.setLayer(selectFeatureItems[0]);
             }
         }
         

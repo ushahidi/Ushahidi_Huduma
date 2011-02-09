@@ -284,6 +284,7 @@ class Entities_Controller extends Frontend_Controller {
         $this->themes->js->default_map = Kohana::config('settings.default_map');
         $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
         $this->themes->js->entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
+        $this->themes->js->entity_id = $entity_id;
 
         if ( ! $entity->longitude OR ! $entity->latitude)
         {
