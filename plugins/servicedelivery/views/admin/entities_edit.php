@@ -91,8 +91,56 @@
                                 <span><h4><?php echo Kohana::lang('ui_servicedelivery.boundary'); ?></h4></span>
                                 <?php print form::dropdown('boundary_id', $boundaries, $form['boundary_id']); ?>
                             </div>
+
+							<?php if ($static_entity_id): ?>
+
                             <!-- metadata -->
+							<div class="row">
+								<h4>
+									<?php echo Kohana::lang('ui_servicedelivery.additional_info'); ?>
+									[<a href="javascript:showAddMetadataDialog(<?php echo urlencode($static_entity_id); ?>)">
+										<?php echo Kohana::lang('ui_servicedelivery.add_info'); ?>
+									</a>]
+								</h4>
+
+								<?php if ($has_metadata): ?>
+								<div class="metadata-box" style="border: 1px dashed #CCCCCC; padding:3px;">
+									<table class="metadata" id="metadata-list">
+										<thead>
+											<tr>
+												<th>Item</th>
+												<th><?php echo Kohana::lang('ui_servicedelivery.value'); ?></th>
+												<th>As of Year</th>
+											</tr>
+										</thead>
+										<tbody>
+											<?php foreach ($metadata_items as $item): ?>
+											<tr>
+												<td><?php echo $item->label; ?></td>
+												<td><?php echo $item->value; ?></td>
+												<td><?php echo $item->as_of_year; ?></td>
+											</tr>
+											<?php endforeach; ?>
+										</tbody>
+									</table>
+								</div>
+								<?php endif; ?>
+
+								<!-- Add new items here -->
+								<div id="dialog" title="<?php echo Kohana::lang('ui_servicedelivery.add_info'); ?>">
+									<a class="add"></a>&nbsp;
+									[<a href="javascript:addMetadataItem(<?php echo urlencode($static_entity_id); ?>)">
+										<?php echo Kohana::lang('ui_servicedelivery.add_info'); ?>
+									</a>]
+
+									<div id="metadata_item_new"></div>
+									
+								</div>
+							</div>
                             <!-- /metadata -->
+							
+							<?php endif; ?>
+							
                         </div>
                         <!-- /column -->
 

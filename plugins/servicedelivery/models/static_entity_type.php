@@ -22,4 +22,18 @@ class Static_Entity_Type_Model extends ORM {
     // A static entity type must be associated with a category
     protected $belongs_to = array('category');
 
+	/**
+	 * Checks if the static entity type in @param $type_id exists in the database
+	 * 
+	 * @param int $type_id
+	 * @return boolean
+	 */
+	public static function is_valid_static_entity_type($type_id)
+	{
+		// Validate numbers using regular expressions as the value may be in quotes ' or "
+		return (preg_match('/^[1-9](\d*)$/', $type_id) > 0)
+			? ORM::factory('static_entity_type', $type_id)->loaded
+			: FALSE;
+	}
+
 }

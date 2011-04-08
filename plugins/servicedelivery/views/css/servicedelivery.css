@@ -14,3 +14,133 @@ ul.boundary-list li a {
 .popup-table {
     font-size:12px;
 }
+
+.entity-map .map-holder {
+	clear:both;
+	width:645px;
+	height:150px;
+	border: 1px solid #C0C2B8;
+	border-bottom:2px solid #C0C2B8;
+}
+
+.entity-name {
+    position: absolute;
+    margin: -20px 320px;
+}
+
+div.comment-col {
+    margin: 0 0 0 40px;
+    padding: 20px 0 0 0;
+    float: left;
+    width: 650px;
+}
+
+div.comment-items {
+    /*
+    border-left: 2px dashed #ccc;
+    border-right: 2px dashed #ccc;
+    */
+    min-height: 20em;
+    width: 100%;
+    padding: 0;
+}
+
+div.comment-item {
+    background: #BCE8F5;
+    padding: 8px;
+}
+
+#dialog {
+	font-size: 10px;
+}
+
+table.metadata { width: 100%; }
+
+.metadata th {
+	background-color: #CCCCCC;
+	padding: 5px;
+	color: #FFFFFF;
+	font-size: 100%;
+	text-align: left;
+}
+
+.metadata td {
+	padding: 2px;
+}
+
+div.ui-dialog {
+	position: absolute;
+	top: 100px;
+	margin:0 auto;
+	z-index: -1;
+}
+
+div.r_details {
+	padding:5px;
+}
+
+h3.entity_name {
+	color: #00ADE3;
+}
+
+#facebox h2 {
+	width: 100%;
+	margin: 0 0 0 -5px;
+	padding: 0 5px 0 5px;
+	border-bottom: 1px solid #ddd!important;
+	background-color: #FFF;
+	color: #000;
+	font-size: 125%;
+}
+
+#facebox h3 {
+	width: 100%;
+	margin:10px 0 10px -10px;
+	padding: 5px;
+	border-bottom: 1px solid #ddd!important;
+	background-color: #FFF;
+	font-size: 95%;
+	color: #000;
+}
+
+#facebox .row {
+	padding: 5px 0;
+}
+
+#facebox .row h4 {
+	padding: 3px 0;
+}
+
+div#loginsection { float: right; clear: both; }
+
+div.login {
+	border: 3px solid rgba(0,0,0,0);
+	-webkit-border-bottom-right-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+	-moz-border-radius-bottomright: 10px;
+	-moz-border-radius-bottomleft: 10px;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	-webkit-box-shadow:0 0 18px rgba(0,0,0,0.4);
+	-moz-box-shadow:0 0 18px rgba(0,0,0,0.4);
+	box-shadow:0 0 18px rgba(0,0,0,0.4);
+	background-color: #0e7596;
+	padding: 5px 10px;
+	height: 140px;
+	width: 200px;
+}
+
+.login { font: 75% "Trebuchet MS",Arial,Helvetica,sans-serif,Verdana; }
+.login .row { padding: 0px; margin: 0 0 10px 0; color: #FFFFFF; }
+.login .field { width: 200px; height: 30px; }
+.login h3, .login h4, .login h5, .dashboard_role_detail { color: #FFFFFF; }
+.login h3 { font-size: 180%; letter-spacing: 1px; }
+.login h4 { font-size: 150%; }
+.login h5 { font-size: 120%; padding:0; margin:2px 0; font-weight: normal; }
+.login .logged_in_user { font-weight: bold; font-size: 1.8em; padding: 5px 0; }
+.login .dashboard_role_detail { font-style: italic; font-size: 1.3em; }
+.login .logout_button { position: absolute; margin: 45px 0 0 0; }
+.login #dashboard_login { -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #999999; border:1px solid #DDDDDD; color:#FFFFFF; padding: 5px; font-weight: bold; }
+.field {border: 1px solid #DDDDDD; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.login #dashboard_remember { margin: 0 3px 0 10px; }
+.login label {font-size: 120%; }

@@ -222,6 +222,18 @@
                 // Get Current Center
                 currCenter = map.getCenter();
 
+                // Get all layers
+                /*
+                currentLayers = map.layers;
+                if (currentLayers.length > 0)
+                {
+                    for (var i=0; i < currentLayers.length; i++)
+                    {
+                        if ( ! currentLayers[i].isBaseLayer)
+                            map.removeLayer(currentLayers[i]);
+                    }
+                }
+                */
                 // Refresh Map
                 addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
             }

@@ -33,6 +33,9 @@ class servicedelivery
     public function add()
     {
         plugin::add_stylesheet('servicedelivery/views/css/servicedelivery');
+		plugin::add_stylesheet('servicedelivery/views/css/facebox');
+		plugin::add_javascript('servicedelivery/views/js/facebox');
+		
         Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'generate_service_delivery_tab'));
 
         if (Router::$controller == 'main')

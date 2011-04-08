@@ -41,4 +41,31 @@ class Category_Model extends ORM_Tree
 		
 		return $cats;
 	}
+
+	/**
+	 * Checks if the category specified in @param $category_id is valid and exists
+	 * and exists in the database
+	 * 
+	 * @param int $category_id
+	 * @return boolean
+	 */
+	public static function is_valid_category($category_id)
+	{
+		return (preg_match('/^[1-9](\d*)$/', $category_id) > 0)
+			? ORM::factory('category', $category_id)->loaded
+			: FALSE;
+	}
+
+	/**
+	 * Gets the list of available categories into an array to be used within a dropdown list
+	 *
+	 * @param	voolean $parent_only
+	 * @return	array
+	 */
+	public static function get_dropdown_categories($parent_only = TRUE)
+	{
+		return ($parent_only)
+			? self::factory('category')->where('parent_id', 0)->select_list('id', 'category_title')
+			: self::factory('category')->select_list('id', 'category_title');
+	}
 }

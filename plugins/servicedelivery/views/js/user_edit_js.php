@@ -20,7 +20,7 @@
             /* Form Actions */
             // Action on Save Only
             $('.btn_save').live('click', function () {
-                $("#save").attr("value", "1");
+                $("#save").attr("value", 1);
                 $(this).parents("form").submit();
                 return false;
             });
@@ -30,11 +30,20 @@
                 return false;
             });
 
+
+			// Form submission event
+			$("#dashboardUserForm").submit(function(){
+
+				if ($("#is_active").attr("checked")) {
+					$("#is_active").attr("value", 1);
+				}
+			});
+
             // Delete Action
             $('.btn_delete').live('click', function () {
                 var agree=confirm("<?php echo Kohana::lang('ui_admin.are_you_sure_you_want_to'); ?> <?php echo Kohana::lang('ui_admin.delete_action'); ?>?");
                 if (agree){
-                    $('#agencyStaffMain').submit();
+                    $('#dashboardUsersMain').submit();
                 }
                 return false;
             });

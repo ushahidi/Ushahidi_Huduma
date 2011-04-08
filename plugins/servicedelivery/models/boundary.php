@@ -19,5 +19,70 @@ class Boundary_Model extends ORM {
 
     // Relationships
     protected $belongs_to = array('boundary_type');
+
+
+	/**
+	 * Helper method to get the list of boundaries whose parent id is specified
+	 * in @param $parent_id
+	 *
+	 * @param int $parent_id
+	 * @param boolean $include_type_name
+	 * @return array
+	 */
+	public static function get_boundaries_list($parent_id = FALSE, $include_type_name = TRUE)
+	{
+		// To hold the return list
+		$boundaries = array();
+
+		// Fetch the boundary objects
+		$orm_iterator = ($parent_id == TRUE AND self::is_valid_boundary($parent_id))
+			? ORM::factory('boundary')
+					->where('parent_id', $parent_id)
+					->find_all()
+
+			: ORM::factory('boundary')->find_all();
+
+		// Fetch the items in the iterator into $boundaries
+		foreach ($orm_iterator as $item)
+		{
+			// $boundary_type_name == TRUE, include name of the boundary type
+			$boundaries[$item->id] = $item->boundary_name.
+					(($include_type_name)? ' '.$item->boundary_type->boundary_type_name : '');
+		}
+
+		// Return
+		return $boundaries;
+
+	}
+
+	/**
+	 * Gets the list of boundaries whose boundary type in @param $type_id
+	 *
+	 * @param int $type_id
+	 * @return array
+	 */
+	public static function get_boundaries_list_by_type($type_id)
+	{
+		return Boundary_Type_Model::is_valid_boundary_type($type_id)
+			? ORM::factory('boundary')
+				->select('id', 'boundary_name')
+				->where('boundary_type_id', $type_id)
+				->find_all()
+
+			: array();
+
+	}
+
+	/**
+	 * Checks if the boundary in @param $boundary_id exists in the database
+	 * @param int $boundary_id
+	 * @return boolean
+	 */
+	public static function is_valid_boundary($boundary_id)
+	{
+		return (preg_match('/^[1-9](\d*)$/', $boundary_id) > 0)
+			? ORM::factory('boundary', $boundary_id)->loaded
+			: FALSE;
+	}
 }
 ?>

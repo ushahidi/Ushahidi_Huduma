@@ -22,8 +22,8 @@
      'add_edit_entity'          => 'Add/Edit Entities',
      'entity_location'          => 'Entity Location',
 
-     'metadata'                 => 'Metadata',
-     'view_staff'               => 'View Staff',
+     'additional_info'          => 'Additional Information',
+     'dashboard_users'			=> 'Dashboard Users',
      'agency_name'              => 'Agency Name',
      'servicedelivery'          => 'Service Delivery',
      'agency'                   => 'Agency',
@@ -41,9 +41,11 @@
      'add_edit_staff'           => 'Add/Edit Staff',
      'save_entity'              => 'Save Entity',
      'delete_entity'            => 'Delete Entity',
-     'save_staff'               => 'Save Staff',
-     'delete_staff'             => 'Deelte Staff',
+     'save_user'				=> 'Save User',
+     'delete_user'				=> 'Delete User',
      'view_agencies'            => 'View Agencies',
+	 'dashboard_role'			=> 'Dashboard Role',
+	 'dashboard_roles'			=> 'Dashboard Roles',
 
      // Miscellaneous
      'parent_boundary_type'     => 'Parent Boundary Type',
@@ -51,6 +53,35 @@
      'agency_saved'             => 'Agency Saved',
      'agency_deleted'           => 'Agency Deleted',
      'agency_staff_saved'       => 'Agency Staff Saved',
-     'agency_staff_deleted'     => 'Agency Staff Deleted'
+     'agency_staff_deleted'     => 'Agency Staff Deleted',
+	 'item_label'				=> 'Item Label',
+	 'value'					=> 'Value',
+	 'as_of_year'				=> 'Last Update Date',
+	 'add_info'					=> 'Add Info',
+	 'view_additional_info'		=> 'View Additional Information',
+	 'is_active'				=> 'Active?',
+	 'belongs_to_service_agency'=> 'Belongs to service agency?',
+	 'dashboard_user_saved'		=> 'Dashboard user added/edited',
+	 'select_role'				=> 'Select Role',
+	 'add_role'					=> 'Add Role',
+	 'add_edit_dashboard_role'	=> 'Add/Edit Dashboard Role',
+	 'role_privileges'			=> 'Role Privileges',
+	 'associated_service_agency'=> 'Associated Service Agency',
+	 'select_agency'			=> 'Select Agency',
+	 'select_entity'			=> 'Select Entity',
+	 'select_category'			=> 'Select Category',
+	 'dashboard_role_saved'		=> 'Dashboard role successfully saved',
+	 'username_or_email'		=> 'Username or email',
+	 'username_placeholder'		=> 'Username...',
+	 'password_placeholder'		=> 'Password...',
+	 'sign_in'					=> 'Sign In',
+	 'remember_me'				=> 'Remember me',
+	 'welcome'					=> 'Welcome',
+
+	 // Error Messages
+	 'error'					=> array(
+		 'invalid_entity_id'	=> 'The specified static entity/service point is invalid',
+		 'invalid_metadata'		=> 'Invalid or missing metadata values'
+	 )
  );
 ?>

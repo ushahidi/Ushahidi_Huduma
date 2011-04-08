@@ -19,5 +19,21 @@ class Boundary_Type_Model extends ORM {
 
     // Relationships
     protected $has_many = array('boundary');
+
+
+	/**
+	 * Checks if the boundary type in @param $type_id exists in the database
+	 * 
+	 * @param int $type_id
+	 * @return boolean
+	 */
+	public static function is_valid_boundary_type($type_id)
+	{
+		// Attempt to fetch the boundary from the database
+		return is_int($type_id)
+			? self::factory('boundary_type', $type_id)->loaded
+			: FALSE;
+
+	}
 }
 ?>

@@ -211,15 +211,14 @@ class Agencies_Controller extends Admin_Controller {
         $agencies_list = ORM::factory('agency')
                                     ->where(array('parent_id' => '0'))
                                     ->select_list('id', 'agency_name');
-        
+
         // Get the list of categories
         $categories_list = ORM::factory('category')
                             ->where('parent_id', '0')
                             ->select_list('id', 'category_title');
 
-        // List of administrative boundaries
-        $admin_boundaries = ORM::factory('boundary')
-                                ->select_list('id', 'boundary_name');
+        // Feth the list of administrative boundaries
+        $admin_boundaries = Boundary_Model::get_boundaries_list();
 
         $admin_boundaries[0] = "-- National Level --";
 

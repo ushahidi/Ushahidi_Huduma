@@ -40,6 +40,11 @@ class navigator_Core {
             ? Kohana::lang("ui_servicedelivery.entities")
             : "<a href=\"".url::site()."admin/entities\">".Kohana::lang('ui_servicedelivery.entities')."</a>";
 
+        // Dashboard users
+        $menu .= ($this_sub_page == "dashboard_users")
+            ? Kohana::lang("ui_servicedelivery.dashboard_users")
+            : "<a href=\"".url::site()."admin/dashboard/users\">".Kohana::lang('ui_servicedelivery.dashboard_users')."</a>";
+		
         // Output the menu
         echo $menu;
     }

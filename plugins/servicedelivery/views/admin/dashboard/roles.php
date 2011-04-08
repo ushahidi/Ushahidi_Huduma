@@ -1,6 +1,6 @@
 <?php
 /**
- * Service provider view page.
+ * Dashboard roles view page.
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -8,31 +8,31 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Serviceprovider Controller
+ * @module     Dashboard roles Controller
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
  ?>
             <div class="bg">
                 <h2>
-                    <?php navigator::subtabs('agencies'); ?>
+                    <?php navigator::subtabs('dashboard_users'); ?>
                 </h2>
 
                 <!-- tabs -->
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/agencies"><?php echo Kohana::lang('ui_servicedelivery.view_agencies'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/agencies/edit"><?php echo Kohana::lang('ui_servicedelivery.add_edit_agency');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/agencies/staff" class="active"><?php echo Kohana::lang('ui_servicedelivery.view_staff');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/agencies/edit_staff"><?php echo Kohana::lang('ui_servicedelivery.add_edit_staff');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/dashboard/users"><?php echo Kohana::lang('ui_servicedelivery.dashboard_users');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/dashboard/users/edit"><?php echo Kohana::lang('ui_admin.manage_users_edit');?></a></li>
+                        <li><a href="<?php echo url::site() ?>admin/dashboard/roles" class="active"><?php echo Kohana::lang('ui_servicedelivery.dashboard_roles');?></a></li>
                     </ul>
                     <!-- /tabset -->
 
             		<div class="tab">
             			<ul>
-            				<li><a href="#" onclick="agencyStaffAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
-            				<li><a href="#" onclick="agencyStaffAction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
+							<li><a href="#" rel="facebox" onclick="showDashboardRoleDialog('');"><?php echo strtoupper(Kohana::lang('ui_servicedelivery.add_role')) ;?></a></li>
+            				<li><a href="#" onclick="dashboardRoleAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
+            				<li><a href="#" onclick="dashboardRoleAction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
             			</ul>
             		</div>
                 </div>
@@ -49,26 +49,34 @@
                 <?php if ($form_saved): ?>
             		<!-- green-box -->
             		<div class="green-box" id="submitStatus">
-            			<h3><?php echo Kohana::lang('ui_servicedelivery.staff');?> <?php echo $form_action; ?>
+            			<h3><?php echo Kohana::lang('ui_servicedelivery.dashboard_role');?> <?php echo $form_action; ?>
             			    <a href="#" id="hideMessage" class="hide"><?php echo Kohana::lang('ui_main.hide_this_message');?></a>
             			</h3>
             		</div>
             	<?php endif; ?>
-                
+
+				<div id="facebox" style="display: none;">
+					<div class="popup">
+						<div class="content"></div>
+						<a href="#" class="close">
+							<?php print html::image(array('src' => 'plugins/servicedelivery/views/images/closelabel.png', 'class'=> 'close_image')); ?>
+						</a>
+					</div>
+				</div>
+					
             	<!-- report-table -->
                 <div class="report-form">
-                    <?php print form::open(NULL, array('id' => 'agencyStaff', 'name' => 'agencyStaff')); ?>
+                    <?php print form::open(NULL, array('id' => 'dashboardRolesMain', 'name' => 'dashboardRolesMain')); ?>
                         <input type="hidden" name="action" id="action" value="" />
-                        <input type="hidden" name="agency_staff_id[]" id="agency_staff_single" value="" />
+                        <input type="hidden" name="dashboard_role_id[]" id="dashboard_role_single" value="" />
 
                         <div class="table-holder">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th class="col-1">
-                                        <input id="checkAllAgencies" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'agency_staff_id[]' )" /></th>
-                                        <th class="col-2"><?php echo Kohana::lang('ui_servicedelivery.agency_staff_name');?></th>
-                                        <th class="col-3"><?php echo Kohana::lang('ui_servicedelivery.agency'); ?></th>
+                                        <input id="checkAllRoles" type="checkbox" class="check-box" onclick="CheckAll( this.id, 'dashboard_role_id[]' )" /></th>
+                                        <th class="col-2"><?php echo Kohana::lang('ui_admin.header_role');?></th>
                                         <th class="col-4"><?php echo Kohana::lang('ui_admin.actions');?></th>
                                     </tr>
                                 </thead>
@@ -93,31 +101,33 @@
                                 <?php endif; ?>
 
                                 <?php
-                                    foreach ($staff as $staff_member)
+                                    foreach ($dashboard_roles as $role)
                                     {
-                                        $agency_staff_id = $staff_member->id;
-                                        $agency_staff_name = $staff_member->full_name;
-                                        $agency_name = $staff_member->agency->agency_name;
+										$dashboard_role_id = $role->id;
+										$name = $role->name;
                                  ?>
                                         <tr>
                                             <td class="col-1">
-                                                <input name="agency_staff_id[]" id="agency" value="<?php echo $agency_staff_id; ?>" type="checkbox" class="check-box"/>
+                                                <input name="dashboard_role_id[]" id="dashboard_role" value="<?php echo $dashboard_role_id; ?>" type="checkbox" class="check-box"/>
                                             </td>
 
-                                            <td class="col-2"><?php echo $agency_staff_name; ?></td>
-                                            <td class="col-3"><?php echo $agency_name; ?></td>
+                                            <td class="col-2">
+												<div class="post">
+													<h4><?php echo $name; ?></h4>
+												</div>
+											</td>
 
                                             <td class="col-4">
 
                                                 <!-- actions -->
                                                 <ul>
                                                     <li class="none-separator">
-                                                        <a href="<?php echo url::site().'admin/agencies/edit_staff/'.$agency_staff_id ?>">
+                                                        <a rel="facebox" href="javascript:showDashboardRoleDialog('<?php echo urlencode($dashboard_role_id); ?>')">
                                                             <?php echo Kohana::lang('ui_admin.edit_action'); ?>
                                                         </a>
                                                     </li>
                                                     <li class="none-separator">
-                                                        <a href="#" class="del" onclick="agencyStaffAction('d','DELETE', '<?php echo $agency_staff_id; ?>');">
+                                                        <a href="#" class="del" onclick="dashboardRoleAction('d','DELETE', '<?php echo urlencode($dashboard_role_id); ?>');">
                                                             <?php echo Kohana::lang('ui_admin.delete_action') ;?>
                                                         </a>
                                                     </li>
