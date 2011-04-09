@@ -16,7 +16,7 @@ class Main_Controller extends Frontend_Controller {
 
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(FALSE);
 
 		if (Kohana::config('settings.private_deployment'))
 		{
@@ -35,34 +35,6 @@ class Main_Controller extends Frontend_Controller {
 
 		// Load Session
 		$this->session = Session::instance();
-
-        // Load Header & Footer
-		$this->template->header  = new View('header');
-		$this->template->footer  = new View('footer');
-
-		// Themes Helper
-		$this->themes = new Themes();
-		$this->themes->api_url = Kohana::config('settings.api_url');
-		$this->template->header->submit_btn = $this->themes->submit_btn();
-		$this->template->header->languages = $this->themes->languages();
-		$this->template->header->search = $this->themes->search();
-
-		// Set Table Prefix
-		$this->table_prefix = Kohana::config('database.default.table_prefix');
-
-		// Retrieve Default Settings
-		$site_name = Kohana::config('settings.site_name');
-			// Prevent Site Name From Breaking up if its too long
-			// by reducing the size of the font
-			if (strlen($site_name) > 20)
-			{
-				$site_name_style = " style=\"font-size:21px;\"";
-			}
-			else
-			{
-				$site_name_style = "";
-			}
-			
 		$this->template->header->private_deployment = Kohana::config('settings.private_deployment');
 		$this->template->header->loggedin_username = FALSE;
 		$this->template->header->loggedin_userid = FALSE;
@@ -73,49 +45,6 @@ class Main_Controller extends Frontend_Controller {
 			$this->template->header->loggedin_userid = Auth::instance()->get_user()->id;
 		}
 		
-		$this->template->header->site_name = $site_name;
-		$this->template->header->site_name_style = $site_name_style;
-		$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
-
-		$this->template->header->this_page = "";
-
-		// Google Analytics
-		$google_analytics = Kohana::config('settings.google_analytics');
-		$this->template->footer->google_analytics = $this->themes->google_analytics($google_analytics);
-
-        // Load profiler
-        // $profiler = new Profiler;
-
-		// Get tracking javascript for stats
-		if(Kohana::config('settings.allow_stat_sharing') == 1){
-			$this->template->footer->ushahidi_stats = Stats_Model::get_javascript();
-		}else{
-			$this->template->footer->ushahidi_stats = '';
-		}
-		
-		// add copyright info
-		$this->template->footer->site_copyright_statement = '';
-		$site_copyright_statement = trim(Kohana::config('settings.site_copyright_statement'));
-		if ($site_copyright_statement != '')
-		{
-			$this->template->footer->site_copyright_statement = $site_copyright_statement;
-		}
-
-		if ( ! $this->use_default_header)
-		{
-			$this->template->header = new View('header_main');
-
-			// Themes Helper
-			$this->themes = new Themes();
-			$this->themes->api_url = Kohana::config('settings.api_url');
-			$this->template->header->submit_btn = $this->themes->submit_btn();
-			$this->template->header->languages = $this->themes->languages();
-			$this->template->header->search = $this->themes->search();
-
-			$this->template->header->site_name = $this->site_name;
-			$this->template->header->site_name_style = $this->site_name_style;
-			$this->template->header->site_tagline = Kohana::config('settings.site_tagline');
-		}
 	}
 
 	/**
