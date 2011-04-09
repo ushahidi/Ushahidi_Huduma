@@ -42,8 +42,8 @@
 								<p class="dashboard_role_detail"><?php echo $static_entity_name; ?></p>
 							</div>
 
-							<div class="row">
-								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'huduma_button'), Kohana::lang('ui_admin.logout')); ?>
+							<div class="row login_panel_button">
+								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'huduma_button login_panel_button'), Kohana::lang('ui_admin.logout')); ?>
 							</div>
 							<?php print form::close(); ?>
 						<?php else: ?>
@@ -58,7 +58,7 @@
 									<?php print form::password(array('name' => 'dashboard_password', 'class'=>'field', 'placeholder' => Kohana::lang('ui_huduma.password_placeholder')), ''); ?>
 								</div>
 
-								<div class="row">
+								<div class="row login_panel_button">
 									<?php print form::input(array('type' => 'submit', 'name'=>'submit', 'class'=>'huduma_button'), Kohana::lang('ui_huduma.sign_in')); ?>
 									<?php print form::input(array('type'=>'checkbox', 'name'=>'dashboard_login_remember', 'id'=>'dashboard_remember'), ''); ?>
 									<label for="dashboard_login_remember"><?php echo Kohana::lang('ui_huduma.remember_me'); ?></label>
