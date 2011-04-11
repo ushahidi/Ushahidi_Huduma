@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_role` (
 --
 -- Table dashboard_user_privileges
 --
-CREATE TABLE `dashboard_role_privileges` (
+CREATE TABLE IF NOT EXISTS `dashboard_role_privileges` (
 	`dashboard_role_id` INT NOT NULL,
 	`static_entity_id` INT NOT NULL DEFAULT 0,
 	`boundary_id` INT NOT NULL DEFAULT 0,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_user` (
 -- Table static_entity_metadata
 --
 CREATE TABLE IF NOT EXISTS `static_entity_metadata_log` (
-	`id` INT NOT NULL AUTO_INCEREMENT,
+	`id` INT NOT NULL AUTO_INCREMENT,
 	`static_entity_id` INT NOT NULL,
 	`metadata` TEXT NOT NULL,
 	`modification_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `static_entity_metadata` (
 	`static_entity_id` INT NOT NULL,
 	`item_label` VARCHAR(100) NOT NULL,
 	`item_value` VARCHAR(50),
-	`as_of_year` VARCHAR(4)
+	`as_of_year` VARCHAR(4),
 	PRIMARY KEY (`id`)
 );
 
