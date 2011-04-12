@@ -120,4 +120,5 @@ $config['modules'] = array
 	// MODPATH.'media',     // Media caching and compression
 	// MODPATH.'archive',   // Archive utility
 	// MODPATH.'unit_test', // Unit testing
+	MODPATH.'authlite',		// Dashboard (frontend) authentication
 );
