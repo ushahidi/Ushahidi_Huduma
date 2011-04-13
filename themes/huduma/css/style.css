@@ -359,10 +359,14 @@ div.submit-incident a:hover{
 
 /* mainmenu */
 div#mainmenu {
-	background: #c7f91a url(../images/top-menu-bg.png) no-repeat;
+/*	background: #c7f91a url(../images/top-menu-bg.png) no-repeat;*/
+	background-color: #c7f91a;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
 	width: 100%;
 	height: 32px;
-	margin: 170px 0 10px 20px;
+	margin: 150px 0 10px 20px;
 }
 
 div#mainmenu ul{
@@ -404,13 +408,6 @@ div#mainmenu a.active{
     text-decoration: none;
     color: #fff;
     background: #00ade3;
-}
-
-div#topright-menubar {
-	float: right;
-	background: #c7f91a url(../images/top-menu-bg-right.png) no-repeat;
-	width: 13px;
-	height: 32px;
 }
 
 /* filters */

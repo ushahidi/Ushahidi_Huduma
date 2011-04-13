@@ -35,16 +35,17 @@ class huduma
         plugin::add_stylesheet('huduma/views/css/huduma');
 		plugin::add_stylesheet('huduma/views/css/facebox');
 		plugin::add_javascript('huduma/views/js/facebox');
-		
+
         Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'generate_service_delivery_tab'));
+		Event::add('ushahidi_action.header_scripts', array($this, '_modify_header_scripts'));
 
         if (Router::$controller == 'main')
         {
-            // Modify the header scripts
-            Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
-
+			// Modify the header scripts
+			Event::add('ushahidi_action.huduma_overlay_js', array($this, '_overlay_js'));
+			
             // Calls the Javascript used function to overlay data on the main map
-            Event::add('ushahidi_action.main_map_overlay', array($this, 'overlay_main_map'));
+            Event::add('ushahidi_action.main_map_overlay', array($this, '_overlay_main_map_js_call'));
         }
 
     }
@@ -67,23 +68,33 @@ class huduma
     }
 
 
+	/**
+	 * Renders the javascript for d
+	 */
+	public function _modify_header_scripts()
+	{
+		$toggle_button_js = new View('js/toggle_login_button_js');
+		$toggle_button_js->render(TRUE);
+	}
+	
     /**
-     * Modifies the header scripts
+     * Renders the javascript to render the static entities overlay
      */
-    public function modify_header_scripts()
+    public function _overlay_js()
     {
         // Get the current event data
         $data = Event::$data;
 
-        // Load the JavaScript header for rendering the overlay data
-        $overlay_js = new View('js/overlays_js');
+		// Load the JavaScript header for rendering the overlay data
+		$overlay_js = new View('js/overlays_js');
 
-        // TODO Check the plugin settings to determine the json URL
-        $overlay_js->overlay_json_url = 'overlays/cluster';
-        $overlay_js->overlay_layer_name = 'Administrative Units';
+		// TODO Check the plugin settings to determine the json URL
+		$overlay_js->overlay_json_url = 'overlays/cluster';
+		$overlay_js->overlay_layer_name = 'Administrative Units';
 
-        // Set the event data
-        Event::$data .= $overlay_js;
+		// Append the overlay js to the current data
+		$overlay_js->render(TRUE);
+
     }
 
     /**
@@ -91,7 +102,7 @@ class huduma
      * should already have been defined in the javascript header file loaded in this->modify_header_scripts()
      * above
      */
-    public function overlay_main_map()
+    public function _overlay_main_map_js_call()
     {
         // Call the JS function to render the overlay data
         echo 'overlayMainMap();';

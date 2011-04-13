@@ -81,38 +81,6 @@
 							
                         </div>
 
-
-<!--                        <div class="comment-col">
-                            <div class="comment-items">
-                                <div class="comment-item">
-                                    <p><strong>Anonymous Commented</strong></p>
-                                </div>
-                            </div>
-                        </div>-->
-						
-						<!-- metadata -->
-						<div id="metadata-dialog" title="<?php echo $entity_name.' - '.Kohana::lang('ui_huduma.additional_info'); ?>">
-							<table class="metadata" id="metadata-list">
-								<thead>
-									<tr>
-										<th>Item</th>
-										<th><?php echo Kohana::lang('ui_huduma.value'); ?></th>
-										<th><?php echo Kohana::lang('ui_huduma.as_of_year'); ?></th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php foreach ($metadata as $item): ?>
-									<tr>
-										<td><?php echo $item->label; ?></td>
-										<td><?php echo $item->value; ?></td>
-										<td><?php echo $item->as_of_year; ?></td>
-									</tr>
-									<?php endforeach; ?>
-								</tbody>
-							</table>
-						</div>
-						<!-- /metadata -->
-
                     </div>
                 <?php print form::close(); ?>
             </div>

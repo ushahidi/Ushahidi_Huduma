@@ -27,19 +27,18 @@
 			var proj_4326 = new OpenLayers.Projection('EPSG:4326');
 			var proj_900913 = new OpenLayers.Projection('EPSG:900913');
 			var options = {
-				units: "dd",
+				units: "m",
 				numZoomLevels: 18,
 				controls:[],
 				projection: proj_900913,
 				'displayProjection': proj_4326
 				};
 			map = new OpenLayers.Map('map', options);
-			map.addControl( new OpenLayers.Control.LoadingPanel({minSize: new OpenLayers.Size(573, 366)}) );
 
 			<?php echo map::layers_js(FALSE); ?>
             map.addLayers(<?php echo map::layers_array(FALSE); ?>);
             map.addControl(new OpenLayers.Control.Navigation());
-            map.addControl(new OpenLayers.Control.PanZoomBar());
+            map.addControl(new OpenLayers.Control.PanZoom());
             map.addControl(new OpenLayers.Control.MousePosition(
 				{ div: 	document.getElementById('mapMousePosition'), numdigits: 5
 			}));

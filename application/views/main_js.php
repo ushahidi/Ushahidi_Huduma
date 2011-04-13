@@ -694,3 +694,6 @@
 			});
 
 		});
+
+		// Custom event for Huduma overlays
+		<?php Event::run('ushahidi_action.huduma_overlay_js'); ?>

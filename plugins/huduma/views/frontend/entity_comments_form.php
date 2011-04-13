@@ -13,7 +13,7 @@
 
 		<div class="row">
 			<h4><?php echo Kohana::lang('ui_main.email'); ?>:</h4>
-			<?php print form::input(array('type'=>'text', 'name'=>'comment_email', 'id'=>'commebt_email', 'class'=>'comment_field text medium'), ''); ?>
+			<?php print form::input(array('type'=>'text', 'name'=>'comment_email', 'id'=>'commebt_email', 'class'=>'comment_field text'), ''); ?>
 		</div>
 
 		<div class="row">

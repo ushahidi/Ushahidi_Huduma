@@ -409,9 +409,6 @@ class Main_Controller extends Frontend_Controller {
         $this->themes->js->active_startDate = $display_startDate;
         $this->themes->js->active_endDate = $display_endDate;
         
-        // Run the header_scripts event - Modifies the JavaScript Header
-        Event::run('ushahidi_action.header_scripts', $this->themes->js);
-        
         //$myPacker = new javascriptpacker($js , 'Normal', false, false);
         //$js = $myPacker->pack();
 

@@ -33,6 +33,7 @@
             <div id="header-right">
 				
 				<div id="loginsection">
+					<?php print form::input(array('type'=>'button', 'name'=>'d_login_button', 'id'=>'d_login_button', 'class'=>'huduma_button'), Kohana::lang('ui_main.login')); ?>
 					<!-- login -->
 					<div class="login">
 						<?php if ($is_logged_in): ?>
@@ -75,9 +76,6 @@
         			<ul>
         				<?php nav::main_tabs($this_page); ?>
         			</ul>
-					
-					<div id="topright-menubar"></div>
-
         		</div>
                 <!-- /mainmenu -->
                 <div id="clearingfix"></div>
