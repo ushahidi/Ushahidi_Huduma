@@ -16,11 +16,28 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 	public function index()
 	{
-		$this->template->content = new View('frontend/dashboards/home');
+		// Load the captcha library
+		$captcha = Captcha::factory();
+
+		// Setup the form
+		$form = array(
+			'comment_author' => '',
+			'comment_email' => '',
+			'comment_description' => '',
+			'captcha' => ''
+		);
+
+		// Copy the form as errors, so the errors maintain the same keys as the field names
+		$errors = $form;
+		$form_error = FALSE;
+		$form_saved = FALSE;
 
 		// Has the static entity role been specified, get content
 		if ($this->static_entity_role)
 		{
+			// Load the static entity view
+			$this->template->content = new View('frontend/entity_view');
+			
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
 
@@ -29,12 +46,25 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 			// Set the entity name
 			$this->template->content->entity_name = $entity_name;
+
+			// Disable "view metadata" link
+			$this->template->content->show_metadata = FALSE
+			$this->template->content->show_dashboard_panel = TRUE;
 			
 			// Get the comments for the static entity
 			$this->template->content->comments = Static_Entity_Model::get_comments($this->static_entity_id);
 
-			$this->template->content->entity_comments_form = new View('frontend/entity_comments_form');
-			// TODO Set the captcha for the comments form
+			// Load the comments form
+			$entity_comments_form = new View('frontend/entity_comments_form');
+			
+			// Set the form content
+			$entity_comments_form->captcha = $captcha;
+			$entity_comments_form->form = $form;
+			$entity_comments_form->errors = $errors;
+			$entity_comments_form->form_error = $form_error;
+			$entity_comments_form->form_saved = $form_saved;
+
+			$this->template->content->entity_comments_form = $entity_comments_form;
 
 			// Javascript header
 			$this->themes->map_enabled = TRUE;

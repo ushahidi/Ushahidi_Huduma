@@ -108,11 +108,10 @@ class Entities_Controller extends Frontend_Controller {
 
 	public function view($entity_id = FALSE, $saved = FALSE)
     {
-
+		// Entity id not specified, redirect to entity listing
         if ( ! $entity_id OR $entity_id == 0)
         {
             url::redirect('frontend/entities');
-
         }
 
         $this->template->content = new View("frontend/entity_view");
@@ -140,8 +139,7 @@ class Entities_Controller extends Frontend_Controller {
         $form_saved = ($saved == 'saved')? TRUE : FALSE;
         $form_error = FALSE;
         $form_action = "";
-		$has_metadata = empty($entity->metadata) ? FALSE : TRUE;
-
+		$show_metadata = empty($entity->metadata) ? FALSE : TRUE;
 
         // Check if the form has been submitted
         if ($_POST AND Kohana::config('settings.allow_comments'))
@@ -265,20 +263,28 @@ class Entities_Controller extends Frontend_Controller {
             }
         }
 		
-		$this->template->content->form = $form;
-		$this->template->content->errors = $errors;
-		$this->template->content->form_error = $form_error;
-		$this->template->content->form_saved = $form_saved;
 		$this->template->content->entity_id = $entity->id;
         $this->template->content->entity_name = $entity->entity_name;
 		$this->template->content->boundary_id = $entity->boundary_id;
         $this->template->content->latitude = $entity->latitude;
-        $this->template->content->longitude = $entity->longitude;
-		$this->template->content->has_metadata = $has_metadata;
-		$this->template->content->metadata = json_decode($entity->metadata);
+        $this->template->content->longitude = $entity->longitude;		
+		$this->template->content->show_dashboard_panel = FALSE;
+		$this->template->content->show_metadata = $show_metadata;
 
+		// Show the comments
+		$this->template->content->comments = Static_Entity_Model::get_comments($entity_id);
 
-        // TODO Unpack the metadata on the frontend (view page)
+		// Load the comments form
+		$entity_comments_form = new View('frontend/entity_comments_form');
+
+		// Set the form content
+		$entity_comments_form->captcha = $captcha;
+		$entity_comments_form->form = $form;
+		$entity_comments_form->errors = $errors;
+		$entity_comments_form->form_error = $form_error;
+		$entity_comments_form->form_saved = $form_saved;
+
+		$this->template->content->entity_comments_form = $entity_comments_form;
 
         //Javascript Header
         $this->themes->map_enabled = TRUE;
