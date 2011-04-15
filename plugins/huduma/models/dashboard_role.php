@@ -314,6 +314,7 @@ class Dashboard_Role_Model extends ORM {
 			{
 				return FALSE;
 			}
+		}
 	}
 }
 ?>

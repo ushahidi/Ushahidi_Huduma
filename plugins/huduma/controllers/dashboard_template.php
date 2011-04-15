@@ -59,6 +59,13 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	 * @var boolean
 	 */
 	protected $agency_role = FALSE;
+	
+	/**
+	 * Agency id for the user's role
+	 * 
+	 * @var int
+	 */
+	protected $agency_id = 0;
 
 	/**
 	 * Admin boundary specific role
@@ -66,6 +73,13 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	 * @var boolean
 	 */
 	protected $boundary_role = FALSE;
+	
+	/**
+	 * ID of the boundary to which the role has access
+	 *
+	 * @var int
+	 */
+	protected $boundary_id  = 0;
 
 	/**
 	 * Shows that the role is for a specific category
@@ -73,8 +87,18 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	 * @var boolean
 	 */
 	protected $category_role = FALSE;
+	
+	/**
+	 * ID of the category to which the role access
+	 *
+	 * @var int
+	 */
+	protected $category_id = 0;
 
-
+    
+    /**
+     * Constructor
+     */
 	public function __construct()
 	{
 		parent::__construct();
@@ -93,9 +117,11 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 			{
 				// Set the role
 				$this->role = $this->user->dashboard_role;
+				
+				$role_id = $this->role->id;
 
 				// Check for static entity_id privilege
-				$entity_privilege = Dashboard_Role_Model::has_static_entity_privilege($this->role->id);
+				$entity_privilege = Dashboard_Role_Model::has_static_entity_privilege($role_id);
 
 				if ($entity_privilege)
 				{
@@ -106,15 +132,14 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 				}
 				else
 				{
-					// Proceed to check for agency wide, category-wide, boundary privileges
+				    // Get the other privileges
+				    $this->_determine_role_privileges();
 				}
-
 			}
-
 		}
 		else
 		{
-			// Redirect to the dashboards login page
+			// User not logged in, redirect to the dashboards login page
 			url::redirect('dashboards/login');
 		}
 	}
@@ -126,6 +151,72 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	{
 		// Redirect to dashboards home page
 		url::redirect('dashboards/home');
+	}
+	
+	/**
+	 * Helper function to determine the privileges of the the current user's role
+	 *
+	 * This function checks all other privileges other than the static entity id
+	 * privilege
+	 */
+	private function _determine_role_privileges()
+	{
+	    // Fetch the role id
+	    $role_id = $this->role->id;
+	    
+		// Agency-wide privilege
+		$agency_privilege = Dashboard_Role_Model::has_agency_privilege($role_id);
+		
+		if ($agency_privilege)
+		{
+		    $this->agency_role = TRUE;
+		    
+		    // Decode the return value
+		    $entity_privilege = json_decode($entity_privilege);
+		    
+		    // Set the agency and boundary id for the privilege
+		    $this->agency_id = $entity_privilege->agency_id;
+		    $this->boundary_id = $entity_privilege->boundary_id;
+		    
+		    // Halt
+		    return;
+		}
+		
+		// Category-wide privilege
+		$category_privilege = Dashboard_Role_Model::has_category_privilege($role_id);
+		
+		if ($category_privilege)
+		{
+		    // Enable category role
+		    $this->category_role = TRUE;
+		    // Decode JSON
+		    $category_privilege = json_decode($category_privilege);
+		    
+		    // Set the category and boundary to which the role has access
+		    $this->category_id = $category_privilege->category_id;
+		    $this->boundary_id = $category_privilege->boundary_id;
+		    
+		    // Halt
+		    return;
+		}
+		
+		// Boundary-wide privilege
+		$boundary_privilege = Dashboard_Role_Model::has_boundary_privilege($role_id);
+		
+		if ($boundary_privilege)
+		{
+		    $this->boundary_role = TRUE;
+		    
+		    // Decode JSON
+		    $boundary_privilege = json_decode($boundary_privilege);
+		    
+		    // Set the boudary id
+		    $this->boundary_id = $boundary_privilege->boundary_id;
+		    
+		    // Halt (probably unnecessary as it's the last check anyway)
+		    return;
+		}
+	    
 	}
 }
 ?>
