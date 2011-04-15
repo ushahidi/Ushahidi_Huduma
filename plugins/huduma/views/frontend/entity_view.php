@@ -67,27 +67,6 @@
 							<?php endforeach; ?>
 							<!-- /comments -->
 
-	                        <?php if ($form_error) : ?>
-                            <!-- red-box -->
-                            <div class="red-box">
-                                <h3><?php echo Kohana::lang('ui_main.error'); ?></h3>
-                                <ul>
-                                 <?php
-                                 foreach($errors as $error_item => $description)
-                                 {
-                                     print (!$description)? "" : "<li>".$description."</li>";
-                                 }
-                                 ?>
-                                </ul>
-                            </div>
-                        	<?php endif; ?>
-
-                        	<?php if ($form_saved): ?>
-                            <!-- green-box -->
-                            <div class="green-box" id="submitStatus">
-                                <h3><?php echo Kohana::lang('ui_huduma.entity_saved'); ?></h3>
-                            </div>
-                        	<?php endif; ?>
 
 							<?php echo $entity_comments_form; ?>
                         </div>

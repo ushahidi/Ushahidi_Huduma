@@ -188,5 +188,132 @@ class Dashboard_Role_Model extends ORM {
 			}
 		}
 	}
+
+	/**
+	 * Checks if the specified role has agency level access
+	 *
+	 * @param	int	$role_id
+	 * @return	boolean
+	 */
+	public static function has_agency_privilege($role_id)
+	{
+		// Validate role
+		if ( ! self::is_valid_dashboard_role($role_id))
+		{
+			// Invalid dashboard role
+			return FALSE;
+		}
+		else
+		{
+			// Role is valid
+			
+			// Database instance for this operation
+			$database = new Database();
+
+			// For agency privilege, agency_id MUST be non-zero and static_entity_id = 0
+			$results = $database->from('dashboard_role_privileges')
+								->where(array('dashboard_role_id' => $role_id, 'agency_id !=' => 0, 'static_entity_id' => 0))
+								->get();
+
+			// Fetch the data
+			if (count($results) > 0)
+			{
+				return json_encode(array(
+					'status' => TRUE,
+					'agency_id' => $results[0]->agency_id,
+					'boundary_id' => $results[0]->boundary_id
+				));
+			}
+			else
+			{
+				// No records found, FAIL
+				return FALSE;
+			}
+		}
+	}
+
+	/**
+	 * Checks if the specified role has category privileges
+	 *
+	 * @param	int	$role_id
+	 * @return 	boolean
+	 */
+	public static function has_category_privilege($role_id)
+	{
+		if ( ! self::is_valid_dashboard_role($role_id))
+		{
+			return FALSE;
+		}
+		else
+		{
+			// Database instance for the lookup
+			$database = new Database();
+
+			// Category ID must be non-zero and agency_id must be zero
+			$results = $database->from('dahboard_role_privileges')
+								->where(array('dahboard_role_id' => $role_id, 'category_id !=' => 0, 'agency_id' => 0))
+								->get();
+
+			// Records found?
+			if (count($records) > 0)
+			{
+				// Success, return 
+				return json_encode(array(
+					'status' => TRUE,
+					'category_id' => $results[0]->category_id,
+					'boundary_id' => $results[0]->boundary_id
+				));
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	/**
+	 * Checks if the specified role has a boundary privilege
+	 * This check only applies where the role has been granted access
+	 * to a specific boundary - without agency or category restriction
+	 *
+	 * @param	int	$role_id
+	 * @return	boolean
+	 */
+	public static function has_boundary_privilege($role_id)
+	{
+		// Validate specified role
+		if ( ! self::is_valid_dahboard_role($role_id))
+		{
+			return FALSE;
+		}
+		else
+		{
+			// Success, proceed
+
+			// Database instance
+			$database = new Database();
+
+			$results = $database->from('dashboard_role_privileges')
+				->where(array(
+					'dashboard_role_id' => $role_id, 
+					'boundary_id !=' => 0, 
+					'category_id' => 0, 
+					'agency_id' => 0
+				))
+				->get();
+
+			// Check if records have been returned
+			if (count($records) > 0)
+			{
+				return json_encode(array(
+					'status' => TRUE,
+					'boundary_id' => $results[0]->boundary_id
+				));
+			}
+			else
+			{
+				return FALSE;
+			}
+	}
 }
 ?>
