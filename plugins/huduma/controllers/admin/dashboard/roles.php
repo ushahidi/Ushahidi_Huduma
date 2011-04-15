@@ -28,20 +28,37 @@ class Roles_Controller extends Admin_Controller {
 		// Check if the form has been submitted
 		if ($_POST)
 		{
+		    // Get the specified action
+		    $action = $_POST['action'];
 
-			// Check for add/update
-			if ($action == 'a')
+			if ($action == 'd')
 			{
-				// TODO add the id of the currently selected role
-				array_push($data, array('id' => $_POST['id']));
+			    Kohana::log('debug', 'Deleting dashboard role(s)');
+			    
+				// Setup validation
+				$validation = Validation::factory($_POST);
 				
-				// Instance to be used for validation
-				$dashboard_role = new Dashboard_Role_Model();
-
-			}
-			elseif ($action == 'd')
-			{
-				// Get the selected role
+				// Add some filters
+				$validation->pre_filter('trim');
+				
+				// Add rules
+				$validation->add_rules('dashboard_role_id.*', 'required');
+				
+				if ($validation->validate())
+				{
+				    Kohana::log('debug', 'Validation succeeded');
+				    foreach ($validation->dashboard_role_id as $role_id)
+				    {
+				        Kohana::log('debug', 'Deleting role id: '.$role_id);
+				        
+				        Dashboard_Role_Model::remove_role($role_id);
+				    }
+				}
+				else
+				{
+				    Kohana::log('debug', 'Validation failed! Selected records not deleted');
+				}
+				
 			}
 		}
 

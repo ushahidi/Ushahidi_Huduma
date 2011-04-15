@@ -78,7 +78,7 @@
 							boundary_id: $("#role_administrative_boundary_id").val(),
 							category_id: $("#role_category_id").val()
 						}
-
+						
 						// Post the data
 						$.post('<?php echo url::site().'admin/dashboard/roles/save'?>',
 							data,
@@ -155,7 +155,7 @@
 					var htmlStr = "<option value=\"0\">---<?php echo Kohana::lang('ui_huduma.select_entity'); ?>---</option>";
 
 					$.each(response.data, function(id, value){
-						htmlStr += "<option value=\""+id+"\>"+value+"</option>";
+						htmlStr += "<option value=\""+id+"\">"+value+"</option>";
 					});
 
 					// Populate the dropdown

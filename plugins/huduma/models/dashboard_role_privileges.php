@@ -29,6 +29,7 @@ class Dashboard_Role_Privileges_Model extends ORM {
 		$dashboard_role = ORM::factory('dashboard_role', $array->dashboard_role_id);
 
 		Kohana::log('debug', sprintf('Dashboard role id: %s', $dashboard_role->id));
+		
 		// Check if role is associated with a service agency
 		if ($dashboard_role->agency_id == 0 AND ($array->category_id == 0 OR $array->boundary_id == 0) )
 		{

@@ -36,7 +36,7 @@ class huduma
 		plugin::add_stylesheet('huduma/views/css/facebox');
 		plugin::add_javascript('huduma/views/js/facebox');
 
-        Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'generate_service_delivery_tab'));
+        Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
 		Event::add('ushahidi_action.header_scripts', array($this, '_modify_header_scripts'));
 
         if (Router::$controller == 'main')
@@ -53,14 +53,14 @@ class huduma
     /**
      * Adds a service delivery menu to the list of admin menus on the right of the admin console
      */
-    public function generate_service_delivery_tab()
+    public function add_huduma_tab()
     {
         // Get the current event data
         $main_right_tabs = Event::$data;
 
         // Generate the menu string
         $main_right_tabs = arr::merge($main_right_tabs, array(
-            'servicedelivery' => Kohana::lang('ui_huduma.servicedelivery'))
+            'servicedelivery' => Kohana::lang('ui_huduma.huduma'))
         );
         
         // Set the event data

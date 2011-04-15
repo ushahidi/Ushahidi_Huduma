@@ -25,7 +25,7 @@
      'additional_info'          => 'Additional Information',
      'dashboard_users'			=> 'Dashboard Users',
      'agency_name'              => 'Agency Name',
-     'servicedelivery'          => 'Service Delivery',
+     'huduma'                   => 'Huduma',
      'agency'                   => 'Agency',
      'agencies'                 => 'Agencies',
      'parent_agency'            => 'Parent/Governing Agency',

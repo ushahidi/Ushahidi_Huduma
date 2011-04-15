@@ -59,7 +59,7 @@
 					<div class="popup">
 						<div class="content"></div>
 						<a href="#" class="close">
-							<?php print html::image(array('src' => 'plugins/servicedelivery/views/images/closelabel.png', 'class'=> 'close_image')); ?>
+							<?php print html::image(array('src' => 'plugins/huduma/views/images/closelabel.png', 'class'=> 'close_image')); ?>
 						</a>
 					</div>
 				</div>
