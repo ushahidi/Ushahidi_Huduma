@@ -34,7 +34,7 @@
 
 		<div class="row">
 			<h4><?php echo Kohana::lang('ui_main.email'); ?>:</h4>
-			<?php print form::input('comment_email', $form['comment_email'], ' "class=comment_field text"'); ?>
+			<?php print form::input('comment_email', $form['comment_email'], ' class="comment_field text"'); ?>
 		</div>
 
 		<div class="row">

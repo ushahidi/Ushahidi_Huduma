@@ -253,29 +253,32 @@ class Entities_Controller extends Frontend_Controller {
                 $form_error = TRUE;
             }
         }
-		
-		$this->template->content->entity_id = $entity->id;
-        $this->template->content->entity_name = $entity->entity_name;
-		$this->template->content->boundary_id = $entity->boundary_id;
+        
+        // ucfirst() conversion each word in the string
+        $entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
+        
+        $this->template->content->entity_id = $entity->id;
+        $this->template->content->entity_name = $entity_name;
+        $this->template->content->boundary_id = $entity->boundary_id;
         $this->template->content->latitude = $entity->latitude;
         $this->template->content->longitude = $entity->longitude;		
-		$this->template->content->show_dashboard_panel = FALSE;
-		$this->template->content->show_metadata = $show_metadata;
+        $this->template->content->show_dashboard_panel = FALSE;
+        $this->template->content->show_metadata = $show_metadata;
+        
+        // Show the comments
+        $this->template->content->comments = Static_Entity_Model::get_comments($entity_id);
 
-		// Show the comments
-		$this->template->content->comments = Static_Entity_Model::get_comments($entity_id);
-
-		// Load the comments form
-		$entity_comments_form = new View('frontend/entity_comments_form');
-
-		// Set the form content
-		$entity_comments_form->captcha = $captcha;
-		$entity_comments_form->form = $form;
-		$entity_comments_form->errors = $errors;
-		$entity_comments_form->form_error = $form_error;
-		$entity_comments_form->form_saved = $form_saved;
-
-		$this->template->content->entity_comments_form = $entity_comments_form;
+        // Load the comments form
+        $entity_comments_form = new View('frontend/entity_comments_form');
+        
+        // Set the form content
+        $entity_comments_form->captcha = $captcha;
+        $entity_comments_form->form = $form;
+        $entity_comments_form->errors = $errors;
+        $entity_comments_form->form_error = $form_error;
+        $entity_comments_form->form_saved = $form_saved;
+        
+        $this->template->content->entity_comments_form = $entity_comments_form;
 
         //Javascript Header
         $this->themes->map_enabled = TRUE;
