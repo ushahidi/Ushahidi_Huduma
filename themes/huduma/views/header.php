@@ -35,7 +35,7 @@
 				<div id="loginsection">
 					<?php print form::input(array('type'=>'button', 'name'=>'d_login_button', 'id'=>'d_login_button', 'class'=>'huduma_button'), Kohana::lang('ui_main.login')); ?>
 					<!-- login -->
-					<div class="login">
+					<div class="login" style="display: none;">
 						<?php if ($is_logged_in): ?>
 							<?php print form::open(url::site().'dashboards/logout'); ?>
 							<div class="row">

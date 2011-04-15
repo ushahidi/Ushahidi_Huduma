@@ -217,17 +217,8 @@ class Entities_Controller extends Frontend_Controller {
 
                     $comment_spam = 0;
                 }
-			
-				//TODO CREATE COMMENTS MODEL
-//                $comment = new Comment_Model();
-//                $comment->incident_id = $id;
-//                $comment->comment_author = strip_tags($post->comment_author);
-//                $comment->comment_description = strip_tags($post->comment_description);
-//                $comment->comment_email = strip_tags($post->comment_email);
-//                $comment->comment_ip = $_SERVER['REMOTE_ADDR'];
-//                $comment->comment_date = date("Y-m-d H:i:s",time());
 
-                // Activate comment for now
+				// Activate comment for now
                 if ($comment_spam == 1)
                 {
                     $comment->comment_spam = 1;

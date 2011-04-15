@@ -43,7 +43,7 @@
 		</div>
 
 		<div class="row">
-			<h4><?php echo Kohana::lang('ui_main.captcha'); ?></h4>
+			<h4><?php echo Kohana::lang('ui_main.security_code'); ?></h4>
 			<?php print $captcha->render(); ?><br><br>
 			<?php print form::input('captcha', $form['captcha'], ' class="text comment_field"'); ?>
 		</div>
