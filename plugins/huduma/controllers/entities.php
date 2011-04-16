@@ -141,36 +141,39 @@ class Entities_Controller extends Frontend_Controller {
         $form_action = "";
 		$show_metadata = empty($entity->metadata) ? FALSE : TRUE;
 
-        // Check if the form has been submitted
-        if ($_POST AND Kohana::config('settings.allow_comments'))
-        {
-            // Set up validation
-            $post = Validation::factory($_POST);
+        // Check if the form has been submitted and that the endity ID is valid
+        if ($_POST AND Static_Entity_Model::is_valid_static_entity($entity_id))
+        {            
+            // Manually extract the data to be passed on for validation and subsequent saving
+            $data = arr::extract($_POST, 'comment_author', 'comment_email', 'comment_description');
+            
+            // Add the the static entity id to the data array
+            $data = array_merge($data, array('static_entity_id' => $entity_id));
+            
+            // Validate the captcha
+            $valid_captcha = Captcha::valid($_POST['captcha']);
+            
+            // Static Entity Comment instance
+            $entity_comment = new Static_Entity_Comment_Model();
 
-            // Add some filters
-            $post->pre_filter('trim', TRUE);
-
-            $post->add_rules('comment_author', 'required','length[3,100]');
-            $post->add_rules('comment_description', 'required');
-            $post->add_rules('comment_email', 'required','email','length[4,100]');
-
-
-            if ($post->validate())
+            // Validation check
+            if ($entity_comment->validate($data) AND $valid_captcha)
             {
+                // To hold the SPAM status of the comment
+                $comment_spam = 0;
+                
                 // Yes! everything is valid
-
                 if ($api_akismet != "")
                 {
                     // Run Akismet Spam Checker
-
                     $akismet = new Akismet();
 
                     // Comment data
                     $comment = array(
-                        'author' => $post->comment_author,
-                        'email' => $post->comment_email,
+                        'author' => $entity_comment->comment_author,
+                        'email' => $entity_comment->comment_email,
                         'website' => "",
-                        'body' => $post->comment_description,
+                        'body' => $entity_comment->comment_description,
                         'user_ip' => $_SERVER['REMOTE_ADDR']
                     );
 
@@ -214,41 +217,47 @@ class Entities_Controller extends Frontend_Controller {
                 else
                 {
                     // No API Key!!
-
                     $comment_spam = 0;
                 }
 
 				// Activate comment for now
                 if ($comment_spam == 1)
                 {
-                    $comment->comment_spam = 1;
-                    $comment->comment_active = 0;
+                    $entity_comment->comment_spam = 1;
+                    $entity_comment->comment_active = 0;
                 }
                 else
                 {
-                    $comment->comment_spam = 0;
-                    if (Kohana::config('settings.allow_comments') == 1)
-                    {
-                        // Auto Approve
-                        $comment->comment_active = 1;
-                    }
-                    else
-                    {
-                        // Manually Approve
-                        $comment->comment_active = 0;
-                    }
+                    $entity_comment->comment_spam = 0;
+                    
+                    // Auto Approve
+                    // TODO Add configuration comment configuration setting under the static entity
+                    // dashboard
+                    $entity_comment->comment_active = 1;
                 }
 
-                $comment->save();
+                // Save the comment
+                $entity_comment->save();
+                
+                // Success
+                $form_saved = TRUE;
+                
+                array_fill_keys($form, '');
             }
             // Validation failed
             else
             {
                 // Repopulate the form fields
-                $form = arr::overwrite($form, $post->as_array());
+                // $form = arr::overwrite($form, $data->as_array());
+                
+                // Check if the captcha was valid
+                // if ( ! $valid_captcha)
+                // {
+                //     $data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
+                // }
 
                 // Populate the form errors if any
-                $errors = arr::overwrite($errors, $post->errors('entity'));
+                $errors = arr::overwrite($errors, $data->errors('entity'));
 
                 $form_error = TRUE;
             }
@@ -266,11 +275,14 @@ class Entities_Controller extends Frontend_Controller {
         $this->template->content->show_metadata = $show_metadata;
         
         // Show the comments
-        $this->template->content->comments = Static_Entity_Model::get_comments($entity_id);
+        $entity_view_comments = new View('frontend/entity_view_comments');
+        $entity_view_comments->comments = Static_Entity_Model::get_comments($entity_id);
+        
+        $this->template->content->entity_view_comments = $entity_view_comments;
 
         // Load the comments form
         $entity_comments_form = new View('frontend/entity_comments_form');
-        
+                
         // Set the form content
         $entity_comments_form->captcha = $captcha;
         $entity_comments_form->form = $form;

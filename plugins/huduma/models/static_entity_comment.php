@@ -21,6 +21,26 @@ class Static_Entity_Comment_Model extends ORM {
 	protected $belongs_to = array('static_entity');
 
 	protected $has_many = array('rating');
+	
+	/**
+	 * Validates a comment entry before saving
+	 *
+	 * @param   array   $array Data to be validated
+	 * @param   boolean $save
+	 * @return boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+	    // Set up validation and add some rules
+	    $array = Validation::factory($array)
+	                ->pre_filter('trim', TRUE)
+	                ->add_rules('static_entity_id', 'required', 'Static_Entity_Model::is_valid_static_entity')
+	                ->add_rules('comment_author', 'required', 'length[3,100]')
+	                ->add_rules('comment_email', 'required', 'email', 'length[4,100]')
+	                ->add_rules('comment_description', 'required');
+	                
+	    return parent::validate($array, $save);
+	}
 
 }
 ?>

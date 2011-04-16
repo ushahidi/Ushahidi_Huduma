@@ -57,18 +57,10 @@
 								<a href="javascript:showEntityMetadata()"><?php echo Kohana::lang('ui_huduma.view_additional_info'); ?></a>
 							</div>
 							<?php endif; ?>
-
-							<!-- comments -->
-							<?php foreach ($comments as $comment): ?>
-							<div class="row">
-								<h6><?php echo $comment->comment_author; ?></h6>
-								<p><?php echo $comment->comment_description; ?></p>
-							</div>
-							<?php endforeach; ?>
-							<!-- /comments -->
-
-
-							<?php echo $entity_comments_form; ?>
+                            
+                            <?php echo $entity_view_comments; ?>
+                                
+                            <?php echo $entity_comments_form; ?>
                         </div>
 
                     </div>

@@ -1,19 +1,10 @@
 /*
- * Service delivery plugin stylesheet
+ * Huduma plugin stylesheet
  */
 
- ul.boundary-list li {
-    list-style-type: none;
-}
-
-ul.boundary-list li a {
-    padding-left: 5px;
-    text-decoration: none;
-}
-
-.popup-table {
-    font-size:12px;
-}
+ul.boundary-list li { list-style-type: none; }
+ul.boundary-list li a { padding-left: 5px; text-decoration: none; }
+.popup-table { font-size:12px; }
 
 .entity-map .map-holder {
 	clear:both;
@@ -23,10 +14,7 @@ ul.boundary-list li a {
 	border-bottom:2px solid #C0C2B8;
 }
 
-.entity-name {
-    position: absolute;
-    margin: -20px 320px;
-}
+.entity-name { position: absolute; margin: -20px 320px; }
 
 div.comment-col {
     margin: 0 0 0 40px;
@@ -45,15 +33,8 @@ div.comment-items {
     padding: 0;
 }
 
-div.comment-item {
-    background: #BCE8F5;
-    padding: 8px;
-}
-
-#dialog {
-	font-size: 10px;
-}
-
+div.comment-item { background: #BCE8F5; padding: 8px; }
+#dialog { font-size: 10px; }
 table.metadata { width: 100%; }
 
 .metadata th {
@@ -64,9 +45,7 @@ table.metadata { width: 100%; }
 	text-align: left;
 }
 
-.metadata td {
-	padding: 2px;
-}
+.metadata td { padding: 2px; }
 
 div.ui-dialog {
 	position: absolute;
@@ -75,13 +54,8 @@ div.ui-dialog {
 	z-index: -1;
 }
 
-div.r_details {
-	padding:5px;
-}
-
-h3.entity_name {
-	color: #00ADE3;
-}
+div.r_details { padding:5px; }
+h3.entity_name { color: #00ADE3; }
 
 #facebox h2 {
 	width: 100%;
@@ -103,14 +77,8 @@ h3.entity_name {
 	color: #000;
 }
 
-#facebox .row {
-	padding: 5px 0;
-}
-
-#facebox .row h4 {
-	padding: 3px 0;
-}
-
+#facebox .row { padding: 5px 0; }
+#facebox .row h4 { padding: 3px 0; }
 div#loginsection { float: right; clear: both; }
 
 div.login {
@@ -130,13 +98,13 @@ div.login {
 	box-shadow:0 0 18px rgba(0,0,0,0.4);
 	background-color: #0e7596;
 	padding: 5px 10px;
-	height: 140px;
+	height: 130px;
 	width: 200px;
 }
 
 .login, .dashboard-comment { font: 75% "Trebuchet MS",Arial,Helvetica,sans-serif,Verdana; }
 .login .row, .dashboard-comment .row { padding: 0px; margin: 0 0 10px 0; color: #FFFFFF; }
-.login .field { width: 200px; height: 30px; }
+.login .field { width: 200px; height: 23px; }
 .login h3, .login h4, .login h5, .dashboard_role_detail { color: #FFFFFF; }
 .login h3 { font-size: 180%; letter-spacing: 1px; }
 .login h4 { font-size: 150%; }
@@ -145,6 +113,7 @@ div.login {
 .login .dashboard_role_detail { font-style: italic; font-size: 1.3em; }
 .login #dashboard_remember { margin: 0 3px 0 10px; }
 .login label {font-size: 120%; }
+
 .huduma_button {
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -155,19 +124,53 @@ div.login {
 	padding: 5px;
 	font-weight: bold;
 }
-#d_login_button { padding: 5px 15px; background-color: #c7f91a; color: #000;  cursor:pointer; }
-div.login_panel_button { position: absolute; margin: 0; top: 120px; }
 
-.field, .comment_field {border: 1px solid #DDDDDD; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-input.comment_field { width: 250px; height: 25px; }
-input.medium { width: 450px; }
-div.dashboard-comment {
+#d_login_button { padding: 5px 15px; background-color: #c7f91a; color: #000;  cursor:pointer; }
+div.login_panel_button { position: absolute; margin: 0; top: 105px; }
+.field, .comment_field {border: 1px solid #DDDDDD; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+input.comment_field { width: 200px; height: 20px; }
+input.medium { width: 350px; }
+
+div.dashboard_comment_form {
 	border: 2px solid #CCCCCC;
-	margin: 15px 0;
+	margin: 5px 0;
 	padding: 8px 15px 0;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
 	background-color: #efefef;
+/*	clear: both;*/
 }
-.dashboard-comment h4 { font-size: 135%; padding:5px 0 0 0; margin: 10px 0 0 0 }
+
+.dashboard_comment_form h4 { font-size: 13px; padding:5px 0 0 0; margin: 10px 0 0 0; }
+div.dashboard_comments { padding: 10px; margin-bottom: 5px; }
+div.dashboard_comment_box { border-top: 1px dotted #C0C2B8; margin-bottom: 50px; padding: 10px; }
+div.dashboard_comment_block { float: left; width: 350px; }
+div.dashboard_comment_credibility { float: right; margin: 0 15px; }
+
+.entity_rating_value { 
+	height: 18px;
+	width:40px;
+	border: 1px solid #E5E5E5;
+	color: #CCC;
+	background-color: #F3F3F3;
+	text-align: center;
+	font-size: 18px;
+	margin: 0 2px;
+	padding: 5px 0;
+}
+
+.rating_tickers .ratelink { 
+	border-bottom: 1px solid #E5E5E5; 
+	border-left: 1px solid #E5E5E5; 
+	border-right: 1px solid #E5E5E5;
+	border-top: 0px;
+	background-color: #F3F3F3;
+	text-align: center;
+	margin: 0 2px;
+	height: 18px;
+	width: 40px;
+	display: block;
+	font-size: 11px;
+	text-decoration: none;
+}

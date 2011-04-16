@@ -38,6 +38,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 			// Load the static entity view
 			$this->template->content = new View('frontend/entity_view');
 			
+			// TODO Has the form been submitted
+						
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
 
@@ -48,11 +50,14 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content->entity_name = $entity_name;
 
 			// Disable "view metadata" link
-			$this->template->content->show_metadata = FALSE
+			$this->template->content->show_metadata = FALSE;
 			$this->template->content->show_dashboard_panel = TRUE;
 			
 			// Get the comments for the static entity
-			$this->template->content->comments = Static_Entity_Model::get_comments($this->static_entity_id);
+			$entity_view_comments = new View('frontend/entity_view_comments');
+			$entity_view_comments->comments = Static_Entity_Model::get_comments($this->static_entity_id);
+			
+			$this->template->content->entity_view_comments = $entity_view_comments;
 
 			// Load the comments form
 			$entity_comments_form = new View('frontend/entity_comments_form');
