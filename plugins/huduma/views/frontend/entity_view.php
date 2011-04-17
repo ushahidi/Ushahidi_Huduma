@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- /column -->
-                        <div style="float: left; margin-left: 40px; padding-top:20px;">
+                        <div id="entity_view_column" style="float: left; left: 40px; padding-top:20px; position: relative;">
                             <div id="report-map" class="entity-map">
                                 <div class="map-holder" id="map"></div>
                                 <div style="clear:both"></div>

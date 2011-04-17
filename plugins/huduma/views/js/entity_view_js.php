@@ -17,6 +17,8 @@
 ?>
 		var map;
 		var myPoint;
+		var commentForm;
+		
 		jQuery(window).load(function() {
 			var moved=false;
 
@@ -181,4 +183,21 @@
 		// Display the entity metadata
 		function showEntityMetadata() {
 			$("#metadata-dialog").dialog( "open" );
+		}
+		
+		/**
+		 * Adds the comment form below the comment container referenced by @param containerId
+		 */
+		function showCommentBox(containerId, commentId) {
+		    // Verify specified container exists and commentForm is not null
+		    if ($("#"+containerId+"") != null && commentForm == null) {
+		        // Fetch and remove the comment form
+		        commentForm = $(".dashboard_comment_form");
+	        }
+	        
+		    // Append comment form to the comment container
+		    $("#"+containerId+" > div.comment_box_holder").append(commentForm);
+		    
+		    // Set the comment being replied to
+		    $("#dashboard_comment_reply_to").val(unescape(commentId));
 		}

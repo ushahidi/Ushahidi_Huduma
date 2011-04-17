@@ -148,7 +148,10 @@ class Entities_Controller extends Frontend_Controller {
             $data = arr::extract($_POST, 'comment_author', 'comment_email', 'comment_description');
             
             // Add the the static entity id to the data array
-            $data = array_merge($data, array('static_entity_id' => $entity_id));
+            $data = array_merge($data, array(
+                'static_entity_id' => $entity_id,
+                // 'parent_comment_id' => $_POST['dashboard_comment_reply_to']
+                ));
             
             // Validate the captcha
             $valid_captcha = Captcha::valid($_POST['captcha']);
@@ -247,17 +250,17 @@ class Entities_Controller extends Frontend_Controller {
             // Validation failed
             else
             {
-                // Repopulate the form fields
-                // $form = arr::overwrite($form, $data->as_array());
-                
                 // Check if the captcha was valid
-                // if ( ! $valid_captcha)
-                // {
-                //     $data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
-                // }
+                if ( ! $valid_captcha)
+                {
+                    $data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
+                }
+                
+                // Repopulate the form fields
+                $form = arr::overwrite($form, $data->as_array());
 
                 // Populate the form errors if any
-                $errors = arr::overwrite($errors, $data->errors('entity'));
+                $errors = arr::overwrite($errors, $data->errors('comment'));
 
                 $form_error = TRUE;
             }
@@ -282,6 +285,7 @@ class Entities_Controller extends Frontend_Controller {
 
         // Load the comments form
         $entity_comments_form = new View('frontend/entity_comments_form');
+        $entity_comments_form->is_dashboard_user = FALSE;
                 
         // Set the form content
         $entity_comments_form->captcha = $captcha;
