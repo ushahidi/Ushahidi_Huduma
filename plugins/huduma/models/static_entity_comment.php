@@ -38,8 +38,30 @@ class Static_Entity_Comment_Model extends ORM {
 	                ->add_rules('comment_author', 'required', 'length[3,100]')
 	                ->add_rules('comment_email', 'required', 'email', 'length[4,100]')
 	                ->add_rules('comment_description', 'required');
-	                
+	    
+	    // Check if the dashboard user id is in the validation data
+	    if ( ! empty($array->dashboard_user_id) AND $array->dashboard_user_id != 0)
+	    {
+	        // Ensure the dashboard user id is validated
+	        $array->add_rules('dashboard_user_id', array('Dashboard_User_Model', 'is_valid_dashboard_user'));
+	    }
+	    
 	    return parent::validate($array, $save);
+	}
+	
+	//> HELPER CLASS METHODS
+	
+	/**
+	 * Checks if the specified comment id is valid and exists in the database
+	 *
+	 * @param   int $comment_id
+	 * @return  boolean
+	 */
+	public static function is_valid_static_entity_comment($comment_id)
+	{
+	    return (preg_match('/^[1-9](\d*)$/') > 0)
+	        ? self::factory('static_entity_comment', $comment_id)->loaded
+	        : FALSE;
 	}
 
 }
