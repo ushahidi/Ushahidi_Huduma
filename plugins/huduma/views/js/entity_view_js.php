@@ -200,4 +200,15 @@
 		    
 		    // Set the comment being replied to
 		    $("#dashboard_comment_reply_to").val(unescape(commentId));
+		    
+		    // Display the cancel button
+		    $("#comment_cancel").css("display", "block");
+		    $("#comment_cancel").click(function() {
+		        // Append comment form to the bottom of the page
+		        $("#entity_view_column").append(commentForm);
+		        
+		        // Hide the current button
+		        $(this).hide();
+		    });
 		}
+		

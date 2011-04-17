@@ -140,9 +140,10 @@ div.dashboard_comment_form {
 	width: 610px;
 /*	clear: both;*/
 }
-
+ul.comment_form_buttons { list-style-type: none; display: block; margin: 0; padding: 0;}
+.comment_form_buttons li { float: left; padding: 0 8px 0 0; }
 .dashboard_comment_form h4 { font-size: 13px; padding:5px 0 0 0; margin: 10px 0 0 0; }
-ul.dashboard_comments { padding: 10px; margin-bottom: 5px; list-style-type: none;}
+ul.dashboard_comments { padding: 10px; margin-bottom: 5px; list-style-type: none; }
 li.dashboard_comment_box { border-top: 1px dotted #C0C2B8; margin-bottom: 50px; padding: 10px; position: relative;}
 .dashboard_comment_box .comment_box_holder { position: relative; top: 50px; width: 650px; padding: 0;}
 .dashboard_comment_box .dashboard_comment_actions { position: absolute; right: 10px; top: 0; padding: 3px 0;}

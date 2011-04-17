@@ -59,7 +59,18 @@
     		<?php endif; ?>
 		
     		<div class="row" style="clear: both; padding: 10px 0;">
-    			<?php print form::input(array('type'=>'submit', 'name' =>'comment_submit', 'class'=>'huduma_button'), Kohana::lang('ui_huduma.submit_comment')); ?>
+    		    <div class="row" style="margin-bottom: 15px; padding-bottom: 15px;">
+        		    <ul class="comment_form_buttons">
+            			<li>
+            			    <?php print form::input(array('type'=>'submit', 'name' =>'comment_submit', 'class'=>'huduma_button'), 
+            			        Kohana::lang('ui_huduma.submit_comment')); ?>
+            			</li>
+            			<li>
+            			    <?php print form::input(array('type'=>'button', 'name' =>'comment_cancel',  'id'=>'comment_cancel', 'class'=>'huduma_button', 
+            			        'style'=>'display: none;'), Kohana::lang('ui_main.cancel')); ?>
+            			</li>
+        			</ul>
+    			</div>
     		</div>
     		
         <?php print form::close(); ?>
