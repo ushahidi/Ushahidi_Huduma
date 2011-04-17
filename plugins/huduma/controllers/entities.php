@@ -118,9 +118,15 @@ class Entities_Controller extends Frontend_Controller {
 		// Load Akismet API Key (Spam Blocker)
 
         $api_akismet = Kohana::config('settings.api_akismet');
-
+        
+        // Get the entity
         $entity = ORM::factory('static_entity', $entity_id);
 
+        // Check if there's a dashboard user currently logged in
+        $auth_lite = Authlite::instance('authlite');
+        $is_dashboard_user = $auth_lite->logged_in();
+        $current_user = ($is_dashboard_user) ? $auth_lite->get_user() : NULL;
+        
         // Set up the form for comments
         $form = array(
             'comment_author' => '',
@@ -145,7 +151,23 @@ class Entities_Controller extends Frontend_Controller {
         if ($_POST AND Static_Entity_Model::is_valid_static_entity($entity_id))
         {            
             // Manually extract the data to be passed on for validation and subsequent saving
-            $data = arr::extract($_POST, 'comment_author', 'comment_email', 'comment_description');
+            $data = arr::extract($_POST, 'comment_description');
+            
+            // Check if dashboard user is logged in
+            if ($is_dashboard_user)
+            {
+                // Dashboard user is logged in, fetch name and email from ORM
+                $data = array_merge($data, array(
+                    'comment_author' => $current_user->name,
+                    'comment_email' => $current_user->email,
+                    'dashboard_user_id' => $current_user->id,
+                ));
+            }
+            else
+            {
+                // User not logged in, fetch author and email address from input
+                $data = array_merge($data, arr::extract($_POST, 'comment_author', 'comment_email'));
+            }
             
             // Add the the static entity id to the data array
             $data = array_merge($data, array(
@@ -285,7 +307,7 @@ class Entities_Controller extends Frontend_Controller {
 
         // Load the comments form
         $entity_comments_form = new View('frontend/entity_comments_form');
-        $entity_comments_form->is_dashboard_user = FALSE;
+        $entity_comments_form->is_dashboard_user = $is_dashboard_user;
                 
         // Set the form content
         $entity_comments_form->captcha = $captcha;

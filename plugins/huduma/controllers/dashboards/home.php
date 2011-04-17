@@ -63,7 +63,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			        $form_error = FALSE;
 			        
 			        // Clear the form keys
-			        //$form = array_fill_keys($form, '');
+			        array_fill_keys($form, '');
 			    }
 			    // Validation failed
 			    else
