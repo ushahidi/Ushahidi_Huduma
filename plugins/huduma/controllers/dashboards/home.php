@@ -16,15 +16,10 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 	public function index()
 	{
-		// Load the captcha library
-		$captcha = Captcha::factory();
 
 		// Setup the form
 		$form = array(
-			'comment_author' => '',
-			'comment_email' => '',
-			'comment_description' => '',
-			'captcha' => ''
+			'comment_description' => ''
 		);
 
 		// Copy the form as errors, so the errors maintain the same keys as the field names
@@ -39,6 +34,51 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content = new View('frontend/entity_view');
 			
 			// TODO Has the form been submitted
+			if ($_POST)
+			{
+			    // Manually extract the data
+			    $data = arr::extract($_POST, 'comment_description');
+			    
+			    $data = array_merge($data, array(
+			        'dashboard_user_id' => $this->user->id, 
+			        'comment_author' => $this->user->name,
+			        'comment_email' => $this->user->email,
+			        // 'parent_comment_id' => $_POST['dashboard_comment_reply_to']
+			        'static_entity_id' => $this->static_entity_id));
+			    			    
+			    // Entity comment instance
+			    $entity_comment = new Static_Entity_Comment_Model();
+			    
+			    // Validation
+			    if ($entity_comment->validate($data))
+			    {
+			        // Success
+			        // Set extra properties
+			        $entity_comment->comment_active = 1;
+			        $entity_comment->comment_spam = 0;
+			        
+			        // Success, save!
+			        $entity_comment->save();
+			        $form_saved = TRUE;
+			        $form_error = FALSE;
+			        
+			        // Clear the form keys
+			        //$form = array_fill_keys($form, '');
+			    }
+			    // Validation failed
+			    else
+			    {
+			        // Repopulate form fields
+			        $form = arr::overwrite($form, $data->as_array());
+			        
+			        // Repopulate error fields
+			        $errors = arr::overwrite($errors, $data->errors('comments'));
+			        
+			        // Validation error
+			        $form_error = FALSE;
+			        $form_saved = FALSE;
+			    }
+			}
 						
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
@@ -61,9 +101,9 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 			// Load the comments form
 			$entity_comments_form = new View('frontend/entity_comments_form');
+			$entity_comments_form->is_dashboard_user = TRUE;
 			
 			// Set the form content
-			$entity_comments_form->captcha = $captcha;
 			$entity_comments_form->form = $form;
 			$entity_comments_form->errors = $errors;
 			$entity_comments_form->form_error = $form_error;
