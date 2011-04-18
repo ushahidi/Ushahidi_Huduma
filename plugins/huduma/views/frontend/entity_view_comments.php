@@ -30,19 +30,16 @@
             </span>
 			
 			<div class="dashboard_comment_credibility">
-                <div class="entity_rating_value" id="crating_<?php echo $comment->id; ?>">
+                <div class="entity_rating_value" id="cloader_<?php echo $comment->id; ?>">
                     <?php echo $comment->comment_rating; ?>
                 </div>
                 <span class="rating_tickers">
                     <span class="ratelink">
-                        <a href="javascript:rating('<?php echo $comment->id; ?>','add','comment','cloader_<?php echo $comment->id; ?>')">
+                        <a href="javascript:rating('<?php echo $comment->id; ?>','add', 'cloader_<?php echo $comment->id; ?>')">
                         +</a>
-                        <a href="javascript:rating('<?php echo $comment->id; ?>','subtract','comment','cloader_<?php echo $comment->id; ?>')">-</a>
+                        <a href="javascript:rating('<?php echo $comment->id; ?>','subtract','cloader_<?php echo $comment->id; ?>')">-</a>
                     </span>
                 </span>
-                <div>
-                    <span id="cloader_<?php echo $comment->id; ?>" class="rating_loading" ></span>
-                </div>
 			</div>
 			
 			<?php echo navigator::inline_comments($comment->id); ?>

@@ -78,6 +78,7 @@
 	 'remember_me'				=> 'Remember me',
 	 'welcome'					=> 'Welcome',
 	 'submit_comment'			=> 'Submit Comment',
+	 'comment_saved'            => 'Comment Saved',
 
 	 // Error Messages
 	 'error'					=> array(

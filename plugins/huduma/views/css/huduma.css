@@ -141,7 +141,7 @@ div.dashboard_comment_form {
 	/*clear: both;*/
 }
 .children { margin:0 !important; }
-.children li { height: 1%; list-style: none outside none; margin:50px 0 0 20px; padding: 5px 0; position: relative; border-top: 1px solid #E5E5E5;}
+.children li { height: 1%; list-style: none outside none; margin:50px 0 0 30px; padding: 5px 0; position: relative; border-top: 1px solid #E5E5E5;}
 .dashboard_comment_form h4 { font-size: 13px; padding:5px 0 0 0; margin: 10px 0 0 0; }
 .comment_form_buttons { margin: 0 !important; }
 .comment_form_buttons li { float: left; list-style-type: none; padding: 0 8px 0 0; }

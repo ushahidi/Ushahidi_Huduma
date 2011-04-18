@@ -212,3 +212,18 @@
 		    });
 		}
 		
+		function rating(commentId, action, ratingContainer) {
+		    // Post the rating
+		    var postData = { comment_id: commentId, action: action };
+		    
+		    // Post for rating
+		    $.post('<?php echo url::site(); ?>entities/rate_comment', 
+		            postData, 
+		            function(response){
+		                if (response.success) {
+		                    $("#"+ratingContainer+"").html(response.data);
+		                }
+		            }
+		    );
+		}
+		

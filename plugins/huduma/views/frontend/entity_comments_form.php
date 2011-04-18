@@ -23,7 +23,7 @@
     		<?php if ($form_saved): ?>
     		<!-- green-box -->
     		<div class="green-box" id="submitStatus">
-    			<h3><?php echo Kohana::lang('ui_main.comment_saved'); ?></h3>
+    			<h3><?php echo Kohana::lang('ui_huduma.comment_saved'); ?></h3>
     		</div>
     		<!-- /green-box-->
     		<?php endif; ?>

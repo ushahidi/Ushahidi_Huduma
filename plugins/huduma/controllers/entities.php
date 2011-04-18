@@ -338,7 +338,66 @@ class Entities_Controller extends Frontend_Controller {
         }
 
         $this->template->header->header_block = $this->themes->header_block();
-
+    }
+    
+    /**
+     * Performs comment rating
+     */
+    public function rate_comment()
+    {
+        // No template, disable auto-rendering
+        $this->template = "";
+        $this->auto_render = FALSE;
+        
+        // Check for POST
+        if ($_POST)
+        {
+            // Setup validation
+            $validation = Validation::factory($_POST);
+            
+            // Add some filters
+            $validation->pre_filter('trim', TRUE);
+            
+            // Add some rules
+            $validation->add_rules('comment_id', 'required', array('Static_Entity_Comment_Model', 'is_valid_static_entity_comment'));
+            $validation->add_rules('action', 'required');
+            
+            // Validate
+            if ($validation->validate())
+            {
+                // Load the comment instance
+                $entity_comment = new Static_Entity_Comment_Model($validation->comment_id);
+                
+                // Get current comment rating and date
+                $comment_rating = $entity_comment->comment_rating;
+                $comment_date = $entity_comment->comment_date;
+                
+                // Check for action
+                if ($validation->action == 'add')
+                {
+                    // Increase the rating
+                    $comment_rating++;
+                }
+                elseif ($validation->action == 'subtract')
+                {
+                    // Reduce the rating
+                    $comment_rating -= ($comment_rating > 0)? 1 : 0;
+                }
+                
+                // Set the new comment rating and save
+                $entity_comment->comment_rating = $comment_rating;
+                $entity_comment->comment_date = $comment_date;
+                $entity_comment->save();
+                
+                // Return new comment value
+                header("Content-type: application/json; charset=utf-8");
+                
+                print json_encode(array(
+                    'success' => TRUE,
+                    'data' => $comment_rating
+                ));
+            }
+        }
     }
 }
 ?>
