@@ -45,9 +45,8 @@
                 </div>
 			</div>
 			
-			<div class="comment_box_holder"></div>
-			<?php //TODO: Check if thare are any replies to this comment and generate another list ?>
-			<?php //TODO: Adjust the table structure for dashboard comments to store replies to comments ?>
+			<?php echo navigator::inline_comments($comment->id); ?>
+			<div class="comment_box_holder"></div>	
 		</li>
 	<?php endforeach; ?>
 	<!-- /comments -->

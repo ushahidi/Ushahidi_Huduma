@@ -46,6 +46,11 @@ class Static_Entity_Comment_Model extends ORM {
 	        $array->add_rules('dashboard_user_id', array('Dashboard_User_Model', 'is_valid_dashboard_user'));
 	    }
 	    
+	    if ( ! empty($array->parent_comment_id) AND $array->parent_comment_id != 0)
+	    {
+	        $array->add_rules('parent_comment_id', array('Static_Entity_Comment_Model', 'is_valid_static_entity_comment'));
+	    }
+	    
 	    return parent::validate($array, $save);
 	}
 	
@@ -59,9 +64,32 @@ class Static_Entity_Comment_Model extends ORM {
 	 */
 	public static function is_valid_static_entity_comment($comment_id)
 	{
-	    return (preg_match('/^[1-9](\d*)$/') > 0)
+	    return (preg_match('/^[1-9](\d*)$/', $comment_id) > 0)
 	        ? self::factory('static_entity_comment', $comment_id)->loaded
 	        : FALSE;
+	}
+	
+	/**
+	 * Gets the inline comments for the comment in @param $comment_id
+	 *
+	 * @param   int $comment_id
+	 * @return  array
+	 */
+	public static function get_inline_comments($comment_id)
+	{
+	   if ( ! self::is_valid_static_entity_comment($comment_id))
+	   {
+	       return FALSE;
+	   }
+	   else
+	   {
+	       // Return the comments with @param $comment_id as the parent
+    	   return self::factory('static_entity_comment')
+    	                ->select('id', 'comment_author', 'comment_description', 'comment_date')
+    	                ->where(array('parent_comment_id' => $comment_id, 'comment_spam' => 0, 'comment_active' => 1))
+    	                ->orderby('comment_date', 'asc')
+    	                ->find_all();
+        }
 	}
 
 }

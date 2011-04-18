@@ -36,7 +36,7 @@
 		    <?php else: ?>
     		<div class="row" style="float: left">
                 <h4><?php echo Kohana::lang('ui_main.leave_a_comment'); ?></h4>
-    			<?php print form::textarea('comment_description', $form['comment_description'], ' cols="37" rows="11" class="comment_field text"'); ?>
+    			<?php print form::textarea('comment_description', $form['comment_description'], ' cols="35" rows="11" class="comment_field text"'); ?>
     		</div>
 		
     		<div style="float: right; position:">

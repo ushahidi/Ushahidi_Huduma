@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS `static_entity_comment`(
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`static_entity_id` INT NOT NULL,
 	`dashboard_user_id` INT,
+	`parent_comment_id` INT DEFAULT 0,
 	`comment_author` VARCHAR(100),
 	`comment_email` VARCHAR(100),
 	`comment_description` TEXT,

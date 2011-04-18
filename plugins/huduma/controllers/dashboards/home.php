@@ -43,7 +43,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			        'dashboard_user_id' => $this->user->id, 
 			        'comment_author' => $this->user->name,
 			        'comment_email' => $this->user->email,
-			        // 'parent_comment_id' => $_POST['dashboard_comment_reply_to']
+			        'parent_comment_id' => $_POST['dashboard_comment_reply_to']
 			        'static_entity_id' => $this->static_entity_id));
 			    			    
 			    // Entity comment instance

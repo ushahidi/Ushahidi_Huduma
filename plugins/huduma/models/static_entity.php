@@ -119,7 +119,7 @@ class Static_Entity_Model extends ORM {
 		return self::factory('static_entity', $entity_id)->entity_name;
 	}
 
-	public static function get_comments($entity_id)
+	public static function get_comments($entity_id, $parents_only = TRUE)
 	{
 		if ( ! self::is_valid_static_entity($entity_id))
 		{
@@ -127,11 +127,22 @@ class Static_Entity_Model extends ORM {
 		}
 		else
 		{
+		    // Build the where clause
+		    $where_clause = array(
+		        'static_entity_id' => $entity_id,
+		        'comment_active' => 1,
+		        'comment_spam' => 0,
+		    );
+		    
+		    // Check if only parent comments are to be retrieved
+		    if ($parents_only)
+		    {
+		        $where_clause = array_merge($where_clause, array('parent_comment_id' => 0));
+		    }
+		    
 			// Return array of comments
 			return self::factory('static_entity_comment')
-						->where('static_entity_id', $entity_id)
-						->where('comment_active', '1')
-						->where('comment_spam', '0')
+						->where($where_clause)
 						->orderby('comment_date', 'asc')
 						->find_all();
 		}

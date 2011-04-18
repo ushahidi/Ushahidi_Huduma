@@ -172,7 +172,7 @@ class Entities_Controller extends Frontend_Controller {
             // Add the the static entity id to the data array
             $data = array_merge($data, array(
                 'static_entity_id' => $entity_id,
-                // 'parent_comment_id' => $_POST['dashboard_comment_reply_to']
+                'parent_comment_id' => $_POST['dashboard_comment_reply_to']
                 ));
             
             // Validate the captcha
