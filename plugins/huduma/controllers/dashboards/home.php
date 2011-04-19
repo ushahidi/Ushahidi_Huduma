@@ -27,6 +27,10 @@ class Home_Controller extends Dashboard_Template_Controller {
 		$form_error = FALSE;
 		$form_saved = FALSE;
 
+        // Load the dashboard panel view
+        $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+        $dashboard_panel->static_entity_panel = TRUE;
+        
 		// Has the static entity role been specified, get content
 		if ($this->static_entity_role)
 		{
@@ -43,8 +47,9 @@ class Home_Controller extends Dashboard_Template_Controller {
 			        'dashboard_user_id' => $this->user->id, 
 			        'comment_author' => $this->user->name,
 			        'comment_email' => $this->user->email,
-			        'parent_comment_id' => $_POST['dashboard_comment_reply_to']
-			        'static_entity_id' => $this->static_entity_id));
+			        'parent_comment_id' => $_POST['dashboard_comment_reply_to'],
+			        'static_entity_id' => $this->static_entity_id
+			    ));
 			    			    
 			    // Entity comment instance
 			    $entity_comment = new Static_Entity_Comment_Model();
@@ -79,6 +84,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			        $form_saved = FALSE;
 			    }
 			}
+			// end if
 						
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
@@ -92,6 +98,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			// Disable "view metadata" link
 			$this->template->content->show_metadata = FALSE;
 			$this->template->content->show_dashboard_panel = TRUE;
+			$this->template->content->dashboard_panel = $dashboard_panel;
 			
 			// Get the comments for the static entity
 			$entity_view_comments = new View('frontend/entity_view_comments');
@@ -143,6 +150,153 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 			// Get content for that boundary
 		}
+	}
+	
+	/**
+	 * Shows the entity profile page for a static entity
+	 */
+	public function entity_profile()
+	{
+	    // Ensure the user has a static entity role
+	    if ( ! $this->static_entity_role)
+	    {
+	        // Go back to home page
+	        $this->index();
+	    }
+	    
+	    // Load the entity view page with edit options
+	    $this->template->content = new View('frontend/dashboards/entity_profile_edit');
+	    
+	    // Setup forms
+	    $form = array(
+	        'entity_id' => '',
+	        'entity_name' => '',
+	        'latitude' => '',
+	        'longitude' => '',
+	        'agency_id' => '',
+	        'boundary_id' => ''
+	    );
+	    
+	    // Copy form as errors
+	    $errors = $form;
+	    
+	    $form_error = FALSE;
+	    $form_saved = FALSE;
+	    
+	    // Dashboard panel
+	    $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+	    $dashboard_panel->static_entity_panel = TRUE;
+	    
+	    $this->template->content->dashboard_panel = $dashboard_panel;
+
+	    // Retrieve the entity
+	    $entity = new Static_Entity_Model($this->static_entity_id);
+	    
+	    // Has the form been submitted - For metadata update or otherwise
+	    if ($_POST)
+	    {
+	        // Validation
+	        // Proceed
+	    }
+	    else
+	    {
+	        // Set the form values
+    	    $form = array(
+    	        'entity_name' => $entity->entity_name,
+    	        'latitude' => $entity->latitude,
+    	        'longitude' => $entity->longitude,
+    	        'agency_id' => $entity->agency_id,
+    	        'boundary_id' => $entity->boundary_id,
+    	    );
+	        
+	    }
+	    
+        // Set data for the content view
+        $this->template->content->form = $form;
+        $this->template->content->errors = $errors;
+        $this->template->content->form_saved = $form_saved;
+        $this->template->content->form_error = $form_error;
+        $this->template->content->agencies_dropdown = Agency_Model::get_agencies_dropdown();
+        $this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropddown();
+        
+        // TODO Javascript header
+        // $this->themes->js = new View('js/entity_edit_js');
+        // $this->themes->js->map_enabled = TRUE;
+        
+		// Set the header block
+		$this->template->header->header_block = $this->themes->header_block();
+	}
+	
+	/**
+	 * Change password page
+	 */
+	public function change_password()
+	{
+	    // Load the content view
+	    $this->template->content = new View('frontend/dashboards/change_password');
+	    
+	    // Set up form fields
+	    $form = array(
+	        'name' => $this->user->name,
+	        'username' => $this->user->username,
+	        'email' => '',
+	        'password' => '',
+	    );
+	    
+	    // Copy forms as errors so that the erros maintain the keys corresponding to the field names
+	    $errors = $form;
+	    
+	    $form_saved = FALSE;
+	    $form_error = FALSE;
+	    
+	    // Has te form been submitted
+	    if ($_POST)
+	    {
+	        // Manually extract the data
+	        $data = arr::extract($_POST, 'email', 'password', 'confirm_password');
+	        
+	        if ($this->user->valiidate($data))
+	        {
+	            // Success
+	            $this->user->save();
+	            
+	            $form_saved = TRUE;
+	            $form_error = FALSE;
+	            
+	            array_fill_keys($form, '');
+	        }
+	        else
+	        {
+	            $form = arr::overwrite($form, $data->as_array());
+	            $error = arr::overwrite($form, $data->errors());
+	            
+	            // Turn on form error
+	            $form_error = TRUE;
+	            
+	            $form_saved = FALSE;
+	        }
+	    }
+	    else
+	    {
+	        // Set the email key in the $forms array
+	        $form['email'] = $this->user->email;
+	    }
+	    
+	    $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+	    $dashboard_panel->static_entity_panel = TRUE;
+	    
+	    // Set content data
+	    $this->template->content->dashboard_panel = $dashboard_panel;
+	    $this->template->content->form = $form;
+	    $this->template->content->errors = $errors;
+	    $this->template->content->form_error = $form_error;
+	    $this->template->content->form_saved = $form_saved;
+	    
+	    // TODO: Javscript header
+	    
+	    // Set the header block
+	    $this->template->header->header_block = $this->themes->header_block();
+
 	}
 }
 ?>

@@ -21,6 +21,41 @@ class Static_Entity_Model extends ORM {
     protected $belongs_to = array('static_entity_type');
 
     /**
+     * Validates the static entity data against the specific set of rules
+     *
+     * @param   array   $array
+     * @param   boolean $save
+     * @return  boolean
+     */
+    public function validate(array & $array, $save = FALSE)
+    {
+        $array = Validation::factory($array)
+                    ->add_rules('entity_name', 'required')
+                    ->add_rules('longitude', 'required', 'numeric')
+                    ->add_rules('latitude', 'required', 'numeric');
+        
+        // Validate the ID for update operations
+        if (isset($array->id))
+        {
+            $array->add_rules('id', array('Static_Entity_Model', 'is_valid_static_entity'));
+        }
+        
+        // Validate admin boundary
+        if (isset($array->boundary_id) AND $array->boundary_id != 0)
+        {
+            $array->add_rules('boundary_id', array('Boundary_Model', 'is_valid_boundary'));
+        }
+        
+        // Valiadate service agency
+        if (isset($array->agency_id) AND $array->agency_id != 0)
+        {
+            $array->add_rules('agency_id', array('Agency_Model', 'is_valid_agency'));
+        }
+        
+        return parent::validate($array, $save);
+    }
+    
+    /**
      * Gets the list of static entities for the entity type specified in @param $type_id
 	 * 
      * @param int $type_id
@@ -119,6 +154,12 @@ class Static_Entity_Model extends ORM {
 		return self::factory('static_entity', $entity_id)->entity_name;
 	}
 
+    /**
+     * Gets the comments for the specified static entity
+     * @param   int     $entity_id
+     * @param   boolean $parents_only To filter only parent comments - those with inline replies
+     * @return  ORM_Iterator
+     */
 	public static function get_comments($entity_id, $parents_only = TRUE)
 	{
 		if ( ! self::is_valid_static_entity($entity_id))

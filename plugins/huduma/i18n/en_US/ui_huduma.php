@@ -79,6 +79,9 @@
 	 'welcome'					=> 'Welcome',
 	 'submit_comment'			=> 'Submit Comment',
 	 'comment_saved'            => 'Comment Saved',
+	 'dashboard_home'           => 'Dashboard Home',
+	 'entity_profile'           => 'Entity Profile',
+	 'change_password'          => 'Change Password',
 
 	 // Error Messages
 	 'error'					=> array(

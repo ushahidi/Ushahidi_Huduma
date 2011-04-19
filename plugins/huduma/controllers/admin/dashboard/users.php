@@ -134,7 +134,8 @@ class Users_Controller extends Admin_Controller {
 			else
 			{
 				// Repopulate the form fields
-				$form = arr::overwrite($form, $data->errors());
+				$form = arr::overwrite($form, $data->as_array());
+				$errors = arr::overwrite($errors, $data->errros());
 				
 				// Turn on the form error
 				$form_error = TRUE;

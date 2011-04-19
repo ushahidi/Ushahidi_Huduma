@@ -95,7 +95,6 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	 */
 	protected $category_id = 0;
 
-    
     /**
      * Constructor
      */

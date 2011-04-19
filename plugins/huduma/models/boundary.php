@@ -64,7 +64,7 @@ class Boundary_Model extends ORM {
 	public static function get_boundaries_list_by_type($type_id)
 	{
 		return Boundary_Type_Model::is_valid_boundary_type($type_id)
-			? ORM::factory('boundary')
+			? self::factory('boundary')
 				->select('id', 'boundary_name')
 				->where('boundary_type_id', $type_id)
 				->find_all()
@@ -81,8 +81,18 @@ class Boundary_Model extends ORM {
 	public static function is_valid_boundary($boundary_id)
 	{
 		return (preg_match('/^[1-9](\d*)$/', $boundary_id) > 0)
-			? ORM::factory('boundary', $boundary_id)->loaded
+			? self::factory('boundary', $boundary_id)->loaded
 			: FALSE;
+	}
+	
+	/**
+	 * Gets the list of boundaries for display in a dropdown list
+	 *
+	 * @return  array
+	 */
+	public static function get_boundaries_dropdown()
+	{
+	    return self::factory('boundary')->select_list('id', 'boundary_name');
 	}
 }
 ?>
