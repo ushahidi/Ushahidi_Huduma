@@ -18,6 +18,8 @@
                     <div id="sidebar-left-content">
 						<?php if ($show_dashboard_panel): ?>
 						<?php echo $dashboard_panel; ?>
+						<?php else: ?>
+						    <div class="row">&nbsp;</div>
 					    <?php endif; ?>
                     </div>
                 </div>

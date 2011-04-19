@@ -253,9 +253,12 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    if ($_POST)
 	    {
 	        // Manually extract the data
-	        $data = arr::extract($_POST, 'email', 'password', 'confirm_password');
+	        $data = arr::extract($_POST, 'email', 'password', 'confirm_password', 'name', 'email', 'username');
 	        
-	        if ($this->user->valiidate($data))
+	        // Add the other properties so that the validate method doesn't throw an error
+	        $data = array_merge($data, array('is_active' => $this->user->is_active));
+	        
+	        if ($this->user->validate($data) AND $_POST['save'] == 1)
 	        {
 	            // Success
 	            $this->user->save();
@@ -292,7 +295,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    $this->template->content->form_error = $form_error;
 	    $this->template->content->form_saved = $form_saved;
 	    
-	    // TODO: Javscript header
+	    // Javscript header
+	    $this->themes->js = new View('js/dashboard_common_js');
 	    
 	    // Set the header block
 	    $this->template->header->header_block = $this->themes->header_block();

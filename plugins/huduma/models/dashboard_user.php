@@ -73,8 +73,6 @@ class Dashboard_User_Model extends ORM {
 		}
 
 		// Validate method in parent will set the properties
-		Kohana::log('debug', Kohana::debug($array));
-
 		return parent::validate($array, $save);
 	}
 

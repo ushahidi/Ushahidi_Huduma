@@ -196,3 +196,7 @@ div.nav_dashboard_panel {
 .dashboard_menu li { list-style: none outside none; text-align: right; padding: 8px 5px; border-bottom: 1px solid #E5E5E5; }
 .dashboard_menu li a { text-decoration: none; height: 20px; }
 .dashboard_menu li a img {position: relative; top: 5px; right: 0;}
+.buttons { margin: 10px 0;}
+.buttons li { float: left; list-style-type: none; padding: 5px; }
+.buttons li a { text-decoration: none; border: 1px solid #CCC; padding: 8px; display: block; background-color: #F3F3F3;}
+div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  padding:0 0 15px 0; width: 650px;}

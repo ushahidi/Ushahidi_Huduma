@@ -82,6 +82,7 @@
 	 'dashboard_home'           => 'Dashboard Home',
 	 'entity_profile'           => 'Entity Profile',
 	 'change_password'          => 'Change Password',
+	 'profile_updated'          => 'Profile Updated',
 
 	 // Error Messages
 	 'error'					=> array(

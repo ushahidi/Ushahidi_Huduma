@@ -3,6 +3,7 @@
  * View file for the static entity comments
  */
 ?>
+<div id="entity_view_column">
 <ul class="dashboard_comments">
     <h5><?php echo strtoupper(Kohana::lang('ui_main.comments')); ?></h5>
 	<!-- comments -->
@@ -48,3 +49,4 @@
 	<?php endforeach; ?>
 	<!-- /comments -->
 </ul>
+</div>
