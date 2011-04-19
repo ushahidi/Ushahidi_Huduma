@@ -374,6 +374,9 @@ class Home_Controller extends Dashboard_Template_Controller {
 	     $this->template->header->header_block = $this->themes->header_block();
 	 }
 	 
+	 /**
+	  * Updates a static entity comment
+	  */
 	 public function update_comment()
 	 {
 	     $this->template = "";
@@ -394,8 +397,9 @@ class Home_Controller extends Dashboard_Template_Controller {
 	             // Get the action
 	             $action = $_POST['action'];
 	             
-	             // Load the entity comment
+	             // Load the entity comment and fetch the comment date
 	             $comment = ORM::factory('static_entity_comment', $comment_id);
+	             $comment_date = $comment->comment_date;
 	             
 	             // Check for the action
 	             if ($action == 'spam')
@@ -418,6 +422,9 @@ class Home_Controller extends Dashboard_Template_Controller {
 	                 // Mark comment as active
 	                 $comment->comment_active  = 1;
 	             }
+	             
+	             // Maintain the original comment date
+	             $comment->comment_date = $comment_date;
 	             
 	             // Save comment
 	             $comment->save();
