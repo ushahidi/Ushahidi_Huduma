@@ -52,6 +52,12 @@ class Static_Entity_Model extends ORM {
             $array->add_rules('agency_id', array('Agency_Model', 'is_valid_agency'));
         }
         
+        // Validate entity type
+        if (isset($array->static_entity_type_id) AND $array->static_entity_type_id != 0)
+        {
+            $array->add_rules('static_entity_type_id', array('Static_Entity_Type_Model', 'is_valid_static_entity_type'));
+        }
+        
         return parent::validate($array, $save);
     }
     

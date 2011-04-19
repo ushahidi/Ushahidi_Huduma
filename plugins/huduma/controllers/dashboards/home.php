@@ -14,9 +14,11 @@
  */
 class Home_Controller extends Dashboard_Template_Controller {
 
+    /**
+     * Dashboard landing page
+     */
 	public function index()
 	{
-
 		// Setup the form
 		$form = array(
 			'comment_description' => ''
@@ -165,7 +167,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    }
 	    
 	    // Load the entity view page with edit options
-	    $this->template->content = new View('frontend/dashboards/entity_profile_edit');
+	    $this->template->content = new View('frontend/dashboards/entity_profile');
 	    
 	    // Setup forms
 	    $form = array(
@@ -173,6 +175,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	        'entity_name' => '',
 	        'latitude' => '',
 	        'longitude' => '',
+	        'static_entity_type_id' => '',
 	        'agency_id' => '',
 	        'boundary_id' => ''
 	    );
@@ -195,8 +198,38 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    // Has the form been submitted - For metadata update or otherwise
 	    if ($_POST)
 	    {
+	        $data = arr::extract($_POST, 'entity_name', 'longitude', 'latitude', 'agency_id', 'boundary_id', 'static_entity_type_id');
+	        
 	        // Validation
-	        // Proceed
+	        if ($entity->validate($data))
+	        {
+	            // Success! Save
+	            $entity->save();
+	            
+                // Turn on form_saved
+	            $form_saved = TRUE;
+	            $form_error = FALSE;
+	            
+    	        // Set the form values
+        	    $form = array(
+        	        'entity_name' => $entity->entity_name,
+        	        'latitude' => $entity->latitude,
+        	        'longitude' => $entity->longitude,
+        	        'static_entity_type_id' => $entity->static_entity_type_id,
+        	        'agency_id' => $entity->agency_id,
+        	        'boundary_id' => $entity->boundary_id,
+        	    );
+	        }
+	        else
+	        {
+                // Turn on the form error
+	            $form_error = TRUE;
+	            $form_saved = FALSE;
+	            
+                // Populate forms and erros with new values
+	            $form = arr::overwrite($form, $data->as_array());
+	            $errors = arr::overwrite($errors, $data->errors());
+	        }
 	    }
 	    else
 	    {
@@ -205,10 +238,10 @@ class Home_Controller extends Dashboard_Template_Controller {
     	        'entity_name' => $entity->entity_name,
     	        'latitude' => $entity->latitude,
     	        'longitude' => $entity->longitude,
+    	        'static_entity_type_id' => $entity->static_entity_type_id,
     	        'agency_id' => $entity->agency_id,
     	        'boundary_id' => $entity->boundary_id,
     	    );
-	        
 	    }
 	    
         // Set data for the content view
@@ -216,12 +249,18 @@ class Home_Controller extends Dashboard_Template_Controller {
         $this->template->content->errors = $errors;
         $this->template->content->form_saved = $form_saved;
         $this->template->content->form_error = $form_error;
+        $this->template->content->entity_types_dropdown = Static_Entity_Type_Model::get_entity_types_dropdown();
         $this->template->content->agencies_dropdown = Agency_Model::get_agencies_dropdown();
-        $this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropddown();
+        $this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropdown();
         
-        // TODO Javascript header
-        // $this->themes->js = new View('js/entity_edit_js');
-        // $this->themes->js->map_enabled = TRUE;
+        //  Javascript header
+        $this->themes->map_enabled = TRUE;
+        $this->themes->js = new View('js/entity_edit_js');
+        $this->themes->js->longitude = $entity->longitude;
+        $this->themes->js->latitude = $entity->latitude;
+        $this->themes->js->default_map = Kohana::config('settings.default_map');
+        $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
+        $this->themes->js .= new View('js/dashboard_common_js');
         
 		// Set the header block
 		$this->template->header->header_block = $this->themes->header_block();
@@ -300,7 +339,108 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    
 	    // Set the header block
 	    $this->template->header->header_block = $this->themes->header_block();
-
 	}
+	
+	/**
+	 * Comment moderation page
+	 */
+	 public function moderate_comments()
+	 {
+	     // Load template
+	     $this->template->content = new View('frontend/dashboards/moderate_comments');
+	     
+	     // Get the no. of items per page
+	     $items_per_page = (int)Kohana::config('settings.items_per_page_admin');
+	     
+	     // Setup pagination
+	     $pagination = new Pagination(array(
+	         'query_string' => 'page',
+	         'items_per_page' => $items_per_page,
+	         'total_items' => ORM::factory('static_entity_comment')->where('static_entity_id', $this->static_entity_id)->count_all()
+	     ));
+	     
+	     // Fetch comments for current page
+	     $comments = ORM::factory('static_entity_comment')
+	                        ->where('static_entity_id', $this->static_entity_id)
+	                        ->find_all($items_per_page, $pagination->sql_offset);
+	     
+	     $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+	     $dashboard_panel->static_entity_panel = TRUE;
+	     $this->template->content->dashboard_panel = $dashboard_panel;
+	     $this->template->content->comments = $comments;
+	     $this->template->content->pagination = $pagination;
+	     $this->template->content->total_items = $pagination->total_items;
+	     $this->themes->js = new View('js/dashboard_common_js');
+	     $this->template->header->header_block = $this->themes->header_block();
+	 }
+	 
+	 public function update_comment()
+	 {
+	     $this->template = "";
+	     $this->auto_render = FALSE;
+	     
+         // Return value
+	     header("Content-type: application/json; charset=utf-8");
+	     
+	     // Check for form POST
+	     if ($_POST)
+	     {
+	         // Get the comment id
+	         $comment_id = $_POST['comment_id'];
+	         
+	         // Validate comment
+	         if (Static_Entity_Comment_Model::is_valid_static_entity_comment($comment_id))
+	         {
+	             // Get the action
+	             $action = $_POST['action'];
+	             
+	             // Load the entity comment
+	             $comment = ORM::factory('static_entity_comment', $comment_id);
+	             
+	             // Check for the action
+	             if ($action == 'spam')
+	             {
+	                 // Mark comment as spam
+	                 $comment->comment_spam = 1;
+	             }
+	             elseif ($action == 'notspam')
+	             {
+	                 // Mark comment as not spam
+	                 $comment->comment_spam = 0;
+	             }
+	             elseif ($action == 'delete')
+	             {
+	                 // Mark comment as inactive
+	                 $comment->comment_active = 0;
+	             }
+	             elseif ($action == 'undelete')
+	             {
+	                 // Mark comment as active
+	                 $comment->comment_active  = 1;
+	             }
+	             
+	             // Save comment
+	             $comment->save();
+	             
+	             // Success!
+        	     print json_encode(array(
+        	       'success' => TRUE
+        	     ));
+	         }
+	         else
+	         {
+        	     print json_encode(array(
+        	       'success' => FALSE
+        	     ));
+	         }
+	         
+	     }
+	     else
+	     {
+    	     print json_encode(array(
+    	       'success' => FALSE
+    	     ));
+	     }
+	 }
 }
 ?>

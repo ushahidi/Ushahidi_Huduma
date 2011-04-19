@@ -32,8 +32,19 @@ class Static_Entity_Type_Model extends ORM {
 	{
 		// Validate numbers using regular expressions as the value may be in quotes ' or "
 		return (preg_match('/^[1-9](\d*)$/', $type_id) > 0)
-			? ORM::factory('static_entity_type', $type_id)->loaded
+			? self::factory('static_entity_type', $type_id)->loaded
 			: FALSE;
+	}
+	
+	/**
+	 * Gets a key=>value array of the static entity types where the key is the id and value
+	 * is the type name of the static entity type
+	 *
+	 * @return  array
+	 */
+	public static function get_entity_types_dropdown()
+	{
+	    return self::factory('static_entity_type')->select_list('id', 'type_name');
 	}
 
 }

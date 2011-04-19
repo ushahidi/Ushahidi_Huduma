@@ -23,9 +23,6 @@ class Entities_Controller extends Frontend_Controller {
         $this->template->header->this_page = 'entities';
         $this->template->content = new View('frontend/entities');
 
-        // Database instance
-//        $db = new Database;
-
         // Get entity type ids if we're allowed to filter by category
         $entity_type_ids = array();
         if (isset($_GET['e']) AND !empty($_GET['e']) AND $_GET['e'] != 0)

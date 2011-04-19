@@ -83,6 +83,9 @@
 	 'entity_profile'           => 'Entity Profile',
 	 'change_password'          => 'Change Password',
 	 'profile_updated'          => 'Profile Updated',
+	 'moderate_comments'        => 'Moderate Comments',
+	 'undelete'                 => 'Undelete',
+	 'not_spam'                 => 'Not Spam',
 
 	 // Error Messages
 	 'error'					=> array(

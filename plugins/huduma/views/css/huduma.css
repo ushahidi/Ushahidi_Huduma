@@ -23,37 +23,8 @@ div.comment-col {
     width: 650px;
 }
 
-div.comment-items {
-    /*
-    border-left: 2px dashed #ccc;
-    border-right: 2px dashed #ccc;
-    */
-    min-height: 20em;
-    width: 100%;
-    padding: 0;
-}
-
+div.comment-items { min-height: 20em; width: 100%; padding: 0; }
 div.comment-item { background: #BCE8F5; padding: 8px; }
-#dialog { font-size: 10px; }
-table.metadata { width: 100%; }
-
-.metadata th {
-	background-color: #CCCCCC;
-	padding: 5px;
-	color: #FFFFFF;
-	font-size: 100%;
-	text-align: left;
-}
-
-.metadata td { padding: 2px; }
-
-div.ui-dialog {
-	position: absolute;
-	top: 100px;
-	margin:0 auto;
-	z-index: -1;
-}
-
 div.r_details { padding:5px; }
 h3.entity_name { color: #00ADE3; }
 
@@ -129,6 +100,7 @@ div.login {
 div.login_panel_button { position: absolute; margin: 0; top: 105px; }
 .field, .comment_field {border: 1px solid #DDDDDD; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 input.comment_field { width: 200px; height: 20px; }
+input.medium { width: 280px;}
 div.dashboard_comment_form {
 	border: 1px solid #CCCCCC;
 	margin: 15px 0 0 0;
@@ -147,11 +119,11 @@ div.dashboard_container { float: left; left: 40px; position: relative; padding-t
 ul.comment_form_buttons { position: relative; margin: 0 !important; }
 .comment_form_buttons li { float: left; list-style-type: none; padding: 0 8px 0 0; }
 ul.dashboard_comments { padding: 10px; margin-bottom: 5px; list-style-type: none; }
-li.dashboard_comment_box { border-top: 1px dotted #C0C2B8; margin-bottom: 50px; padding: 10px; position: relative;}
+li.dashboard_comment_box { border-top: 1px dotted #C0C2B8; margin-bottom: 50px; padding: 10px; position: relative; clear: both;}
 .dashboard_comments .comment_box_holder { position: relative; top: 50px; padding: 0; margin-left: -15px; width:615px; }
 .dashboard_comments .dashboard_comment_actions { position: absolute; right: 10px; top: 0; padding: 3px 0;}
-.dashboard_comment_actions a { font-size: 90%; color: #888; border-right: 1px solid #E5E5E5;}
-.dashboard_comment_actions a:last-child { border: none; padding-left: 3px;}
+.dashboard_comment_actions a { font-size: 90%; color: #888; border-right: 1px solid #E5E5E5; padding-left: 3px; }
+.dashboard_comment_actions a:last-child { border: none; }
 div.dashboard_comment_block { float: left; width: 580px; }
 .dashboard_comment_text { padding: 4px 0;}
 div.dashboard_comment_credibility { float: right; margin: 10px 0; }
@@ -199,4 +171,8 @@ div.nav_dashboard_panel {
 .buttons { margin: 10px 0;}
 .buttons li { float: left; list-style-type: none; padding: 5px; }
 .buttons li a { text-decoration: none; border: 1px solid #CCC; padding: 8px; display: block; background-color: #F3F3F3;}
-div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  padding:0 0 15px 0; width: 650px;}
+div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  padding:15px 0; width: 660px; clear: both; overflow: hidden;}
+.dashboard_container .location-info { margin-bottom: 5px; }
+.dashboard_container div.left-col { float: left;  width: 300px; padding: 0; margin: 0 !important; }
+.dashboard_container div.right-col { float: left; width: 350px; padding: 0; margin-left: 10px; clear: bottom;}
+.dashboard_container .location-info input { width: 100px;}

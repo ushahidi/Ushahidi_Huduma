@@ -8,7 +8,7 @@
     <h5><?php echo strtoupper(Kohana::lang('ui_main.comments')); ?></h5>
 	<!-- comments -->
 	<?php foreach ($comments as $comment): ?>
-	    <li class="dashboard_comment_box" style="clear: both;" id="dashboard_comment_<?php echo $comment->id; ?>">
+	    <li class="dashboard_comment_box" id="dashboard_comment_<?php echo $comment->id; ?>">
 			<div class="dashboard_comment_block">
     			<div>
                     <strong><?php echo $comment->comment_author ?></strong>&nbsp;
