@@ -185,3 +185,14 @@ CREATE TABLE IF NOT EXISTS `static_entity_comment`(
 	`comment_date` TIMESTAMP NOT NULL,
 	PRIMARY KEY(`id`)
 ) COMMENT = 'Comments for static entities';
+
+--
+-- Table static_entity_type_metadata
+--
+CREATE TABLE IF NOT EXISTS `static_entity_type_metadata` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	'static_entity_type_id' INT NOT NULL,
+	'metadata_item' VARCHAR(100) NOT NULL, -- Name of the metadata item e.g. No. of teachers, School Type
+	`description` VARCHAR(255),
+	PRIMARY KEY (`id`)
+) COMMENT = 'Stores static entity type metadata - defines the compulsory metadata for a static entity';
