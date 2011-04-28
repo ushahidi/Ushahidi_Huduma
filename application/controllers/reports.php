@@ -606,10 +606,11 @@ class Reports_Controller extends Frontend_Controller {
 
 		if ( !$id )
 		{
-
 			url::redirect('main');
 
-		}else{
+		}
+		else
+		{
 			$incident = ORM::factory('incident')
 				->where('id',$id)
 				->where('incident_active',1)
@@ -640,39 +641,31 @@ class Reports_Controller extends Frontend_Controller {
 			if ($_POST AND Kohana::config('settings.allow_comments') )
 			{
 				// Instantiate Validation, use $post, so we don't overwrite $_POST fields with our own things
-
-				$post = Validation::factory($_POST);
-
-				// Add some filters
-
-				$post->pre_filter('trim', TRUE);
-
-				// Add some rules, the input field, followed by a list of checks, carried out in order
-
-				$post->add_rules('comment_author', 'required', 'length[3,100]');
-				$post->add_rules('comment_description', 'required');
-				$post->add_rules('comment_email', 'required','email', 'length[4,100]');
-				$post->add_rules('captcha', 'required', 'Captcha::valid');
+				$comment_data = arr::extract($_POST, 'comment_author', 'comment_description', 'comment_email');
+				$comment_data = array_merge($comment_data, array('incident_id' => $id));
+				
+				// Comment instance for validation
+				$comment = new Comment_Model();
+				
+				// Validate the captcha
+				$valid_captcha =  Captcha::valid($_POST['captcha']);
 
 				// Test to see if things passed the rule checks
-
-				if ($post->validate())
+				if ($comment->validate($comment_data) AND $valid_captcha)
 				{
 					// Yes! everything is valid
 
 					if ($api_akismet != "")
 					{
 						// Run Akismet Spam Checker
-
 						$akismet = new Akismet();
 
 						// Comment data
-
 						$comment = array(
-							'author' => $post->comment_author,
-							'email' => $post->comment_email,
+							'author' => $comment->comment_author,
+							'email' => $comment->comment_email,
 							'website' => "",
-							'body' => $post->comment_description,
+							'body' => $comment->comment_description,
 							'user_ip' => $_SERVER['REMOTE_ADDR']
 						);
 
@@ -690,43 +683,32 @@ class Reports_Controller extends Frontend_Controller {
 							{
 								// throw new Kohana_Exception('akismet.api_key');
 
-							}elseif ($akismet->is_error('AKISMET_RESPONSE_FAILED')){
-
-								// throw new Kohana_Exception('akismet.server_failed');
-
-							}elseif ($akismet->is_error('AKISMET_SERVER_NOT_FOUND')){
-
-								// throw new Kohana_Exception('akismet.server_not_found');
-
 							}
-
-							// If the server is down, we have to post
-							// the comment :(
-							// $this->_post_comment($comment);
-
-							$comment_spam = 0;
-						}else{
-
-							if ($akismet->is_spam())
+							elseif ($akismet->is_error('AKISMET_RESPONSE_FAILED'))
 							{
-								$comment_spam = 1;
-							}else{
-								$comment_spam = 0;
+								// throw new Kohana_Exception('akismet.server_failed');
 							}
+							elseif ($akismet->is_error('AKISMET_SERVER_NOT_FOUND'))
+							{
+								// throw new Kohana_Exception('akismet.server_not_found');
+							}
+							
+							$comment_spam = 0;
 						}
-					}else{
+						else
+						{
 
+							$comment_spam = ($akismet->is_spam())? 1 : 0;
+						}
+					}
+					else
+					{
 						// No API Key!!
-
 						$comment_spam = 0;
 					}
-
-
-					$comment = new Comment_Model();
-					$comment->incident_id = $id;
-					$comment->comment_author = strip_tags($post->comment_author);
-					$comment->comment_description = strip_tags($post->comment_description);
-					$comment->comment_email = strip_tags($post->comment_email);
+					
+					// Set the comment IP and date
+					// TODO: Move fetching of IP addresses to helper
 					$comment->comment_ip = $_SERVER['REMOTE_ADDR'];
 					$comment->comment_date = date("Y-m-d H:i:s",time());
 
@@ -739,15 +721,12 @@ class Reports_Controller extends Frontend_Controller {
 					else
 					{
 						$comment->comment_spam = 0;
-						if (Kohana::config('settings.allow_comments') == 1)
-						{ // Auto Approve
-							$comment->comment_active = 1;
-						}
-						else
-						{ // Manually Approve
-							$comment->comment_active = 0;
-						}
+						$comment->comment_active = (Kohana::config('settings.allow_comments') == 1)
+							? 1
+							: 0;
 					}
+					
+					// Save the comment
 					$comment->save();
 
 					// Event::comment_add - Added a New Comment
@@ -769,16 +748,18 @@ class Reports_Controller extends Frontend_Controller {
 				}
 				else
 				{
-
 					// No! We have validation errors, we need to show the form again, with the errors
 
 					// Repopulate the form fields
 
-					$form = arr::overwrite($form, $post->as_array());
+					$form = arr::overwrite($form, $comment_data->as_array());
 
 					// Populate the error fields, if any
-
-					$errors = arr::overwrite($errors, $post->errors('comments'));
+					if ( ! $valid_captcha)
+					{
+						$comment_data->add_error('captcha', 'captcha');
+					}
+					$errors = arr::overwrite($errors, $comment_data->errors('comments'));
 					$form_error = TRUE;
 				}
 			}
