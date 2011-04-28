@@ -29,8 +29,33 @@ class Incident_Model extends ORM
 	// Prevents cached items from being reloaded
 	protected $reload_on_wakeup   = FALSE;
 
-	static function get_active_categories()
-	{
+
+    /**
+     * Validates the incident data before saving
+     *
+     * @param array     $array   Data to be validated
+     * @param boolean   $save
+     */
+    public function validate(array & $array, $save = FALSE)
+    {
+        $array  = Validation::factory($array)
+                    ->pre_filter('trim', TRUE)
+                    ->add_rules('incident_title', 'required', 'length[3,200]')
+                    ->add_rules('incident_description', 'required')
+                    ->add_rules('incident_date', 'required', 'date_mmddyyyy')
+                    ->add_rules('location_id', 'required', array('Location_Model','is_valid_location'));
+        
+        // Apply extra validation rules
+        Event::run('ushahidi_action.orm_validate_incident', $array);
+        
+        return parent::validate($array, $save);
+    }
+
+    /**
+     * Returns an array of the active categories
+     */
+    static function get_active_categories()
+    {
 		// Get all active categories
 		$categories = array();
 		foreach (ORM::factory('category')
@@ -43,50 +68,41 @@ class Incident_Model extends ORM
 		return $categories;
 	}
 
-	/*
-	* get the total number of reports
-	* @param approved - Only count approved reports if true
-	*/
+	/**
+	 * Get the total number of reports
+	 * @param approved - Only count approved reports if true
+	 */
 	public static function get_total_reports($approved=false)
 	{
-		if($approved)
-		{
-			$count = ORM::factory('incident')->where('incident_active', '1')->count_all();
-		}else{
-			$count = ORM::factory('incident')->count_all();
-		}
+		$count = ($approved)
+			? ORM::factory('incident')->where('incident_active', '1')->count_all()
+			: ORM::factory('incident')->count_all();
 
 		return $count;
 	}
 
-	/*
-	* get the total number of verified or unverified reports
-	* @param verified - Only count verified reports if true, unverified if false
-	*/
+	/**
+	 * Get the total number of verified or unverified reports
+	 * @param verified - Only count verified reports if true, unverified if false
+	 */
 	public static function get_total_reports_by_verified($verified=false)
 	{
-		if($verified)
-		{
-			$count = ORM::factory('incident')->where('incident_verified', '1')->where('incident_active', '1')->count_all();
-		}else{
-			$count = ORM::factory('incident')->where('incident_verified', '0')->where('incident_active', '1')->count_all();
-		}
+		$count = ($verified)
+			? ORM::factory('incident')->where('incident_verified', '1')->where('incident_active', '1')->count_all()
+			: ORM::factory('incident')->where('incident_verified', '0')->where('incident_active', '1')->count_all();
 
 		return $count;
 	}
 
-	/*
-	* get the total number of verified or unverified reports
-	* @param approved - Oldest approved report timestamp if true (oldest overall if false)
-	*/
+	/**
+	 * Get the total number of verified or unverified reports
+	 * @param approved - Oldest approved report timestamp if true (oldest overall if false)
+	 */
 	public static function get_oldest_report_timestamp($approved=true)
 	{
-		if($approved)
-		{
-			$result = ORM::factory('incident')->where('incident_active', '1')->orderby(array('incident_date'=>'ASC'))->find_all(1,0);
-		}else{
-			$result = ORM::factory('incident')->where('incident_active', '0')->orderby(array('incident_date'=>'ASC'))->find_all(1,0);
-		}
+		$result = ($approved)
+			? ORM::factory('incident')->where('incident_active', '1')->orderby(array('incident_date'=>'ASC'))->find_all(1,0)
+			: ORM::factory('incident')->where('incident_active', '0')->orderby(array('incident_date'=>'ASC'))->find_all(1,0);
 
 		foreach($result as $report)
 		{
@@ -121,33 +137,41 @@ class Incident_Model extends ORM
 
 		$select_date_text = "DATE_FORMAT(incident_date, '%Y-%m-01')";
 		$groupby_date_text = "DATE_FORMAT(incident_date, '%Y%m')";
-		if ($interval == 'day') {
+		
+		if ($interval == 'day')
+		{
 			$select_date_text = "DATE_FORMAT(incident_date, '%Y-%m-%d')";
 			$groupby_date_text = "DATE_FORMAT(incident_date, '%Y%m%d')";
-		} elseif ($interval == 'hour') {
+		}
+		elseif ($interval == 'hour')
+		{
 			$select_date_text = "DATE_FORMAT(incident_date, '%Y-%m-%d %H:%M')";
 			$groupby_date_text = "DATE_FORMAT(incident_date, '%Y%m%d%H')";
-		} elseif ($interval == 'week') {
+		}
+		elseif ($interval == 'week')
+		{
 			$select_date_text = "STR_TO_DATE(CONCAT(CAST(YEARWEEK(incident_date) AS CHAR), ' Sunday'), '%X%V %W')";
 			$groupby_date_text = "YEARWEEK(incident_date)";
 		}
 
 		$date_filter = "";
-		if ($start_date) {
+		if ($start_date)
+		{
 			$date_filter .= ' AND incident_date >= "' . $start_date . '"';
 		}
-		if ($end_date) {
+		
+		if ($end_date)
+		{
 			$date_filter .= ' AND incident_date <= "' . $end_date . '"';
 		}
 
-		$active_filter = '1';
-		if ($active == 'all' || $active == 'false') {
-			$active_filter = '0,1';
-		}
+		$active_filter = ($active == 'all' || $active == 'false')? '0,1' : '1';
 
 		$joins = '';
 		$general_filter = '';
-		if (isset($media_type) && is_numeric($media_type)) {
+		
+		if (isset($media_type) && is_numeric($media_type))
+		{
 			$joins = 'INNER JOIN '.$table_prefix.'media AS m ON m.incident_id = i.id';
 			$general_filter = ' AND m.media_type IN ('. $media_type  .')';
 		}
@@ -165,11 +189,13 @@ class Incident_Model extends ORM
 					   GROUP BY ' . $groupby_date_text;
 		$query = $db->query($query_text);
 		$all_graphs['0']['data'] = array();
+		
 		foreach ( $query as $month_count )
 		{
 			array_push($all_graphs['0']['data'],
 				array($month_count->time * 1000, $month_count->number));
 		}
+		
 		$all_graphs['0']['color'] = '#990000';
 
 		$query_text = 'SELECT category_id, category_title, category_color, UNIX_TIMESTAMP(' . $select_date_text . ')
@@ -199,9 +225,9 @@ class Incident_Model extends ORM
 		return $graphs;
 	}
 
-	/*
-	* get the number of reports by date for dashboard chart
-	*/
+	/**
+	 * Get the number of reports by date for dashboard chart
+	 */
 	public static function get_number_reports_by_date($range=NULL)
 	{
 		// Table Prefix
@@ -229,9 +255,9 @@ class Incident_Model extends ORM
 		return $array;
 	}
 
-	/*
-	* return an array of the dates of all approved incidents
-	*/
+	/**
+	 * Returns an array of the dates of all approved incidents
+	 */
 	static function get_incident_dates()
 	{
 		//$incidents = ORM::factory('incident')->where('incident_active',1)->incident_date->find_all();
@@ -242,5 +268,18 @@ class Incident_Model extends ORM
 			$array[] = $incident_date;
 		}
 		return $array;
+	}
+	
+	/**
+	 * Checks if the specified incident id is valid and exists in the database
+	 *
+	 * @param   int $incident_id
+	 * @return  boolean
+	 */
+	public static function is_valid_incident($incident_id)
+	{
+	    return (preg_match('/^[1-9](\d*)$/', $incident_id) > 0)
+	        ? self::factory('incident', $incident_id)->loaded
+	        : FALSE;
 	}
 }

@@ -20,4 +20,50 @@ class Incident_Person_Model extends ORM
 	
 	// Database table name
 	protected $table_name = 'incident_person';
+	
+	/**
+	 * Validates data on the person reporting the incident
+	 *
+	 * @param       $array  array
+	 * @param       $save   boolean
+	 * @return      boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+	    $array = Validation::factory($array)
+	                ->pre_filter('trim');
+	                
+	    // Validate incident
+	    if (isset($array->incident_id))
+	    {
+	        $array->add_rules('incident_id', array('Incident_Model', 'is_valid_incident'));
+	    }
+	    
+	    // Validate location
+	    if (isset($array->location_id))
+	    {
+	        $array->add_rules('location_id', array('Location_Model', 'is_valid_location'));
+	    }
+	    
+	    // Validate first name
+	    if ( ! empty($array->person_first))
+	    {
+	        $array->add_rules('person_first', 'length[3,100]');
+	    }
+	    
+	    // Validate last name
+	    if ( ! empty($array->person_last))
+	    {
+	        $array->add_rules('person_last', 'length[3,100]');
+	    }
+	    
+	    // Validate email address
+	    if ( ! empty($array->person_email))
+	    {
+	        $array->add_rules('person_email', 'email', 'length[3,100]');
+	    }
+	                
+	    // Return validation results from parent
+	    return parent::validate($array, $save);
+	}
 }

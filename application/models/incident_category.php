@@ -20,4 +20,22 @@ class Incident_Category_Model extends ORM
 	
 	// Database table name
 	protected $table_name = 'incident_category';
+	
+	/**
+	 * Validates the categories for an incident category entry
+	 *
+	 * @param   $array    array -  Data to be validated
+	 * @param   $save     boolean
+	 * @return  boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+	    $array = Validation::factory($array)
+	                ->pre_filter('trim', TRUE)
+	                ->add_rules('incident_id', 'required', array('Incident_Model', 'is_valid_incident'))
+	                ->add_rules('category_id', 'required', array('Category_Model', 'is_valid_category'));
+	    
+	    // Return valiation result from parent
+	    return parent::validate($array, $save);
+	}
 }
