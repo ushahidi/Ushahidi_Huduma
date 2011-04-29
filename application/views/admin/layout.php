@@ -52,6 +52,7 @@
 			if($('.tooltip[title]') != null)
 			$('.tooltip[title]').hovertip();
 		});
+		var BASE_URL = '".url::base()."';
 	</script>";
 	
 	// Load Flot

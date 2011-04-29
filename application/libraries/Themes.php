@@ -164,9 +164,10 @@ class Themes_Core {
 function runScheduler(img){img.onload = null;img.src = '".url::site().'scheduler'."';}
 			".'$(document).ready(function(){$(document).pngFix();});'.$this->js.
                         "//-->
+                        var BASE_URL = '".url::base()."';
                         </script>";
 		
-		return $core_js.$plugin_js.$inline_js;
+		return $core_js.$inline_js.$plugin_js;
 	}
 	
 	/**
