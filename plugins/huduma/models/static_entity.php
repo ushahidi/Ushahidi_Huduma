@@ -30,6 +30,7 @@ class Static_Entity_Model extends ORM {
     public function validate(array & $array, $save = FALSE)
     {
         $array = Validation::factory($array)
+                    ->pre_filter('trim')
                     ->add_rules('entity_name', 'required')
                     ->add_rules('longitude', 'required', 'numeric')
                     ->add_rules('latitude', 'required', 'numeric');
@@ -163,10 +164,9 @@ class Static_Entity_Model extends ORM {
     /**
      * Gets the comments for the specified static entity
      * @param   int     $entity_id
-     * @param   boolean $parents_only To filter only parent comments - those with inline replies
      * @return  ORM_Iterator
      */
-	public static function get_comments($entity_id, $parents_only = TRUE)
+	public static function get_comments($entity_id)
 	{
 		if ( ! self::is_valid_static_entity($entity_id))
 		{
@@ -181,17 +181,33 @@ class Static_Entity_Model extends ORM {
 		        'comment_spam' => 0,
 		    );
 		    
-		    // Check if only parent comments are to be retrieved
-		    if ($parents_only)
-		    {
-		        $where_clause = array_merge($where_clause, array('parent_comment_id' => 0));
-		    }
-		    
 			// Return array of comments
-			return self::factory('static_entity_comment')
+			return self::factory('comment')
 						->where($where_clause)
 						->orderby('comment_date', 'asc')
 						->find_all();
 		}
+	}
+	
+	/**
+	 * Returns the metadata for a static entity
+	 *
+	 * @param   int $entity_id ID of the static entity
+	 * @return  array
+	 */
+	public static function get_metadata($entity_id)
+	{
+	    if ( ! self::is_valid_static_entity($entity_id))
+	    {
+	        return FALSE;
+	    }
+	    else
+	    {
+	        // Get the metadata
+	        return self::factory('static_entity_metadata')
+	                    ->where(array('static_entity_id' => $entity_id))
+	                    ->orderby('static_entity_id', 'asc')
+	                    ->find_all();
+	    }
 	}
 }
