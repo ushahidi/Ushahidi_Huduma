@@ -85,15 +85,15 @@
     settings: {
       opacity      : 0.2,
       overlay      : true,
-      loadingImage : '../../../plugins/huduma/views/images/loading.gif',
-      closeImage   : '../../../plugins/huduma/views/images/closelabel.png',
+      loadingImage : BASE_URL + 'plugins/huduma/views/images/loading.gif',
+      closeImage   : BASE_URL + 'plugins/huduma/views/images/closelabel.png',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
       faceboxHtml  : '\
     <div id="facebox" style="display:none;"> \
       <div class="popup"> \
         <div class="content"> \
         </div> \
-        <a href="#" class="close"><img src="../../../plugins/huduma/views/images/closelabel.png" title="close" class="close_image" /></a> \
+        <a href="#" class="close"><img src="'+BASE_URL+'"plugins/huduma/views/images/closelabel.png" title="close" class="close_image" /></a> \
       </div> \
     </div>'
     },
