@@ -3,7 +3,7 @@
  * View page for the static entity comments form
  */
 ?>
-	<div class="dashboard_comment_form">
+	<div class="dashboard_comment_form" style="display:none;">
         <?php print form::open(NULL, array('id'=>'entityCommentForm', 'name'=>'entityCommentForm')); ?>
             <?php print form::input(array('type'=>'hidden', 'name'=>'dashboard_comment_reply_to', 'id'=>'dashboard_comment_reply_to'), '');?>
             

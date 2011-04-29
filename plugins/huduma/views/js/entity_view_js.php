@@ -191,12 +191,15 @@
 		function showCommentBox(containerId, commentId) {
 		    // Verify specified container exists and commentForm is not null
 		    if ($("#"+containerId+"") != null && commentForm == null) {
-		        // Fetch and remove the comment form
-		        commentForm = $(".dashboard_comment_form");
-	        }
+		        // Fetch and  Store the comment form
+                commentForm = $(".dashboard_comment_form");
+	        } 
 	        
 		    // Append comment form to the comment container
 		    $("#"+containerId+" > div.comment_box_holder").append(commentForm);
+		    
+		    // Display the comment form
+		    $(".dashboard_comment_form").css("display", "block");
 		    
 		    // Set the comment being replied to
 		    $("#dashboard_comment_reply_to").val(unescape(commentId));
@@ -204,11 +207,8 @@
 		    // Display the cancel button
 		    $("#comment_cancel").css("display", "block");
 		    $("#comment_cancel").click(function() {
-		        // Append comment form to the bottom of the page
-		        $("#entity_view_column").append(commentForm);
-		        
-		        // Hide the current button
-		        $(this).hide();
+		        // Hide the comment form
+		        $(commentForm).hide();
 		    });
 		}
 		

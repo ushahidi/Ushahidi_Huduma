@@ -49,7 +49,7 @@
     					</div>
     					<?php endif; ?>
                     
-                        <?php echo $entity_view_comments; ?>
+                        <?php echo $entity_reports_view; ?>
                         
                         <?php echo $entity_comments_form; ?>
 

@@ -114,15 +114,15 @@ class navigator_Core {
      * @param   int $comment_id
      * @return  string
      */
-    public static function inline_comments($comment_id)
+    public static function inline_comments($incident_id)
     {
         // To hold the comment tree
         $comment_tree = '';
         
         // Fetch the inline commnets
-        $children = Static_Entity_Comment_Model::get_inline_comments($comment_id);
+        $children = Static_Entity_Model::get_comments($incident_id);
         
-        Kohana::log('info', sprintf('Fetch %d inline comments for comment %d', $children->count(), $comment_id));
+        Kohana::log('info', sprintf('Fetch %d comments for entity %d', $children->count(), $entity_id));
         
         if ($children->count() > 0)
         {
@@ -149,19 +149,6 @@ class navigator_Core {
                 
                 $comment_tree .= "  </div>";
                 
-                // Comment actions panel
-                $comment_tree .= "<span class=\"dashboard_comment_actions\">";
-                $comment_tree .="   <a href=\"#".Kohana::lang('ui_main.reply')."\" onclick=\"showCommentBox('dashboard_comment_".$comment->id."', '".urlencode($comment->id)."')\">";
-                $comment_tree .= Kohana::lang('ui_main.reply');
-                $comment_tree .= "  </a>";
-                $comment_tree .= "  <a href=\"#".Kohana::lang('ui_main.share')."\">";
-                $comment_tree .= "      ".Kohana::lang('ui_main.share');
-                $comment_tree .= "  </a>";
-                $comment_tree .= "</span>";
-                
-                // Recursion - Fetch the inline comments for this comment
-                $comment_tree .= self::inline_comments($comment->id);
-                
                 // Comment box/form holder
                 $comment_tree .= "<div class=\"comment_box_holder\"></div>";
                 
@@ -173,6 +160,6 @@ class navigator_Core {
         }
         
         return $comment_tree;
-    }
+    }    
 }
 ?>

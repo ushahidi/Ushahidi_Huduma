@@ -176,10 +176,10 @@ class Entities_Controller extends Frontend_Controller {
             $valid_captcha = Captcha::valid($_POST['captcha']);
             
             // Static Entity Comment instance
-            $entity_comment = new Static_Entity_Comment_Model();
+            $comment_model = new Comment_Model();
 
             // Validation check
-            if ($entity_comment->validate($data) AND $valid_captcha)
+            if ($comment_model->validate($data) AND $valid_captcha)
             {
                 // To hold the SPAM status of the comment
                 $comment_spam = 0;
@@ -192,10 +192,10 @@ class Entities_Controller extends Frontend_Controller {
 
                     // Comment data
                     $comment = array(
-                        'author' => $entity_comment->comment_author,
-                        'email' => $entity_comment->comment_email,
+                        'author' => $comment_model->comment_author,
+                        'email' => $comment_model->comment_email,
                         'website' => "",
-                        'body' => $entity_comment->comment_description,
+                        'body' => $comment_model->comment_description,
                         'user_ip' => $_SERVER['REMOTE_ADDR']
                     );
 
@@ -245,21 +245,21 @@ class Entities_Controller extends Frontend_Controller {
 				// Activate comment for now
                 if ($comment_spam == 1)
                 {
-                    $entity_comment->comment_spam = 1;
-                    $entity_comment->comment_active = 0;
+                    $comment_model->comment_spam = 1;
+                    $comment_model->comment_active = 0;
                 }
                 else
                 {
-                    $entity_comment->comment_spam = 0;
+                    $comment_model->comment_spam = 0;
                     
                     // Auto Approve
                     // TODO Add configuration comment configuration setting under the static entity
                     // dashboard
-                    $entity_comment->comment_active = 1;
+                    $comment_model->comment_active = 1;
                 }
 
                 // Save the comment
-                $entity_comment->save();
+                $comment_model->save();
                 
                 // Success
                 $form_saved = TRUE;
@@ -297,15 +297,21 @@ class Entities_Controller extends Frontend_Controller {
         $this->template->content->show_metadata = $show_metadata;
         
         // Show the comments
-        $entity_view_comments = new View('frontend/entity_view_comments');
-        $entity_view_comments->comments = Static_Entity_Model::get_comments($entity_id);
+        $entity_reports_view = new View('frontend/entity_reports_view');
+        $entity_reports_view->reports = Static_Entity_Model::get_reports($entity_id);
         
-        $this->template->content->entity_view_comments = $entity_view_comments;
+        $this->template->content->entity_reports_view = $entity_reports_view;
 
         // Load the comments form
         $entity_comments_form = new View('frontend/entity_comments_form');
         $entity_comments_form->is_dashboard_user = $is_dashboard_user;
-                
+        
+        $entity_comments_form->captcha = Captcha::factory();
+        $entity_comments_form->form = $form;
+        $entity_comments_form->errors = $errors;
+        $entity_comments_form->form_error = $form_error;
+        $entity_comments_form->form_saved = $form_error;
+        
         // Set the form content
         $entity_comments_form->captcha = $captcha;
         $entity_comments_form->form = $form;
@@ -396,5 +402,6 @@ class Entities_Controller extends Frontend_Controller {
             }
         }
     }
+    
 }
 ?>

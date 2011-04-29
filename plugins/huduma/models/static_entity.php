@@ -162,13 +162,13 @@ class Static_Entity_Model extends ORM {
 	}
 
     /**
-     * Gets the comments for the specified static entity
-     * @param   int     $entity_id
+     * Gets the comments for the specified report
+     * @param   int     $incident_id
      * @return  ORM_Iterator
      */
-	public static function get_comments($entity_id)
+	public static function get_comments($incident_id)
 	{
-		if ( ! self::is_valid_static_entity($entity_id))
+		if ( ! Incident_Model::is_valid_incident($incident_id))
 		{
 			return FALSE;
 		}
@@ -176,7 +176,7 @@ class Static_Entity_Model extends ORM {
 		{
 		    // Build the where clause
 		    $where_clause = array(
-		        'static_entity_id' => $entity_id,
+		        'incident_id' => $incident_id,
 		        'comment_active' => 1,
 		        'comment_spam' => 0,
 		    );
@@ -187,6 +187,28 @@ class Static_Entity_Model extends ORM {
 						->orderby('comment_date', 'asc')
 						->find_all();
 		}
+	}
+	
+	/**
+	 * Gets the reports for a specific static entity
+	 *
+	 * @param   int   $entity_id
+	 * @return  ORM_Iterator
+	 */
+	public static function get_reports($entity_id)
+	{
+	    if ( ! self::is_valid_static_entity($entity_id))
+	    {
+	        return FALSE;
+	    }
+	    else
+	    {
+	        // Return list of reports
+	        return self::factory('incident')
+	                    ->where(array('static_entity_id' => $entity_id, 'incident_active' => 1))
+	                    ->orderby('incident_date', 'desc')
+	                    ->find_all();
+	    }
 	}
 	
 	/**

@@ -83,6 +83,7 @@
                 </div>
                 <div id="divMap" style="width: 350px; height: 300px;"></div>
             </div>
+            <?php echo $entity_metadata; ?>
         </div>
         
         <div class="row">

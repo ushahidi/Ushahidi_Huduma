@@ -49,12 +49,11 @@ class Home_Controller extends Dashboard_Template_Controller {
 			        'dashboard_user_id' => $this->user->id, 
 			        'comment_author' => $this->user->name,
 			        'comment_email' => $this->user->email,
-			        'parent_comment_id' => $_POST['dashboard_comment_reply_to'],
 			        'static_entity_id' => $this->static_entity_id
 			    ));
 			    			    
 			    // Entity comment instance
-			    $entity_comment = new Static_Entity_Comment_Model();
+			    $entity_comment = new Comment_Model();
 			    
 			    // Validation
 			    if ($entity_comment->validate($data))
@@ -103,10 +102,10 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content->dashboard_panel = $dashboard_panel;
 			
 			// Get the comments for the static entity
-			$entity_view_comments = new View('frontend/entity_view_comments');
-			$entity_view_comments->comments = Static_Entity_Model::get_comments($this->static_entity_id);
+			$entity_reports_view = new View('frontend/entity_reports_view');
+			$entity_reports_view->reports = Static_Entity_Model::get_reports($this->static_entity_id);
 			
-			$this->template->content->entity_view_comments = $entity_view_comments;
+			$this->template->content->entity_reports_view = $entity_reports_view;
 
 			// Load the comments form
 			$entity_comments_form = new View('frontend/entity_comments_form');
@@ -244,6 +243,10 @@ class Home_Controller extends Dashboard_Template_Controller {
     	    );
 	    }
 	    
+	    $entity_metadata = new View('frontend/dashboards/entity_metadata_view');
+	    $entity_metadata->static_entity_id = $this->static_entity_id;
+	    $entity_metadata->metadata_items = Static_Entity_Model::get_metadata($this->static_entity_id);
+	    
         // Set data for the content view
         $this->template->content->form = $form;
         $this->template->content->errors = $errors;
@@ -252,6 +255,7 @@ class Home_Controller extends Dashboard_Template_Controller {
         $this->template->content->entity_types_dropdown = Static_Entity_Type_Model::get_entity_types_dropdown();
         $this->template->content->agencies_dropdown = Agency_Model::get_agencies_dropdown();
         $this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropdown();
+        $this->template->content->entity_metadata = $entity_metadata;
         
         //  Javascript header
         $this->themes->map_enabled = TRUE;
@@ -260,6 +264,8 @@ class Home_Controller extends Dashboard_Template_Controller {
         $this->themes->js->latitude = $entity->latitude;
         $this->themes->js->default_map = Kohana::config('settings.default_map');
         $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
+        $this->themes->js->add_metadata_dialog_url = url::site().'dashboards/home/metadata_add/'.$this->static_entity_id;
+        $this->themes->js->metadata_update_url = url::site().'dashboards/home/metadata_update';
         $this->themes->js .= new View('js/dashboard_common_js');
         
 		// Set the header block
@@ -449,5 +455,70 @@ class Home_Controller extends Dashboard_Template_Controller {
     	     ));
 	     }
 	 }
+	 
+	 /**
+	  * Handles metadata update
+	  */
+	 public function metadata_update()
+	 {
+	     // No template for this method
+	     $this->template = "";
+	     $this->auto_render = FALSE;
+	     
+	     // Set the headers
+	     header("Content-type: application/json; charset=utf-8");
+	     
+	     if ($_POST)
+	     {
+	         if ($_POST['action'] == 's')
+	         {
+	             // Save Action
+    	         $data = arr::extract($_POST, 'item_value', 'item_label', 'as_of_year');
+    	         $data = array_merge($data, array('static_entity_id' => $this->static_entity_id));
+    	         
+    	         $static_entity_metadata = new Static_Entity_Metadata_Model($_POST['id']);
+	         
+    	         if ($static_entity_metadata->validate($data))
+    	         {
+    	             $static_entity_metadata->save();
+    	             print json_encode(array('success' => TRUE));
+    	         }
+    	         else
+    	         {
+    	             print json_encode(array('success' => FALSE));
+    	         }
+    	    }
+    	    elseif ($_POST['action'] == 'd')
+    	    {
+    	        // Delete static entity metadata item
+    	        $static_entity_metadata = ORM::factory('static_entity_metadata', $_POST['id']);
+    	        if ($static_entity_metadata->loaded)
+    	        {
+    	            $static_entity_metadata->delete();
+    	            
+    	            print json_encode(array('success' => TRUE));
+    	        }
+    	        else
+    	        {
+    	            print json_encode(array('success' => FALSE));
+    	        }
+    	    }
+    	}
+    	else
+    	{
+    	    print json_encode(array(
+    	        'success' => FALSE
+    	    ));
+    	}
+    }
+    
+    /**
+     * Loads the view for the metadata dialog
+     */
+    public function metadata_add($entity_id)
+    {
+        $this->template = new View("admin/entity_metadata_dialog");
+        $this->template->static_entity_id = $this->static_entity_id;
+    }
 }
 ?>

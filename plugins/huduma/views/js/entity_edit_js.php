@@ -138,123 +138,195 @@
 
 		// Displays the dialog for adding metadata items
 		function showAddMetadataDialog(entity_id) {
-			$("#dialog").css("visibility", "visible");
+    		// Display the dialog
+    		$("#facebox .content").attr("class", "content body");
+    		$("#facebox").css("display", "block");
+            $("#facebox .content").css("width", "650px");
+    		
+    		// Reset item count
+    		metadataItemCount = 0;
+    		
+    		$.facebox(function(){
+    		    jQuery.get('<?php echo $add_metadata_dialog_url; ?>',
+    		        function(data){
+    		            // Set the dialog data
+    		            jQuery.facebox(data);
+    		            
+            		    // Event handler for the save button
+            		    $("#save_metadata").click(function(){
+            		        // Only post if the metadata count > 0
+            				if (metadataItemCount > 0) {
+            					// To hold the metadata items
+            					var metadata_label = [];
+            					var metadata_value = [];
+            					var metadata_as_of_year = [];
 
-			// Remove the dialog functionality completely
-			$("#dialog").dialog("destroy");
+            					for (i=1; i<=metadataItemCount; i++) {
+            						metadata_label.push($("#metadata_label_" + i).val());
+            						metadata_value.push($("#metadata_value_" + i).val());
+            						metadata_as_of_year.push($("#metadata_as_of_year_" + i).val());
+            					}
 
-			// Calculate the center position
-			var centerPos = new Number((screenWidth - dialogWidth) / 2).toFixed();
-
-			// Show the dialog
-			$("#dialog").dialog({
-				modal: true,
-				width: dialogWidth,
-				position: [centerPos, 100],
-				buttons: [
-					{
-						text: "<?php echo Kohana::lang('ui_main.save'); ?>",
-						click: function() {
-
-							// Only post if the metadata count > 0
-							if (metadataItemCount > 0) {
-								// To hold the metadata items
-								var metadata_label = [];
-								var metadata_value = [];
-								var metadata_as_of_year = [];
-
-								for (i=1; i<=metadataItemCount; i++) {
-									metadata_label.push($("#metadata_label_" + i).val());
-									metadata_value.push($("#metadata_value_" + i).val());
-									metadata_as_of_year.push($("#metadata_as_of_year_" + i).val());
-								}
-
-								// Save an items that may be on the dialog
-								$.post(
-										'<?php echo  url::site() . 'admin/entities/metadata_save'; ?>',
-
-										{
-											entity_id: unescape(entity_id), metadata_label: metadata_label,
-											metadata_value: metadata_value, metadata_as_of_year: metadata_as_of_year
-										},
-
-										function(data) {
-											if (data.status) {
-												// Display the newly added items on the edit page
-												if ($("#metadata-list") != null) {
-													// To hold the HTML of the newly added items
-													var items_html = '';
-
-													$.each(data.metadata, function(item, i){
-														items_html += '<tr>';
-														items_html += '<td>'+this.label+'</td>';
-														items_html += '<td>'+this.value+'</td>';
-														items_html += '<td>'+this.as_of_year+'</td>';
-														items_html += '</tr>'
-													});
-
-													$("#metadata-list tr:last").after(items_html);
-												}
-											} else {
-												// Show error message
-												alert(data.message);
-											}
-										},
-
-										"json"
-								);
-							}
-
-							// Close the dialog
-							$(this).dialog("close");
-						}
-					},
-					{
-						text: "<?php echo Kohana::lang('ui_admin.cancel'); ?>",
-						click: function(){ $(this).dialog("close"); }
-					}
-				]
-			});
-
-			// Attach event handlers
-			$("#dialog").dialog({
-				close: function(){
-						// Remove all previously added metadata items
-						// TODO: Only remove the items not saved
-						$("#metadata_item_new").html('');
-
-						// Reset the metadata item counter
-						metadataItemCount = 0;
-					}
-				}
-			);
-		}
+            					// Save an items that may be on the dialog
+            					$.post('<?php echo  url::site() . 'admin/entities/metadata_save'; ?>',
+            					        {
+            					            entity_id: unescape(entity_id), metadata_label: metadata_label,
+            					            metadata_value: metadata_value, metadata_as_of_year: metadata_as_of_year
+            					        },
+            					        function(data) {
+            					            if (data.status) {
+            					                // Display the newly added items on the edit page
+            					                if ($("#metadata-list") != null) {
+            					                    // To hold the HTML of the newly added items
+            					                    var items_html = '';
+            					                    
+            					                    $.each(data.metadata, function(item, i){
+            					                        items_html += '<tr>';
+            					                        items_html += '<td>'+this.label+'</td>';
+            					                        items_html += '<td>'+this.value+'</td>';
+            					                        items_html += '<td>'+this.as_of_year+'</td>';
+            					                        items_html += '</tr>'
+            					                    });
+            					                    
+            					                    $("#metadata-list tr:last").after(items_html);
+            					                    
+            					                    $.facebox.close;
+            					                }
+            					            } else {
+            					                // Show error message
+            					                alert(data.message);
+            					            }
+            					        },
+            					        
+            					        "json"
+            					        
+            					); // End $.post
+            					
+            				} // End if (metadataCount > 0)
+            			
+            			}); // End $("#save_metadata").click()
+            			
+            		}); // End jQuery.get
+            	
+            }); // End $.facebox()
+        
+        } // End showAddMetadataDialog
 
 
 		/**
 		 * Adds a section for metadata
 		 */
-		function addMetadataItem(entity_id) {
-			// Incremenent the metadata item counter
-			metadataItemCount++;
-			$.post(
-					'<?php echo url::site() . 'admin/entities/metadata_new' ?>',
-					
-					{ entity_id: unescape(entity_id), item_id: metadataItemCount },
-
-					function(data){
-						if (data.status) {
-							$("#metadata_item_new").css('visibility', 'visible');
-							$("#metadata_item_new").append(data.response);
-
-							setTimeout('$("#metadata_label_"+'+metadataItemCount+').focus()', 300);
-						} else {
-							metadataItemCounter--;
-							alert(data.message);
-						}
-					},
-
-					"json"
-			);
-			
+        function addMetadataItem(entity_id) {
+            // Incremenent the metadata item counter
+            metadataItemCount++;
+            $.post('<?php echo url::site() . 'admin/entities/metadata_new' ?>',
+                    { entity_id: unescape(entity_id), item_id: metadataItemCount },
+                    function(data){
+                        if (data.status) {
+                            $("#metadata_item_new").css('visibility', 'visible');
+                            $("#metadata_item_new").append(data.response);
+                            
+                            setTimeout('$("#metadata_label_"+'+metadataItemCount+').focus()', 300);
+                        } else {
+                            metadataItemCounter--;
+                            alert(data.message);
+                        }
+                    },
+                    "json"
+            );
+        }
+		
+		// Edit a metadata item in place
+		var currentEditRows = [];
+		function metadataItemAction(action, itemId, hideLink) {
+		    // Get the current row object
+		    var editRow = $("#metadata_row_"+itemId);
+		    
+		    // Handles cancellation of inline edit
+		    this.cancel = function(){
+		        for (var i = 0; i < currentEditRows.length; i++) {
+		            // Get the row id
+    	            var rowId = currentEditRows[i].id;
+    	            
+    	            // Show/Hide links
+    	            $("#edit_link_"+rowId).css("display", "block");
+    	            $("#delete_link_"+rowId).css("display", "block");
+    	            $("#cancel_link_"+rowId).css("display", "none");
+    	            $("#save_link_"+rowId).css("display", "none");
+    	            
+    	            // Remove the inline input fields
+    	            $('td.edit_item', currentEditRows[i].editRow).each(function(){
+    	                $(this).html($(this).find('input').val());
+    	            });
+		        }
+		    }
+		    
+		    // Being Processing
+		    if (action == 'e') {        // EDIT
+		        // Cancel previous edits before proceeding
+		        cancel();
+		        
+    		    // Show/Hide links
+    		    $(hideLink).css("display", "none");
+    		    $("#delete_link_"+itemId).css("display", "none");
+    		    $("#cancel_link_"+itemId).css("display", "block");
+    		    $("#save_link_"+itemId).css("display", "block");
+    		    
+    		    // Show input fields in the table rows
+    		    $('td.edit_item', editRow).each(function(){
+    		        $(this).html('<input type="text" name="' + $(this).attr('id') + '" value="' + $(this).html() + '" class="text inline">');
+    		    });
+    		    
+    		    // Add current row to the rows collection
+    		    currentEditRows.push({ id: itemId, editRow: editRow });
+    		    
+    		} else if (action == 'd') { // DELETE
+    		    var postData = { id : itemId, action : action };
+    		    $.post('<?php echo $metadata_update_url; ?>', 
+    		            postData,
+    		            function(reponse) {
+    		                if (response.success) {
+    		                    $(editRow).remove();
+    		                } else {
+    		                    // TODO: Error handling
+    		                }
+    		            }
+    		    );
+    		    
+	        } else if (action == 'c') { // CANCEL
+	            
+	            cancel();
+	            
+	        } else if (action == 's') { // SAVE
+	            
+	            // Data for posting
+	            var postData = {
+	                id : itemId,
+	                action : action,
+	                item_label : $('#item_label_'+itemId, editRow).find('input').val(),
+	                item_value : $('#item_value_'+itemId, editRow).find('input').val(),
+	                as_of_year : $('#as_of_year_'+itemId, editRow).find('input').val()
+	            }
+	            
+	            // Submit metadata for update
+	            $.post('<?php echo $metadata_update_url; ?>',
+	                    postData,
+	                    function(response) {
+	                        if (response.success) {
+                	            $('td.edit_item', editRow).each(function(){
+                	                $(this).html($(this).find('input').val());
+                	            });
+                	            
+                	            // Show/Hide Links
+                	            $("#edit_link_"+itemId).css("display", "block");
+                	            $("#delete_link_"+itemId).css("display", "block");
+                    		    $("#cancel_link_"+itemId).css("display", "none");
+                	            $(hideLink).css("display", "none");
+                	            
+        	                } else {
+        	                    // TODO: Error handling
+        	                }
+	                    }
+	            );
+	        }
 		}

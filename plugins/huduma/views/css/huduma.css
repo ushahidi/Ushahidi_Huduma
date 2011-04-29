@@ -176,3 +176,11 @@ div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  
 .dashboard_container div.left-col { float: left;  width: 300px; padding: 0; margin: 0 !important; }
 .dashboard_container div.right-col { float: left; width: 350px; padding: 0; margin-left: 10px; clear: bottom;}
 .dashboard_container .location-info input { width: 100px;}
+.metadata { font-size: 95%;}
+.metadata th { text-align: left;}
+.metadata td { padding: 0 3px;}
+.forms_item h4 { font-size: 90%; }
+.huduma-actions li { list-style: none outside none; float: left;}
+.huduma-actions li a { padding: 0 3px; border-right: 1px solid #CCC; }
+.huduma-actions li a:last-child { border: none; }
+input.inline { width: 130px; font-size: 95%;}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Service provider edit page.
+ * Static entity edit view page
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -8,7 +8,7 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Serviceprovider Controller
+ * @module     Static Entity Controller
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
@@ -74,7 +74,7 @@
                         <?php endif; ?>
 
                         <!-- column -->
-                        <div class="f-col">
+                        <div class="f-col-1" style="width:420px;">
                             <div class="row">
                                 <h4><?php echo Kohana::lang('ui_huduma.entity_name'); ?></h4>
                                 <?php print form::input('entity_name', $form['entity_name'], ' class="text long2"'); ?>
@@ -91,61 +91,20 @@
                                 <span><h4><?php echo Kohana::lang('ui_huduma.boundary'); ?></h4></span>
                                 <?php print form::dropdown('boundary_id', $boundaries, $form['boundary_id']); ?>
                             </div>
-
-							<?php if ($static_entity_id): ?>
-
-                            <!-- metadata -->
-							<div class="row">
-								<h4>
-									<?php echo Kohana::lang('ui_huduma.additional_info'); ?>
-									[<a href="javascript:showAddMetadataDialog(<?php echo urlencode($static_entity_id); ?>)">
-										<?php echo Kohana::lang('ui_huduma.add_info'); ?>
-									</a>]
-								</h4>
-
-								<?php if ($has_metadata): ?>
-								<div class="metadata-box" style="border: 1px dashed #CCCCCC; padding:3px;">
-									<table class="metadata" id="metadata-list">
-										<thead>
-											<tr>
-												<th>Item</th>
-												<th><?php echo Kohana::lang('ui_huduma.value'); ?></th>
-												<th>As of Year</th>
-											</tr>
-										</thead>
-										<tbody>
-											<?php foreach ($metadata_items as $item): ?>
-											<tr>
-												<td><?php echo $item->label; ?></td>
-												<td><?php echo $item->value; ?></td>
-												<td><?php echo $item->as_of_year; ?></td>
-											</tr>
-											<?php endforeach; ?>
-										</tbody>
-									</table>
-								</div>
-								<?php endif; ?>
-
-								<!-- Add new items here -->
-								<div id="dialog" title="<?php echo Kohana::lang('ui_huduma.add_info'); ?>">
-									<a class="add"></a>&nbsp;
-									[<a href="javascript:addMetadataItem(<?php echo urlencode($static_entity_id); ?>)">
-										<?php echo Kohana::lang('ui_huduma.add_info'); ?>
-									</a>]
-
-									<div id="metadata_item_new"></div>
-									
-								</div>
-							</div>
-                            <!-- /metadata -->
-							
-							<?php endif; ?>
+                            
+                            <?php 
+                            if ($static_entity_id)
+                            {
+                                // Show the metadata block only when a static entity exists
+                                 echo $entity_metadata;
+                            }
+                            ?>
 							
                         </div>
                         <!-- /column -->
 
-                        <!-- f-col-1 -->
-                        <div class="f-col-1">
+                        <!-- f-col -->
+                        <div class="f-col" style="width: 405px; margin-left: 60px;">
                             <div class="incident-location">
                                 <h4><?php echo Kohana::lang('ui_huduma.entity_location'); ?></h4>
                                 <div class="location-info">
@@ -155,7 +114,7 @@
                                     <?php print form::input('longitude', $form['longitude'], ' class="text"'); ?>
                                 </div>
                                 <div style="clear:both"></div>
-                                <div id="divMap" class="map_holder_reports"></div>
+                                <div id="divMap" class="entity_map_holder" style="width:395px; height: 300px;"></div>
                             </div>
                         </div>
                         <!-- /f-col-1 -->
