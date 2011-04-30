@@ -122,19 +122,6 @@
 
             // display the map centered on a latitude and longitude (Google zoom levels)
             map.setCenter(myPoint, <?php echo ($default_zoom) ? $default_zoom : 10; ?>);
-
-
-			$("#dialog:ui-dialog").dialog("destroy");
-
-			$("#metadata-dialog").dialog(
-				{
-					autoOpen: false,
-					modal: true,
-					width: 600,
-					height: 450,
-					position: ['center', 100]
-				}
-			);
         });
         
 		function onPopupClose(evt) {
@@ -225,5 +212,64 @@
 		                }
 		            }
 		    );
+		}
+		
+		// Loads the form for submitting a report
+		function loadEntityReportForm(entityId) {
+    		// Display the dialog
+    		$("#facebox .content").attr("class", "content body");
+    		$("#facebox").css("display", "block");
+            
+		    $.facebox(function(){
+		        jQuery.get('<?php echo url::site().'entities/report/'?>'+unescape(entityId),
+		            function(data) {
+		                jQuery.facebox(data);
+		                
+		                //*
+		                //* EVENT HANDLERS
+		                //*
+		                
+            			// Toggle Date Editor
+            			$('a#date_toggle').click(function() {
+            		    	$('#datetime_edit').show(400);
+            				$('#datetime_default').hide();
+            		    	return false;
+            			});
+            			
+            			// Form submission handler
+            			$("#report_submit").click(function(){
+            			    // Fetch the submitted information
+            			    var postData = {
+            			        incident_title : $("#incident_title").val(),
+            			        incident_description : $("#incident_description").val(),
+            			        incident_date : $("#incident_date").val(),
+            			        incident_hour : $("#incident_hour").val(),
+            			        incident_minute : $("#incident_minute").val(),
+            			        incident_ampm : $("#incident_ampm").val(),
+            			        person_first : $("#person_first").val(),
+            			        person_last : $("#person_last").val(),
+            			        person_email : $("#person_email").val()
+            			    };
+            			    
+            			    // Post the provided information
+            			    $.post('<?php echo url::site().'entities/report_submit/'; ?>'+unescape(entityId), 
+            			        postData,
+            			        function(response) {
+            			            if (response.success) {
+            			                // Show message 
+            			                $("#submitStatus").css("display", "block");
+                        			    // Close the dialog
+                        			    setTimeout(function(){ $.facebox.close(); }, 600);
+            			            } else {
+            			                // Show message
+            			                // TODO Figure out how to display the error messages
+            			            }
+            			        }
+            			    );
+            			    
+            			})
+		            }
+		        );
+		    });
 		}
 		

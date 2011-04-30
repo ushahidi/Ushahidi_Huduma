@@ -1,7 +1,17 @@
 <?php
-/**
- * View page for the static entity comments form
- */
+ /**
+  * View page for the static entity comments form
+  *
+  * PHP version 5
+  * LICENSE: This source file is subject to LGPL license
+  * that is available through the world-wide-web at the following URI:
+  * http://www.gnu.org/copyleft/lesser.html
+  * @author     Ushahidi Team <team@ushahidi.com>
+  * @package    Ushahidi - http://source.ushahididev.com
+  * @module     Static Entity Controller
+  * @copyright  Ushahidi - http://www.ushahidi.com
+  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
+  */
 ?>
 	<div class="dashboard_comment_form" style="display:none;">
         <?php print form::open(NULL, array('id'=>'entityCommentForm', 'name'=>'entityCommentForm')); ?>
@@ -39,7 +49,7 @@
     			<?php print form::textarea('comment_description', $form['comment_description'], ' cols="35" rows="11" class="comment_field text"'); ?>
     		</div>
 		
-    		<div style="float: right; position:">
+    		<div style="float: right;">
         		<div class="row">
         			<h4><?php echo Kohana::lang('ui_main.name'); ?>:</h4>
         			<?php print form::input('comment_author', $form['comment_author'], ' class="comment_field text'); ?>

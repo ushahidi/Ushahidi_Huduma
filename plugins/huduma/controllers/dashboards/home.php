@@ -362,11 +362,11 @@ class Home_Controller extends Dashboard_Template_Controller {
 	     $pagination = new Pagination(array(
 	         'query_string' => 'page',
 	         'items_per_page' => $items_per_page,
-	         'total_items' => ORM::factory('static_entity_comment')->where('static_entity_id', $this->static_entity_id)->count_all()
+	         'total_items' => ORM::factory('comment')->where('static_entity_id', $this->static_entity_id)->count_all()
 	     ));
 	     
 	     // Fetch comments for current page
-	     $comments = ORM::factory('static_entity_comment')
+	     $comments = ORM::factory('comment')
 	                        ->where('static_entity_id', $this->static_entity_id)
 	                        ->find_all($items_per_page, $pagination->sql_offset);
 	     

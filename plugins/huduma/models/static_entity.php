@@ -161,34 +161,6 @@ class Static_Entity_Model extends ORM {
 		return self::factory('static_entity', $entity_id)->entity_name;
 	}
 
-    /**
-     * Gets the comments for the specified report
-     * @param   int     $incident_id
-     * @return  ORM_Iterator
-     */
-	public static function get_comments($incident_id)
-	{
-		if ( ! Incident_Model::is_valid_incident($incident_id))
-		{
-			return FALSE;
-		}
-		else
-		{
-		    // Build the where clause
-		    $where_clause = array(
-		        'incident_id' => $incident_id,
-		        'comment_active' => 1,
-		        'comment_spam' => 0,
-		    );
-		    
-			// Return array of comments
-			return self::factory('comment')
-						->where($where_clause)
-						->orderby('comment_date', 'asc')
-						->find_all();
-		}
-	}
-	
 	/**
 	 * Gets the reports for a specific static entity
 	 *
@@ -230,6 +202,39 @@ class Static_Entity_Model extends ORM {
 	                    ->where(array('static_entity_id' => $entity_id))
 	                    ->orderby('static_entity_id', 'asc')
 	                    ->find_all();
+	    }
+	}
+	
+	/**
+	 * Creates a location object for the specified static entity
+	 * This helper method is useful when submitting a report for a specific
+	 * static entity
+	 *
+	 * @return  Location_Model
+	 */
+	public static function get_as_location($entity_id)
+	{
+	    if ( ! self::is_valid_static_entity($entity_id))
+	    {
+	        return FALSE;
+	    }
+	    else
+	    {
+	        // Load the static entity
+	        $static_entity = self::factory('static_entity', $entity_id);
+	        
+	        // Extract entity data to be passed on for validation
+	        $data = array(
+	            'location_name' => $static_entity->entity_name,
+	            'latitude' => $static_entity->latitude,
+	            'longitude' => $static_entity->longitude
+	        );
+	        
+	        // Location_Model instance to be returned
+	        $location = new Location_Model();
+	        
+	        // Return
+	        return ($location->validate($data))? $location : FALSE;
 	    }
 	}
 }

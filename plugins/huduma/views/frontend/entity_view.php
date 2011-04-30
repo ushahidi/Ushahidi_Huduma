@@ -32,6 +32,15 @@
                     </div>
                 </div>
                 
+        		<div id="facebox" style="display: none;">
+        			<div class="popup">
+        				<div class="content"></div>
+        				<a href="#" class="close">
+        					<img src="<?php echo url::base().'plugins/huduma/views/images/closelabel.png'; ?>", class="close_image">
+        				</a>
+        			</div>
+        		</div>
+                
                 <div class="dashboard_container">
                 <?php print form::open(NULL, array('id'=>'entityForm', 'name'=>'entityForm')); ?>
                     <input type="hidden" name="save" id="save" value="" />
@@ -42,13 +51,11 @@
                             <div class="map-holder" id="map"></div>
                             <div style="clear:both"></div>
                         </div>
-
-    					<?php if ($show_metadata): ?>
+                        
     					<div class="row">
-    						<a href="javascript:showEntityMetadata()"><?php echo Kohana::lang('ui_huduma.view_additional_info'); ?></a>
+    						<a href="javascript:loadEntityReportForm('<?php echo urlencode($entity_id); ?>')"><?php echo Kohana::lang('ui_main.submit'); ?></a>
     					</div>
-    					<?php endif; ?>
-                    
+    					
                         <?php echo $entity_reports_view; ?>
                         
                         <?php echo $entity_comments_form; ?>

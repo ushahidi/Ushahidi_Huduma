@@ -33,8 +33,9 @@ class Incident_Model extends ORM
     /**
      * Validates the incident data before saving
      *
-     * @param array     $array   Data to be validated
-     * @param boolean   $save
+     * @param   array     $array   Data to be validated
+     * @param   boolean   $save
+     * @return  boolean
      */
     public function validate(array & $array, $save = FALSE)
     {
@@ -282,4 +283,25 @@ class Incident_Model extends ORM
 	        ? self::factory('incident', $incident_id)->loaded
 	        : FALSE;
 	}
+	
+    /**
+     * Gets the comments for the specified incident
+     *
+     * @return ORM_Iterator
+     */
+    public static function get_comments($incident_id)
+    {
+        if ( ! self::is_valid_incident_($incident))
+        {
+            // Validation failed!
+            return FALSE;
+        }
+        else
+        {
+            // Return list of comments for the incident
+            return self::factory('comment')
+                        ->where(array('incident_id' => $incident_id, 'comment_spam' => 0, 'comment_active' => 1))
+                        ->orderby('comment_date', 'desc');
+        }
+    }
 }

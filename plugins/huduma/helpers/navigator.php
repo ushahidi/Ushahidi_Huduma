@@ -120,7 +120,7 @@ class navigator_Core {
         $comment_tree = '';
         
         // Fetch the inline commnets
-        $children = Static_Entity_Model::get_comments($incident_id);
+        $children = Incident_Model::get_comments($incident_id);
         
         Kohana::log('info', sprintf('Fetch %d comments for entity %d', $children->count(), $entity_id));
         
