@@ -30,6 +30,8 @@
                     
             		<div class="tab">
             			<ul>
+							<li><a href="#" rel="facebox" onclick="showStaticEntityTypeDialog('');"><?php echo strtoupper(Kohana::lang('ui_huduma.add_static_entity_metadata'))
+							;?></a></li>
             				<li><a href="#" onclick="entityTypeAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
             				<li><a href="#" onclick="entityTypeAction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
             			</ul>

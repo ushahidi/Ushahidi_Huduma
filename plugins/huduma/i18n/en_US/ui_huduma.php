@@ -20,6 +20,7 @@
      'entity_types'             => 'Static Entity Types',
      'entity_type_name'         => 'Entity Type Name',
      'add_edit_entity'          => 'Add/Edit Entities',
+     'add_static_entity_metadata' => 'Add Static Entity Type Metadata',
      'entity_location'          => 'Entity Location',
 
      'additional_info'          => 'Additional Information',
@@ -69,8 +70,10 @@
 	 'associated_service_agency'=> 'Associated Service Agency',
 	 'select_agency'			=> 'Select Agency',
 	 'select_entity'			=> 'Select Entity',
+	 'select_entity_type'		=> 'Select Entity Type',
 	 'select_category'			=> 'Select Category',
 	 'dashboard_role_saved'		=> 'Dashboard role successfully saved',
+	 'metadata_item_saved'		=> 'Static Entity Type Metadata Item successfully saved',
 	 'username_or_email'		=> 'Username or email',
 	 'username_placeholder'		=> 'Username...',
 	 'password_placeholder'		=> 'Password...',

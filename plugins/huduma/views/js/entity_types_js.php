@@ -61,3 +61,65 @@
 			}
 		}
 	}
+
+	// Displays the dialog for adding static entity type metadata
+	function showStaticEntityTypeDialog(static_entity_type_id) {
+	
+		// Display the dialog
+		$("#facebox .content").attr("class", "content body");
+		$("#facebox").css("display", "block");
+		
+		$.facebox(function(){
+			jQuery.get('<?php echo url::site().'admin/entities/get/'?>'+unescape(static_entity_type_id),
+				function(data){
+					// Set the dialog data
+					jQuery.facebox(data);
+
+					// Attach events to the save and close buttons
+					$('.btn_save_close').live('click', function() {
+						// Get the input data
+						var data = {
+							id: $("#static_entity_type_metadata_id").val(),
+							metadata_item: $("#metadata_name").val(),
+							description: $("#metadata_description").val(),
+							action: $("#static_entity_type_action").val(),
+							static_entity_type_id: $("#metadata_static_entity_type_id").val(),
+						}
+						
+						// Post the data
+						$.post('<?php echo url::site().'admin/entities/save'?>',
+							data,
+							function(response){
+								if (response.success) {
+									// Show the message
+									$("#message_green_box").css("display", "block");
+									$("#message_green_box").css("class", "green-box");
+
+									$("#message_green_box").html("<h3>"+response.message+"</h3>");
+
+									// Close the dialog
+									setTimeout(function(){
+											$.facebox.close;
+
+											// Redirect to landing page
+											window.location.replace('<?php echo
+											url::site().'admin/entities/types'; ?>');
+										},
+										300
+									);
+
+								} else {
+									$("#message_red_box").css("display", "block");
+									$("#message_green_box").css("class", "red-box");
+									
+									$("#message_redbox_box").html("<h3>"+response.message+"</h3>");
+								}
+							}
+						);
+					});
+
+
+				});
+			});
+	}
+
