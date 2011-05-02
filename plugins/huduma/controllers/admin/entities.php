@@ -279,7 +279,8 @@ class Entities_Controller extends Admin_Controller {
 
 
 	/**
-	 * Saves a dashboard role
+	 * Saves a static entity type's metadata 
+	 
 	 */
 	public function save()
 	{
