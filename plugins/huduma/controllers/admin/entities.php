@@ -452,10 +452,10 @@ class Entities_Controller extends Admin_Controller {
                         'longitude' => $static_entity->longitude
                     );
                 
-					// Check if the static entity has any metadata
-					$entity_metadata = new View('admin/entity_metadata_view');
-					$entity_metadata->static_entity_id = $entity_id;
-					$entity_metadata->metadata_items = Static_Entity_Model::get_metadata($entity_id);
+                    // Check if the static entity has any metadata
+                    $entity_metadata = new View('admin/entity_metadata_view');
+                    $entity_metadata->static_entity_id = $entity_id;
+                    $entity_metadata->metadata_items = Static_Entity_Model::get_metadata($entity_id);
                 }
             }
         }
@@ -480,7 +480,7 @@ class Entities_Controller extends Admin_Controller {
         $this->template->content->boundaries = $boundaries;
         $this->template->content->agencies = $agencies;
         $this->template->content->static_entity_id = $entity_id;
-		$this->template->content->entity_metadata = $entity_metadata;
+        $this->template->content->entity_metadata = $entity_metadata;
 
         // TODO Unpack the metadata on the frontend (view page)
 
