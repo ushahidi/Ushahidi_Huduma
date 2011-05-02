@@ -142,12 +142,8 @@ class Entities_Controller extends Admin_Controller {
             if ($post->action == 'a')
             {
                 $post->add_rules('type_name', 'required');
-                $post->add_rules('category_id', 'required', 'numeric');
+                $post->add_rules('category_id', 'required', array('Category_Model', 'is_valid_category'));
                 $post->add_rules('entity_type_image', 'upload::valid', 'upload::type[gif, jpg, png]', 'upload::size[50K]');
-
-                // Add callback to check the existence of the category id
-                $post->add_callbacks('category_id', array($this, 'category_id_check'));
-
             }
             elseif ($post->action == 'd')
             {
@@ -392,8 +388,7 @@ class Entities_Controller extends Admin_Controller {
         $form_saved = ($saved == 'saved')? TRUE : FALSE;
         $form_error = FALSE;
         $form_action = "";
-		$has_metadata = FALSE;
-		$metadata_items = array();
+		$entity_metadata = "";
 
         // Load the static entity
         $static_entity = "";
@@ -401,37 +396,16 @@ class Entities_Controller extends Admin_Controller {
         // Check if the form has been submitted
         if ($_POST)
         {
-            // Set up validation
-            $post = Validation::factory($_POST);
-
-            // Add some filters
-            $post->pre_filter('trim', TRUE);
-
-            // Add the fields to be validated plus callback functions to check existence of foreign keys
-            $post->add_rules('static_entity_type_id', 'required', 'numeric');
-            $post->add_rules('boundary_id', 'required', 'numeric');
-            $post->add_rules('entity_name', 'required');
-            $post->add_rules('latitude', 'required', 'numeric');
-            $post->add_rules('longitude', 'required', 'numeric');
+            // Instance for validation and subsequent saving
+            $static_entity = new Static_Entity_Model($entity_id);
             
-            // Add callbacks
-            $post->add_callbacks('static_entity_type_id', array($this, 'static_entity_type_id_check'));
-            $post->add_callbacks('boundary_id', array($this, 'boundary_id_check'));
-
-            if ($post->validate())
+            // Manually extract the data to be validated
+            $data = arr::extract($_POST, 'static_entity_type_id', 'boundary_id', 'entity_name', 'latitude', 'longitude');
+            
+            // Validate
+            if ($static_entity->validate($data))
             {
-                $static_entity = new Static_Entity_Model($entity_id);
-                $static_entity->static_entity_type_id = $post->static_entity_type_id;
-                $static_entity->boundary_id = $post->boundary_id;
-                $static_entity->entity_name = $post->entity_name;
-                $static_entity->latitude = $post->latitude;
-                $static_entity->longitude = $post->longitude;
-
-                // TODO Ensure that the metadata is propetly encapsulated in a JSON strucutre
-                // before being pushed into the database
-//                $static_entity->metadata = $post->metadata;
-
-                // Save the static entity
+                // SUCCESS! Save the static entity
                 $static_entity->save();
 
                 // Set the entity id
@@ -441,7 +415,7 @@ class Entities_Controller extends Admin_Controller {
                 array_fill_keys($form, '');
 
                 // Save and close?
-                if ($post->save == 1)
+                if ($_POST['save'] == 1)
                 {
                     url::redirect('admin/entities/edit/'.$static_entity->id.'/saved');
                 }
@@ -454,10 +428,10 @@ class Entities_Controller extends Admin_Controller {
             else
             {
                 // Repopulate the form fields
-                $form = arr::overwrite($form, $post->as_array());
+                $form = arr::overwrite($form, $data->as_array());
 
                 // Populate the form errors if any
-                $errors = arr::overwrite($errors, $post->errors('entity'));
+                $errors = arr::overwrite($errors, $data->errors('entity'));
 
                 $form_error = TRUE;
             }
@@ -481,10 +455,11 @@ class Entities_Controller extends Admin_Controller {
                         'latitude' => $static_entity->latitude,
                         'longitude' => $static_entity->longitude
                     );
-
+                
 					// Check if the static entity has any metadata
-					$has_metadata = (strlen($static_entity->metadata) > 0) ? TRUE : FALSE;
-					$metadata_items = ($has_metadata) ? json_decode($static_entity->metadata) : array();
+					$entity_metadata = new View('admin/entity_metadata_view');
+					$entity_metadata->static_entity_id = $entity_id;
+					$entity_metadata->metadata_items = Static_Entity_Model::get_metadata($entity_id);
                 }
             }
         }
@@ -509,8 +484,7 @@ class Entities_Controller extends Admin_Controller {
         $this->template->content->boundaries = $boundaries;
         $this->template->content->agencies = $agencies;
         $this->template->content->static_entity_id = $entity_id;
-		$this->template->content->has_metadata = $has_metadata;
-		$this->template->content->metadata_items = $metadata_items;
+		$this->template->content->entity_metadata = $entity_metadata;
 
         // TODO Unpack the metadata on the frontend (view page)
 
@@ -530,6 +504,9 @@ class Entities_Controller extends Admin_Controller {
             $this->template->js->latitude = $form['latitude'];
             $this->template->js->longitude = $form['longitude'];
         }
+        
+        $this->template->js->add_metadata_dialog_url = url::site().'admin/entities/metadata_add/'.$entity_id;
+        $this->template->js->metadata_update_url = url::site().'admin/entities/metadata_save';
     }
 
 	/**
@@ -551,7 +528,7 @@ class Entities_Controller extends Admin_Controller {
 			// Metadata label
 			$html .= "<div class=\"forms_item\">";
 			$html .= "<h4>".Kohana::lang('ui_huduma.item_label')."</h4>";
-			$html .= "<input type=\"text\" name=\"metadata_label\" id=\"metadata_label_".$item_id."\" class=\"text long2\" value=\"\">";
+			$html .= "<input type=\"text\" name=\"metadata_label\" id=\"metadata_label_".$item_id."\" class=\"text medium\" value=\"\">";
 			$html .="</div>";
 			
 			// Metadata value
@@ -594,15 +571,14 @@ class Entities_Controller extends Admin_Controller {
 
 		if ($_POST AND Static_Entity_Model::is_valid_static_entity($entity_id))
 		{
-
-			// Validation
-			$post = Validation::factory($_POST);
-
-			// Add some validation rules
-			$post->add_rules('metadata_label.*', 'required');
-			$post->add_rules('metadata_value.*', 'required');
-			$post->add_rules('metadata_as_of_year.*', 'required', 'numeric');
-
+		    // Set up validation, add some filters and validation rules
+		    $post = Validation::factory($_POST)
+		                ->pre_filter('trim')
+		                ->add_rules('metadata_label.*', 'required')
+		                ->add_rules('metadata_value.*', 'required')
+		                ->add_rules('metadata_as_of_year.*', 'required', 'numeric');
+			
+			// Test validation rules
 			if ($post->validate() AND count($_POST) > 1)
 			{
 				// To hold the new metadata
@@ -611,6 +587,17 @@ class Entities_Controller extends Admin_Controller {
 				// Iterate over $_POST array and create a json structure for each item
 				for ($i=0; $i < count($post->metadata_value); $i++)
 				{
+				    // Create metadata entry
+				    $static_entity_metadata = new Static_Entity_Metadata_Model();
+				    $static_entity_metadata->static_entity_id = $entity_id;
+				    $static_entity_metadata->item_label = $post->metadata_label[$i];
+				    $static_entity_metadata->item_value = $post->metadata_value[$i];
+				    $static_entity_metadata->as_of_year = $post->metadata_as_of_year[$i];
+				    
+				    // SAVE
+				    $static_entity_metadata->save();
+				    
+				    // Construct JSON 
 					$json_item = "{";
 					$json_item .= "\"label\": \"".$post->metadata_label[$i]."\",";
 					$json_item .="\"value\": \"".$post->metadata_value[$i]."\",";
@@ -619,28 +606,6 @@ class Entities_Controller extends Admin_Controller {
 
 					array_push($new_metadata, $json_item);
 				}
-
-				// Save the metadata for this entity
-				$static_entity = new Static_Entity_Model($entity_id);
-
-				// Get the current metadata
-				$current_metadata = $static_entity->metadata;
-
-				// To hold the metadata to be saved in the DB
-				$metadata = array();
-				if ( ! empty($current_metadata))
-				{
-					// Strip "[" and "]"
-					$current_metadata = preg_replace("/\[|\]/", "", $current_metadata);
-					array_push($metadata, $current_metadata);
-				}
-
-				// Merge new metadata with the current metadata
-				$metadata = array_merge($metadata, $new_metadata);
-
-				$static_entity->metadata = "[".implode(",",$metadata)."]";
-
-				$static_entity->save();
 
 				print json_encode(array(
 					'status' => TRUE,
@@ -663,67 +628,15 @@ class Entities_Controller extends Admin_Controller {
 			));
 		}
 	}
-
-
-//> VALIDATION CALLBACK FUNCTIONS
-
-    /**
-     * Checks if the category id in $post exists in the database
-     *
-     * @param Validation $post
-     */
-    public function category_id_check(Validation $post)
-    {
-        // Check if an error for the category_id already exists
-        if (array_key_exists('category_id', $post->errors()))
-            return;
-
-        if ( ! Category_Model::is_valid_category($post->category_id))
-        {
-            // Category id does not exist
-            $post->add_error('category_id', 'Invalid category');
-        }
-    }
-
-    /**
-     * Callback function for checking if the static entity type in @param $post exists
-     * in the database
-     *
-     * @param Validation $post
-     */
-    public function static_entity_type_id_check(Validation $post)
-    {
-        // Check if an error for the static_entity_type_id already exists
-        if (array_key_exists('static_entity_type_id', $post->errors()))
-            return;
-
-        if ( !Static_Entity_Type_Model::is_valid_static_entity_type($post->static_entity_type_id))
-        {
-            $post->add_error('static_entity_type_id', 'Invalid static entity type');
-        }
-
-    }
-
-    /**
-     * Callback function for checking if the administrative boundary in @param $post exists
-     * in the database
-     * 
-     * @param Validation $post
-     */
-    public function boundary_id_check(Validation $post)
-    {
-        // Check if an error for the admin boundary already exists/has been set
-        if (array_key_exists('administative_boundary_id', $post->errors()))
-            return;
-
-        // If the national boundary has been specified, exit
-        if ($post->boundary_id == 0)
-            return;
-
-        if ( !Boundary_Model::is_valid_boundary($post->boundary_id))
-        {
-            $post->add_error('boundary_id', 'Invalid administrative boundary');
-        }
-    }
+	
+	/**
+	 * Loads the view for the metadata dialog
+	 */
+	public function metadata_add($entity_id)
+	{
+	    $this->template = new View("admin/entity_metadata_dialog");
+	    $this->template->static_entity_id = $entity_id;
+	}
+    
 }
 ?>
