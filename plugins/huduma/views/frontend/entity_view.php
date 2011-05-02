@@ -55,7 +55,8 @@
     					<div class="row">
     						<a href="javascript:loadEntityReportForm('<?php echo urlencode($entity_id); ?>')"><?php echo Kohana::lang('ui_main.submit'); ?></a>
     					</div>
-    					
+    					<?php endif; ?>
+                    
                         <?php echo $entity_reports_view; ?>
                         
                         <?php echo $entity_comments_form; ?>

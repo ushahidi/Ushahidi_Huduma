@@ -19,12 +19,10 @@ CREATE TABLE IF NOT EXISTS `boundary_type` (
 CREATE TABLE IF NOT EXISTS `boundary` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`boundary_name` VARCHAR(45) NOT NULL ,
-	`boundary_type_id` INT NOT NULL ,
+	`boundary_type` INT NOT NULL ,
 	`parent_id` INT NOT NULL DEFAULT 0,
 	`creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`) ,
-	INDEX `boundary_fk1` (`boundary_type_id` ASC) ,
-	CONSTRAINT `boundary_fk1` FOREIGN KEY (`boundary_type_id` ) REFERENCES `boundary_type` (`id` ) ON DELETE NO ACTION ON UPDATE NO ACTION
+	PRIMARY KEY (`id`) 
 ) COMMENT = 'List of administrative boundaries (specific names of the various admin boundaries)';
 
 --

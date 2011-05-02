@@ -546,6 +546,5 @@ class Entities_Controller extends Frontend_Controller {
             print json_encode(array('success' => FALSE));
         }
     }
-    
 }
 ?>
