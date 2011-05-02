@@ -8,7 +8,7 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Dashboard Roles Model
+ * @module     Static Entity Type Metadata Model
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
@@ -18,7 +18,7 @@ class Static_Entity_Type_Metadata_Model extends ORM {
 	protected $table_name = 'static_entity_type_metadata';
 	
 	// Relationships
-	protected $has_many = array('static_entity_type');
+	protected $belongs_to = array('static_entity_type');
 
 
 	/**
@@ -38,21 +38,6 @@ class Static_Entity_Type_Metadata_Model extends ORM {
 
 		return parent::validate($array, $save);
 	}
-	
-	
-	//	> HELPER METHODS
-
-
-	/**
-	 * Gets the list of static entity types for use in a dropdown list
-	 * 
-	 * @return array
-	 */
-	public static function get_entity_types_dropdown()
-	{
-		return self::factory('static_entity_type')->select_list('id', 'name');
-	}
-
 
 }
 ?>

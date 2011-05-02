@@ -289,8 +289,7 @@ class Entities_Controller extends Admin_Controller {
 		if ($_POST)
 		{
 			// Manually specify the fields to be validated
-			$data = arr::extract($_POST, 'id', 'metadata_item', 'description',
-			'static_entity_type_id', 'action');
+			$data = arr::extract($_POST, 'id', 'metadata_item', 'description', 'static_entity_type_id', 'action');
 			$action = $data['action'];
 			
 			// Instance for validation
@@ -356,9 +355,6 @@ class Entities_Controller extends Admin_Controller {
 		$this->template->entity_types = $entity_types;
 
 	}
-
-
-
 
     /**
      * Loads the page for editing/creating a static entity
@@ -560,7 +556,7 @@ class Entities_Controller extends Admin_Controller {
 	}
 
 	/**
-	 * Saves metadata items in a json format
+	 * Adds a new metadata item
 	 */
 	public function metadata_save()
 	{

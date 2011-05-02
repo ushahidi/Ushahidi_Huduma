@@ -212,28 +212,6 @@ class Static_Entity_Model extends ORM {
 	}
 	
 	/**
-	 * Gets the reports for a specific static entity
-	 *
-	 * @param   int   $entity_id
-	 * @return  ORM_Iterator
-	 */
-	public static function get_reports($entity_id)
-	{
-	    if ( ! self::is_valid_static_entity($entity_id))
-	    {
-	        return FALSE;
-	    }
-	    else
-	    {
-	        // Return list of reports
-	        return self::factory('incident')
-	                    ->where(array('static_entity_id' => $entity_id, 'incident_active' => 1))
-	                    ->orderby('incident_date', 'desc')
-	                    ->find_all();
-	    }
-	}
-	
-	/**
 	 * Returns the metadata for a static entity
 	 *
 	 * @param   int $entity_id ID of the static entity
