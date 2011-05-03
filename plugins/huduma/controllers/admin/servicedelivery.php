@@ -30,6 +30,7 @@ class Servicedelivery_Controller extends Admin_Controller {
 			'boundary_name' => '',
 			'boundary_type' => '',
 			'parent_id' => '',
+			'boundary_color' => '',
 		);
 
 		// Copy the form as errors, so the errors will be stored with keys corresponding to the form field names
@@ -44,21 +45,42 @@ class Servicedelivery_Controller extends Admin_Controller {
 		// check, has the form been submitted, if so, setup validation
 		if ($_POST)
 		{
+			// Check actions
 			if ($_POST['action'] == 'a')	// Add/Update
 			{
 				// Manually extract the $_POST data
-				$boundary_data = arr::extract($_POST, 'boundary_name', 'boundary_type', 'parent_id');
+				$boundary_data = arr::extract($_POST, 'boundary_name', 'boundary_type', 'parent_id', 'boundary_color');
 				
 				// Boundary model instance for the operation
 				$boundary = (isset($_POST['boundary_id']) AND Boundary_Model::is_valid_boundary($_POST['boundary_id']))
 						? ORM::factory('boundary', $_POST['boundary_id'])
 						: new Boundary_Model();
 				
+				$file_validation = Validation::factory(array_merge($_FILES, arr::extract($_POST, 'boundary_layer_file')))
+									->pre_filter('trim')
+									->add_rules('boundary_layer_file', 'upload::valid', 'upload::type[geojson]');
+										
 				// TODO: Check for upload file
-				if ($boundary->validate($boundary_data))
+				if ($boundary->validate($boundary_data) AND $file_validation->validate())
 				{
 					// Success! SAVE
 					$boundary->save();
+					
+					// Upload the GeoJSON file
+					$pathinfo = upload::save("boundary_layer_file");
+					if ($pathinfo)
+					{
+						Kohana::log('debug', sprintf('Found the upload file: %s', $pathinfo));
+						
+						// Extracts the name and extension of the file
+						$path_parts = pathinfo($pathinfo);
+						$filename = $path_parts['filename'];
+						$extension = $path_parts['extension'];
+						
+						// Set the name of the layer file
+						$boundary->boundary_layer_file = $filename.".".$extension;
+						$boundary->save();
+					}
 					
 					$form_saved = TRUE;
 					$form_action = Kohana::lang('ui_admin.added_edited');
@@ -69,9 +91,11 @@ class Servicedelivery_Controller extends Admin_Controller {
 				}
 				else
 				{
+					Kohana::log('debug', 'Validation failed');
+					
 					// Overwrite forms and errors
 					$form = arr::overwrite($form, $boundary_data->as_array());;
-					$errors = arr::overwrite($errors, $boundary_data->errors('boundaries'));
+					$errors = arr::overwrite($errors, $boundary_data->errors());
 					
 					// Turn on form error
 					$form_error = TRUE;
@@ -98,8 +122,6 @@ class Servicedelivery_Controller extends Admin_Controller {
 		// No. of items to display per page
 		$items_per_page = (int)Kohana::config('settings.items_per_page_admin');
 		
-		Kohana::log('info', sprintf('Items per page %s', $items_per_page));
-		
 		// Setup pagination
 		$pagination = new Pagination(array(
 			'query_string' => 'page',
@@ -114,14 +136,19 @@ class Servicedelivery_Controller extends Admin_Controller {
 
 		// Boundary types
 		// TODO - Fethc this from a language file
-		$boundary_types = array('1' => 'County', '2' => 'Constituency');
+		$boundary_types = array(
+			'1' => Kohana::lang('ui_huduma.county'), 
+			'2' => Kohana::lang('ui_huduma.constituency')
+		);
 		
 		// Get the parent boundaries
 		$parent_boundaries = Boundary_Model::get_parent_boundaries();
 		$parent_boundaries[0] = "---".Kohana::lang('ui_huduma.top_level_boundary')."---";
 		ksort($parent_boundaries);
 
-		// Output
+		$this->template->colorpicker_enabled = TRUE;
+		
+		// Set content view
 		$this->template->content->form = $form;
 		$this->template->content->errors = $errors;
 		$this->template->content->form_error = $form_error;

@@ -18,17 +18,18 @@
 
  <?php require SYSPATH.'../application/views/admin/form_utils_js.php' ?>
 
-     // Boundaries JS
-     function fillFields(id, boundary_name, boundary_type_id, parent_id) {
-        $("#boundary_id").attr("value", unescape(id));
-        $("#boundary_name").attr("value", unescape(boundary_name));
-        $("#boundary_type").attr("value", unescape(boundary_type_id));
-        $("#parent_id").attr("value", unescape(parent_id));
-    }
+	// Populates the input fields in the boundaries form
+	function fillFields(id, boundary_name, boundary_type_id, parent_id, boundary_color) {
+		show_addedit();
+		$("#boundary_id").attr("value", unescape(id));
+		$("#boundary_name").attr("value", unescape(boundary_name));
+		$("#boundary_type").attr("value", unescape(boundary_type_id));
+		$("#parent_id").attr("value", unescape(parent_id));
+		$("#boundary_color").attr("value", unescape(boundary_color));
+	}
 
 	// Ajax Submission
-	function boundaryAction(action, confirmAction, boundary_id )
-	{
+	function boundaryAction(action, confirmAction, boundary_id) {
 		var statusMessage;
 		if( !isChecked( "boundary" ) && boundary_id =='' )
 		{

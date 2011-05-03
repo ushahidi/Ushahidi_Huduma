@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS `boundary` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`boundary_name` VARCHAR(45) NOT NULL ,
 	`boundary_type` INT NOT NULL , -- Type 1 = County, Type 2 = Constituency
+	`boundary_layer_file` VARCHAR(100),
+	`boundary_color` VARCHAR(10),
 	`parent_id` INT NOT NULL DEFAULT 0,
-	`creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`boundary_layer_visible` INT NOT NULL DEFAULT 1,
 	PRIMARY KEY (`id`) 
 ) COMMENT = 'List of administrative boundaries (specific names of the various admin boundaries)';
 

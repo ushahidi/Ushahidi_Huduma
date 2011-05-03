@@ -33,7 +33,8 @@ class Boundary_Model extends ORM {
 		$array = Validation::factory($array)
 					->pre_filter('trim', TRUE)
 					->add_rules('boundary_name', 'required')
-					->add_rules('boundary_type', 'required', 'chars[1,2]');
+					->add_rules('boundary_type', 'required', 'chars[1,2]')
+					->add_rules('boundary_color', 'required', 'length[6,6]');
 		
 		// Check if the parent id has been set
 		if ( ! empty($array->parent_id) AND $array->parent_id != 0)

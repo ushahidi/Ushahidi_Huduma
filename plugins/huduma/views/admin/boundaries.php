@@ -18,18 +18,66 @@
 					<?php navigator::subtabs("boundaries"); ?>
 				</h2>
 
+				<!-- tabs -->
 				<div class="tabs">
 					<!-- tabset -->
+					<a name="add"></a>
 					<ul class="tabset">
-						<li><a href="<?php echo url::site() ?>admin/servicedelivery" class="active"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+						<li><a href="#" class="active" onclick="show_addedit(true)"><?php echo Kohana::lang('ui_main.add_edit'); ?></a></li>
 					</ul>
-					<!-- /tabset -->
 
-					<div class="tab">
-						<ul>
-							<li><a href="#" onclick="boundaryAction('d','DELETE', '');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_action')) ;?></a></li>
-							<li><a href="#" onclick="boundaryAction('x','DELETE ALL ', '000');"><?php echo strtoupper(Kohana::lang('ui_admin.delete_all')) ;?></a></li>
-						</ul>
+					<!-- tab -->
+					<div class="tab" id="addedit" style="display:none;">
+						<?php print form::open(NULL,array('enctype' => 'multipart/form-data', 'id' => 'boundaryMain', 'name' => 'boundaryMain')); ?>
+							<input type="hidden" id="boundary_id" name="boundary_id" value="<?php echo $form['boundary_id']; ?>" />
+							<input type="hidden" name="action" id="action" value="a" />
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('ui_huduma.boundary_name');?></strong><br />
+								<?php print form::input('boundary_name', $form['boundary_name'], ' class="text long2"'); ?>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('ui_huduma.boundary_type');?></strong><br />
+								<span class="my-sel-holder"><?php print form::dropdown('boundary_type', $boundary_types, $form['boundary_type']); ?></span>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('ui_huduma.parent_boundary');?></strong><br />
+								<span class="my-sel-holder"><?php print form::dropdown('parent_id', $parent_boundaries, $form['parent_id']); ?></span>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('ui_main.color'); ?></strong><br />
+								<?php print form::input('boundary_color', $form['boundary_color'], ' class="text"'); ?>
+								<script type="text/javascript" charset="utf-8">
+									$(document).ready(function() {
+										$('#boundary_color').ColorPicker({
+											onSubmit: function(hsb, hex, rgb) {
+												$('#boundary_color').val(hex);
+											},
+											onChange: function(hsb, hex, rgb) {
+												$('#boundary_color').val(hex);
+											},
+											onBeforeShow: function () {
+												$(this).ColorPickerSetColor(this.value);
+											}
+										})
+										.bind('keyup', function(){
+											$(this).ColorPickerSetColor(this.value);
+										});
+									});
+								</script>
+							</div>
+							<div style="clear: both"></div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('ui_huduma.upload_geojson_file');?>:</strong><br />
+								<?php
+									print form::upload('boundary_layer_file', '', '');
+								?>
+							</div>
+							<div style="clear: both"></div>
+							<div class="tab_form_item">
+								&nbsp;<br />
+								<input type="image" src="<?php echo url::base() ?>media/img/admin/btn-save.gif" class="save-rep-btn" value="SAVE" />
+							</div>
+						<?php print form::close(); ?>
 					</div>
 				</div>
 
@@ -65,9 +113,7 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<th class="col-1">
-										<input type="checkbox" id="checkAllBoundaries" class="check-box" onclick="CheckAll(this.id, 'boundary_id[]')"
-										</th>
+										<th class="col-1"></th>
 										<th class="col-2"><?php echo Kohana::lang('ui_main.name'); ?></th>
 										<th class="col-3"><?php echo Kohana::lang('ui_huduma.boundary_type'); ?></th>
 										<th class="col-4"><?php echo Kohana::lang('ui_admin.actions'); ?></th>
@@ -88,15 +134,11 @@
 								
 								<?php foreach ($boundaries as $boundary): ?>
 								<tr>
-									<td class="col-1">
-										<input type="checkbox" class="check-box" id="boundary" name="boundary_id" value="<?php echo $boundary->id?>" />
-									</td>
+									<td class="col-1"></td>
 									<td class="col-2"><?php echo $boundary->boundary_name; ?></td>
 									<td class="col-3">
 										<?php 
-											echo ($boundary->boundary_type == 1)
-													? Kohana::lang('ui_huduma.county') 
-													: Kohana::lang('ui_huduma.constituency');
+											echo ($boundary->boundary_type == 1) ? Kohana::lang('ui_huduma.county') : Kohana::lang('ui_huduma.constituency');
 										?>
 									</td>
 									<td class="col-4">
@@ -105,7 +147,8 @@
 												<a href="#add" onClick="fillFields('<?php echo(rawurlencode($boundary->id)); ?>',
 												'<?php echo (rawurlencode($boundary->boundary_name)); ?>',
 												'<?php echo (rawurlencode($boundary->boundary_type)); ?>',
-												'<?php echo (rawurlencode($boundary->parent_id)); ?>')">
+												'<?php echo (rawurlencode($boundary->parent_id)); ?>',
+												'<?php echo rawurlencode($boundary->boundary_color); ?>')">
 												<?php echo Kohana::lang('ui_main.edit'); ?>
 												</a>
 											</li>
@@ -124,37 +167,4 @@
 					<?php print form::close(); ?>
 				</div>
 
-				<!-- tabs -->
-				<div class="tabs">
-					<!-- tabset -->
-					<a name="add"></a>
-					<ul class="tabset">
-						<li><a href="#" class="active"><?php echo Kohana::lang('ui_main.add_edit'); ?></a></li>
-					</ul>
-
-					<!-- tab -->
-					<div class="tab">
-						<?php print form::open(NULL,array('id' => 'boundaryMain', 'name' => 'boundaryMain')); ?>
-							<input type="hidden" id="boundary_id" name="boundary_id" value="<?php echo $form['boundary_id']; ?>" />
-							<input type="hidden" name="action" id="action" value="a" />
-							<div class="tab_form_item">
-								<strong><?php echo Kohana::lang('ui_huduma.boundary_name');?></strong><br />
-								<?php print form::input('boundary_name', $form['boundary_name'], ' class="text long2"'); ?>
-							</div>
-							<div class="tab_form_item">
-								<?php echo Kohana::lang('ui_huduma.boundary_type');?><br />
-								<span class="my-sel-holder"><?php print form::dropdown('boundary_type', $boundary_types, $form['boundary_type']); ?></span>
-							</div>
-							<div class="tab_form_item">
-								<?php echo Kohana::lang('ui_huduma.parent_boundary');?><br />
-								<span class="my-sel-holder"><?php print form::dropdown('parent_id', $parent_boundaries, $form['parent_id']); ?></span>
-							</div>
-							<div style="clear: both"></div>
-							<div class="tab_form_item">
-								&nbsp;<br />
-								<input type="image" src="<?php echo url::base() ?>media/img/admin/btn-save.gif" class="save-rep-btn" value="SAVE" />
-							</div>
-						<?php print form::close(); ?>
-					</div>
-				</div>
 			</div>
