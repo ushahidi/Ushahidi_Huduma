@@ -86,7 +86,7 @@
                             <tbody>
                                 <?php if ($total_items == 0): ?>
                                     <tr>
-                                        <td colspan="3" class="col">
+                                        <td colspan="4" class="col">
                                             <h3><?php echo Kohana::lang('ui_admin.no_result_display_msg');?></h3>
                                         </td>
                                     </tr>

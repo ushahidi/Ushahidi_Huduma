@@ -118,6 +118,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$entity_comments_form->form_saved = $form_saved;
 
 			$this->template->content->entity_comments_form = $entity_comments_form;
+			$this->template->content->entity_id = $this->static_entity_id;
 
 			// Javascript header
 			$this->themes->map_enabled = TRUE;
