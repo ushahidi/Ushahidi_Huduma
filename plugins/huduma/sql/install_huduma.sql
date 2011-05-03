@@ -2,24 +2,13 @@
  * Creates the DB tables for the service delivery plugin
  */
 
--- 
--- Table boundary_type
 --
-CREATE TABLE IF NOT EXISTS `boundary_type` (
-	`id` INT NOT NULL AUTO_INCREMENT,
-	`boundary_type_name` VARCHAR(45) NOT NULL ,
-	`parent_id` INT NOT NULL DEFAULT 0 ,
-	`creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`)
-) COMMENT = 'Types of administrative boundaries e.g. province, district, ward, constituency etc';
-
---
--- Table adminstrative_boundary
+-- Table boundary
 --
 CREATE TABLE IF NOT EXISTS `boundary` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`boundary_name` VARCHAR(45) NOT NULL ,
-	`boundary_type` INT NOT NULL ,
+	`boundary_type` INT NOT NULL , -- Type 1 = County, Type 2 = Constituency
 	`parent_id` INT NOT NULL DEFAULT 0,
 	`creation_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`) 

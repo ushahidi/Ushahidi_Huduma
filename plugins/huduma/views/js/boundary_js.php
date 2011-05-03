@@ -22,7 +22,7 @@
      function fillFields(id, boundary_name, boundary_type_id, parent_id) {
         $("#boundary_id").attr("value", unescape(id));
         $("#boundary_name").attr("value", unescape(boundary_name));
-        $("#boundary_type_id").attr("value", unescape(boundary_type_id));
+        $("#boundary_type").attr("value", unescape(boundary_type_id));
         $("#parent_id").attr("value", unescape(parent_id));
     }
 

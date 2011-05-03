@@ -41,7 +41,7 @@
 					</div>
 				</div>
                 
-                <div class="dashboard_container">
+				<div class="dashboard_container">
 					<?php print form::open(NULL, array('id'=>'entityForm', 'name'=>'entityForm')); ?>
 						<input type="hidden" name="save" id="save" value="" />
 						<input type="hidden" name="action" value="a" />

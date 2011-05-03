@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * Model for Administrative Boundaries
+ * Model for the boundaries tablex
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -9,74 +9,100 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Administrative Boundary Model
+ * @module     Boundary Model
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 class Boundary_Model extends ORM {
+
     // Table name
     protected $table_name = 'boundary';
 
-    // Relationships
-    protected $belongs_to = array('boundary_type');
-
+	// Relationships
+	protected $has_many = array('static_entity', 'incident');
 
 	/**
-	 * Helper method to get the list of boundaries whose parent id is specified
-	 * in @param $parent_id
+	 * Validates and optionally saves a new boundary record from an array
+	 * 
+	 * @param 	array 	$array 	values to check
+	 * @param	boolean	$save	Save the record when validation succeeds
+	 * @return	boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+		$array = Validation::factory($array)
+					->pre_filter('trim', TRUE)
+					->add_rules('boundary_name', 'required')
+					->add_rules('boundary_type', 'required', 'chars[1,2]');
+		
+		// Check if the parent id has been set
+		if ( ! empty($array->parent_id) AND $array->parent_id != 0)
+		{
+			$array->add_rules('parent_id', array('Boundary_Model', 'is_valid_boundary'));
+		}
+		
+		// Pass on validation to the parent
+		return parent::validate($array, $save);
+	}
+
+	/**
+	 * Gets the child boundaries for a specific parent boundary
 	 *
 	 * @param int $parent_id
-	 * @param boolean $include_type_name
 	 * @return array
-	 */
-	public static function get_boundaries_list($parent_id = FALSE, $include_type_name = TRUE)
+ 	 */
+	public static function get_child_boundaries($parent_id)
 	{
-		// To hold the return list
-		$boundaries = array();
-
-		// Fetch the boundary objects
-		$orm_iterator = ($parent_id == TRUE AND self::is_valid_boundary($parent_id))
-			? ORM::factory('boundary')
-					->where('parent_id', $parent_id)
-					->find_all()
-
-			: ORM::factory('boundary')->find_all();
-
-		// Fetch the items in the iterator into $boundaries
-		foreach ($orm_iterator as $item)
+		if ( ! self::is_valid_boundary($parent_id) OR $parent_id == 0)
 		{
-			// $boundary_type_name == TRUE, include name of the boundary type
-			$boundaries[$item->id] = $item->boundary_name.
-					(($include_type_name)? ' '.$item->boundary_type->boundary_type_name : '');
+			// Invalid parent, FAIL!
+			return FALSE;
 		}
-
-		// Return
-		return $boundaries;
-
+		else
+		{
+			// Return list of boundaries
+			return self::factory('boundary')
+						->select_list('id',	'boundary_name')
+						->where(array('parent_id' => $parent_id));
+		}
 	}
-
+	
 	/**
-	 * Gets the list of boundaries whose boundary type in @param $type_id
+	 * Gets the list of parent boundaries - the ones that have children
 	 *
-	 * @param int $type_id
 	 * @return array
 	 */
-	public static function get_boundaries_list_by_type($type_id)
+	public static function get_parent_boundaries()
 	{
-		return Boundary_Type_Model::is_valid_boundary_type($type_id)
-			? self::factory('boundary')
-				->select('id', 'boundary_name')
-				->where('boundary_type_id', $type_id)
-				->find_all()
-
-			: array();
-
+		// Get list
+		$parents = self::factory('boundary')
+					->select('id', 'boundary_name', 'boundary_type')
+					->where('parent_id', 0)
+					->orderby('id', 'asc')
+					->find_all();
+		
+		// To hold the return values		
+		$list = array();
+		foreach($parents as $parent)
+		{
+			// Construct the boundary name
+			$boundary_name = $parent->boundary_name;
+			$boundary_name .= ($parent->boundary_type == 1)
+									? " ".Kohana::lang('ui_huduma.county') 
+									: " ".Kohana::lang('ui_huduma.constituency');
+			
+			$list[$parent->id] = $boundary_name;
+		}
+		
+		// Return
+		return $list;
 	}
 
 	/**
-	 * Checks if the boundary in @param $boundary_id exists in the database
-	 * @param int $boundary_id
-	 * @return boolean
+	 * Checks if a boundary with the specifid id exists in the database
+	 *
+	 * @param 	int $boundary_id	Boundary id to lookup in the database
+	 * @return 	boolean
 	 */
 	public static function is_valid_boundary($boundary_id)
 	{
