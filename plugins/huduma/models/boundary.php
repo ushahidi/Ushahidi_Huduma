@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * Model for the boundaries tablex
+ * Model for the boundaries table
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -15,8 +15,8 @@
  */
 class Boundary_Model extends ORM {
 
-    // Table name
-    protected $table_name = 'boundary';
+	// Table name
+	protected $table_name = 'boundary';
 
 	// Relationships
 	protected $has_many = array('static_entity', 'incident');
@@ -62,8 +62,8 @@ class Boundary_Model extends ORM {
 		{
 			// Return list of boundaries
 			return self::factory('boundary')
-						->select_list('id',	'boundary_name')
-						->where(array('parent_id' => $parent_id));
+					->select_list('id',	'boundary_name')
+					->where(array('parent_id' => $parent_id));
 		}
 	}
 	
@@ -88,8 +88,8 @@ class Boundary_Model extends ORM {
 			// Construct the boundary name
 			$boundary_name = $parent->boundary_name;
 			$boundary_name .= ($parent->boundary_type == 1)
-									? " ".Kohana::lang('ui_huduma.county') 
-									: " ".Kohana::lang('ui_huduma.constituency');
+								? " ".Kohana::lang('ui_huduma.county') 
+								: " ".Kohana::lang('ui_huduma.constituency');
 			
 			$list[$parent->id] = $boundary_name;
 		}
