@@ -20,6 +20,15 @@
         </div>
     </div>
 
+	<div id="facebox" style="display: none;">
+		<div class="popup">
+			<div class="content"></div>
+			<a href="#" class="close">
+				<img src="<?php echo url::base().'plugins/huduma/views/images/closelabel.png'; ?>", class="close_image">
+			</a>
+		</div>
+	</div>
+
     <div class="report-form">
         <div class="entity-name">
             <div class="row">

@@ -159,115 +159,116 @@ class Home_Controller extends Dashboard_Template_Controller {
 	 */
 	public function entity_profile()
 	{
-	    // Ensure the user has a static entity role
-	    if ( ! $this->static_entity_role)
-	    {
-	        // Go back to home page
-	        $this->index();
-	    }
-	    
-	    // Load the entity view page with edit options
-	    $this->template->content = new View('frontend/dashboards/entity_profile');
-	    
-	    // Setup forms
-	    $form = array(
-	        'entity_id' => '',
-	        'entity_name' => '',
-	        'latitude' => '',
-	        'longitude' => '',
-	        'static_entity_type_id' => '',
-	        'agency_id' => '',
-	        'boundary_id' => ''
-	    );
-	    
-	    // Copy form as errors
-	    $errors = $form;
-	    
-	    $form_error = FALSE;
-	    $form_saved = FALSE;
-	    
-	    // Dashboard panel
-	    $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-	    $dashboard_panel->static_entity_panel = TRUE;
-	    
-	    $this->template->content->dashboard_panel = $dashboard_panel;
+		// Ensure the user has a static entity role
+		if ( ! $this->static_entity_role)
+		{
+			// Go back to home page
+			$this->index();
+		}
 
-	    // Retrieve the entity
-	    $entity = new Static_Entity_Model($this->static_entity_id);
+		// Load the entity view page with edit options
+		$this->template->content = new View('frontend/dashboards/entity_profile');
+
+		// Setup forms
+		$form = array(
+			'entity_id' => '',
+			'entity_name' => '',
+			'latitude' => '',
+			'longitude' => '',
+			'static_entity_type_id' => '',
+			'agency_id' => '',
+			'boundary_id' => ''
+		);
 	    
-	    // Has the form been submitted - For metadata update or otherwise
-	    if ($_POST)
-	    {
-	        $data = arr::extract($_POST, 'entity_name', 'longitude', 'latitude', 'agency_id', 'boundary_id', 'static_entity_type_id');
+		// Copy form as errors
+		$errors = $form;
+
+		$form_error = FALSE;
+		$form_saved = FALSE;
+
+		// Dashboard panel
+		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+		$dashboard_panel->static_entity_panel = TRUE;
+
+		$this->template->content->dashboard_panel = $dashboard_panel;
+
+		// Retrieve the entity
+		$entity = new Static_Entity_Model($this->static_entity_id);
+	    
+		// Has the form been submitted - For metadata update or otherwise
+		if ($_POST)
+		{
+			$data = arr::extract($_POST, 'entity_name', 'longitude', 'latitude', 'agency_id', 'boundary_id', 'static_entity_type_id');
 	        
-	        // Validation
-	        if ($entity->validate($data))
-	        {
-	            // Success! Save
-	            $entity->save();
-	            
-                // Turn on form_saved
-	            $form_saved = TRUE;
-	            $form_error = FALSE;
-	            
-    	        // Set the form values
-        	    $form = array(
-        	        'entity_name' => $entity->entity_name,
-        	        'latitude' => $entity->latitude,
-        	        'longitude' => $entity->longitude,
-        	        'static_entity_type_id' => $entity->static_entity_type_id,
-        	        'agency_id' => $entity->agency_id,
-        	        'boundary_id' => $entity->boundary_id,
-        	    );
-	        }
-	        else
-	        {
-                // Turn on the form error
-	            $form_error = TRUE;
-	            $form_saved = FALSE;
-	            
-                // Populate forms and erros with new values
-	            $form = arr::overwrite($form, $data->as_array());
-	            $errors = arr::overwrite($errors, $data->errors());
-	        }
-	    }
-	    else
-	    {
-	        // Set the form values
-    	    $form = array(
-    	        'entity_name' => $entity->entity_name,
-    	        'latitude' => $entity->latitude,
-    	        'longitude' => $entity->longitude,
-    	        'static_entity_type_id' => $entity->static_entity_type_id,
-    	        'agency_id' => $entity->agency_id,
-    	        'boundary_id' => $entity->boundary_id,
-    	    );
-	    }
+			// Validation
+			if ($entity->validate($data))
+			{
+				// Success! Save
+				$entity->save();
+
+				// Turn on form_saved
+				$form_saved = TRUE;
+				$form_error = FALSE;
+
+				// Set the form values
+				$form = array(
+					'entity_name' => $entity->entity_name,
+					'latitude' => $entity->latitude,
+					'longitude' => $entity->longitude,
+					'static_entity_type_id' => $entity->static_entity_type_id,
+					'agency_id' => $entity->agency_id,
+					'boundary_id' => $entity->boundary_id,
+				);
+			}
+			else
+			{
+				// Turn on the form error
+				$form_error = TRUE;
+				$form_saved = FALSE;
+
+				// Populate forms and erros with new values
+				$form = arr::overwrite($form, $data->as_array());
+				$errors = arr::overwrite($errors, $data->errors());
+			}
+		}
+		else
+		{
+			// Set the form values
+			$form = array(
+				'entity_name' => $entity->entity_name,
+				'latitude' => $entity->latitude,
+				'longitude' => $entity->longitude,
+				'static_entity_type_id' => $entity->static_entity_type_id,
+				'agency_id' => $entity->agency_id,
+				'boundary_id' => $entity->boundary_id,
+			);
+		}
 	    
-	    $entity_metadata = new View('frontend/dashboards/entity_metadata_view');
-	    $entity_metadata->static_entity_id = $this->static_entity_id;
-	    $entity_metadata->metadata_items = Static_Entity_Model::get_metadata($this->static_entity_id);
-	    
-        // Set data for the content view
-        $this->template->content->form = $form;
-        $this->template->content->errors = $errors;
-        $this->template->content->form_saved = $form_saved;
-        $this->template->content->form_error = $form_error;
-        $this->template->content->entity_types_dropdown = Static_Entity_Type_Model::get_entity_types_dropdown();
-        $this->template->content->agencies_dropdown = Agency_Model::get_agencies_dropdown();
-        $this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropdown();
-        $this->template->content->entity_metadata = $entity_metadata;
+		$entity_metadata = new View('frontend/dashboards/entity_metadata_view');
+		$entity_metadata->static_entity_id = $this->static_entity_id;
+		$entity_metadata->metadata_items = Static_Entity_Model::get_metadata($this->static_entity_id);
+
+		// Set data for the content view
+		$this->template->content->form = $form;
+		$this->template->content->errors = $errors;
+		$this->template->content->form_saved = $form_saved;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->entity_types_dropdown = Static_Entity_Type_Model::get_entity_types_dropdown();
+		$this->template->content->agencies_dropdown = Agency_Model::get_agencies_dropdown();
+		$this->template->content->boundaries_dropdown = Boundary_Model::get_boundaries_dropdown();
+		$this->template->content->entity_metadata = $entity_metadata;
         
-        //  Javascript header
-        $this->themes->map_enabled = TRUE;
-        $this->themes->js = new View('js/entity_edit_js');
-        $this->themes->js->longitude = $entity->longitude;
-        $this->themes->js->latitude = $entity->latitude;
-        $this->themes->js->default_map = Kohana::config('settings.default_map');
-        $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
-        $this->themes->js->add_metadata_dialog_url = url::site().'dashboards/home/metadata_add/'.$this->static_entity_id;
-        $this->themes->js->metadata_update_url = url::site().'dashboards/home/metadata_update';
-        $this->themes->js .= new View('js/dashboard_common_js');
+		//  Javascript header
+		$this->themes->map_enabled = TRUE;
+		$this->themes->js = new View('js/entity_edit_js');
+		$this->themes->js->longitude = $entity->longitude;
+		$this->themes->js->latitude = $entity->latitude;
+		$this->themes->js->default_map = Kohana::config('settings.default_map');
+		$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
+		$this->themes->js->new_metadata_item_url = url::site().'dashboards/home/metadata_new';
+		$this->themes->js->add_metadata_dialog_url = url::site().'dashboards/home/metadata_add/'.$this->static_entity_id;
+		$this->themes->js->metadata_update_url = url::site().'dashboards/home/metadata_update';
+		$this->themes->js .= new View('js/dashboard_common_js');
         
 		// Set the header block
 		$this->template->header->header_block = $this->themes->header_block();
@@ -460,66 +461,80 @@ class Home_Controller extends Dashboard_Template_Controller {
 	 /**
 	  * Handles metadata update
 	  */
-	 public function metadata_update()
-	 {
-	     // No template for this method
-	     $this->template = "";
-	     $this->auto_render = FALSE;
+	public function metadata_update()
+	{
+		// No template for this method
+		$this->template = "";
+		$this->auto_render = FALSE;
+
+		// Set the headers
+		header("Content-type: application/json; charset=utf-8");
 	     
-	     // Set the headers
-	     header("Content-type: application/json; charset=utf-8");
-	     
-	     if ($_POST)
-	     {
+		if ($_POST)
+		{
 	         if ($_POST['action'] == 's')
 	         {
-	             // Save Action
-    	         $data = arr::extract($_POST, 'item_value', 'item_label', 'as_of_year');
-    	         $data = array_merge($data, array('static_entity_id' => $this->static_entity_id));
-    	         
-    	         $static_entity_metadata = new Static_Entity_Metadata_Model($_POST['id']);
-	         
-    	         if ($static_entity_metadata->validate($data))
-    	         {
-    	             $static_entity_metadata->save();
-    	             print json_encode(array('success' => TRUE));
-    	         }
-    	         else
-    	         {
-    	             print json_encode(array('success' => FALSE));
-    	         }
-    	    }
-    	    elseif ($_POST['action'] == 'd')
-    	    {
-    	        // Delete static entity metadata item
-    	        $static_entity_metadata = ORM::factory('static_entity_metadata', $_POST['id']);
-    	        if ($static_entity_metadata->loaded)
-    	        {
-    	            $static_entity_metadata->delete();
-    	            
-    	            print json_encode(array('success' => TRUE));
-    	        }
-    	        else
-    	        {
-    	            print json_encode(array('success' => FALSE));
-    	        }
-    	    }
-    	}
-    	else
-    	{
-    	    print json_encode(array(
-    	        'success' => FALSE
-    	    ));
-    	}
-    }
+				// Save Action
+				$data = arr::extract($_POST, 'item_value', 'item_label', 'as_of_year');
+				$data = array_merge($data, array('static_entity_id' => $this->static_entity_id));
+
+				$static_entity_metadata = new Static_Entity_Metadata_Model($_POST['id']);
+
+				if ($static_entity_metadata->validate($data))
+				{
+					$static_entity_metadata->save();
+					print json_encode(array('success' => TRUE));
+				}
+				else
+				{
+					print json_encode(array('success' => FALSE));
+				}
+			}
+			elseif ($_POST['action'] == 'n')	// Adding new item(s)
+			{
+				navigator::save_new_metadata_items();
+			}
+			elseif ($_POST['action'] == 'd')
+			{
+				// Delete static entity metadata item
+				$static_entity_metadata = ORM::factory('static_entity_metadata', $_POST['id']);
+				if ($static_entity_metadata->loaded)
+				{
+					$static_entity_metadata->delete();
+
+					print json_encode(array('success' => TRUE));
+				}
+				else
+				{
+					print json_encode(array('success' => FALSE));
+				}
+			}
+		}
+		else
+		{
+			print json_encode(array('success' => FALSE));
+		}
+	}
     
-    /**
-     * Loads the view for the metadata dialog
-     */
-    public function metadata_add($entity_id)
-    {
-        $this->template = new View("admin/entity_metadata_dialog");
-        $this->template->static_entity_id = $this->static_entity_id;
-    }
+	/**
+	 * Loads the view for the metadata dialog
+	 */
+	public function metadata_add($entity_id)
+	{
+		$this->template = new View("admin/entity_metadata_dialog");
+		$this->template->static_entity_id = $this->static_entity_id;
+	}
+
+	/**
+	 * Prints the HTML for adding a metadata item on the UI
+	 */
+	public function metadata_new()
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+		
+		// Verify that the entity id exists
+		print navigator::get_metadata_item_row();
+	}
 }
 ?>

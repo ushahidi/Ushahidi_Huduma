@@ -114,52 +114,173 @@ class navigator_Core {
      * @param   int $comment_id
      * @return  string
      */
-    public static function inline_comments($incident_id)
-    {
-        // To hold the comment tree
-        $comment_tree = '';
+	public static function inline_comments($incident_id)
+	{
+		// To hold the comment tree
+		$comment_tree = '';
+
+		// Fetch the inline commnets
+		$children = Incident_Model::get_comments($incident_id);
+
+		Kohana::log('info', sprintf('Fetch %d comments for entity %d', $children->count(), $entity_id));
         
-        // Fetch the inline commnets
-        $children = Incident_Model::get_comments($incident_id);
-        
-        Kohana::log('info', sprintf('Fetch %d comments for entity %d', $children->count(), $entity_id));
-        
-        if ($children->count() > 0)
-        {
-            $comment_tree .= "<ul class=\"children inlinecomments\">";
+		if ($children->count() > 0)
+		{
+			$comment_tree .= "<ul class=\"children inlinecomments\">";
             
-            foreach ($children as $comment)
-            {
-                $comment_tree .= "<li class=\"inlinecomment\" style=\"clear: both;\"  id=\"dashboard_comment_".$comment->id."\">";
-                $comment_tree .= "  <div class=\"dashboard_comment_block\">";
-                
-                // Comment author, date and time
-                $comment_tree .= "      <div>";
-                $comment_tree .= "          <strong>".$comment->comment_author."</strong>&nbsp;";
-                $comment_tree .= "          <span class=\"comment_date_time\">";
-                $comment_tree .= "          ".date('g:m a', strtotime($comment->comment_date))."&nbsp;on&nbsp;";
-                $comment_tree .= "          ".date('F j, Y', strtotime($comment->comment_date));
-                $comment_tree .= "          </span>";
-                $comment_tree .= "      </div>";
-                
-                // Comment description
-                $comment_tree .= "      <div class=\"dashboard_comment_text\">";
-                $comment_tree .= "          <p>".$comment->comment_description."</p>";
-                $comment_tree .= "      </div>";
-                
-                $comment_tree .= "  </div>";
-                
-                // Comment box/form holder
-                $comment_tree .= "<div class=\"comment_box_holder\"></div>";
-                
-                // Close the parent comment
-                $comment_tree .= "</li>";
-            }
-            
-            $comment_tree .= "</ul>";
-        }
-        
-        return $comment_tree;
-    }    
+			foreach ($children as $comment)
+			{
+				$comment_tree .= "<li class=\"inlinecomment\" style=\"clear: both;\"  id=\"dashboard_comment_".$comment->id."\">";
+				$comment_tree .= "  <div class=\"dashboard_comment_block\">";
+
+				// Comment author, date and time
+				$comment_tree .= "      <div>";
+				$comment_tree .= "          <strong>".$comment->comment_author."</strong>&nbsp;";
+				$comment_tree .= "          <span class=\"comment_date_time\">";
+				$comment_tree .= "          ".date('g:m a', strtotime($comment->comment_date))."&nbsp;on&nbsp;";
+				$comment_tree .= "          ".date('F j, Y', strtotime($comment->comment_date));
+				$comment_tree .= "          </span>";
+				$comment_tree .= "      </div>";
+
+				// Comment description
+				$comment_tree .= "      <div class=\"dashboard_comment_text\">";
+				$comment_tree .= "          <p>".$comment->comment_description."</p>";
+				$comment_tree .= "      </div>";
+
+				$comment_tree .= "  </div>";
+
+				// Comment box/form holder
+				$comment_tree .= "<div class=\"comment_box_holder\"></div>";
+
+				// Close the parent comment
+				$comment_tree .= "</li>";
+			}
+			
+			$comment_tree .= "</ul>";
+		}
+
+		return $comment_tree;
+	}
+	
+	/**
+	 * Generates the HTML for adding a new metadata item
+	 */
+	public static function get_metadata_item_row()
+	{
+		if ($_POST AND Static_Entity_Model::is_valid_static_entity($_POST['entity_id']))
+		{
+			$item_id  = $_POST['item_id'];
+
+			// Build the HTML for the metadata item
+			$html = "<div class=\"row\">";
+
+			// Metadata label
+			$html .= "<div class=\"forms_item\">";
+			$html .= "<h4>".Kohana::lang('ui_huduma.item_label')."</h4>";
+			$html .= "<input type=\"text\" name=\"metadata_label\" id=\"metadata_label_".$item_id."\" class=\"text medium\" value=\"\">";
+			$html .="</div>";
+			
+			// Metadata value
+			$html .= "<div class=\"forms_item\">";
+			$html .= "<h4>".Kohana::lang('ui_huduma.value')."</h4>";
+			$html .= "<input type=\"text\" name=\"metadata_value\" id=\"metadata_value_".$item_id."\" class=\"text\" value=\"\">";
+			$html .="</div>";
+			
+			// Metadata date
+			$html .= "<div class=\"forms_item\">";
+			$html .= "<h4>".Kohana::lang('ui_huduma.as_of_year')."</h4>";
+			$html .= "<input type=\"text\" maxchars=\"4\" name=\"metadata_as_of_date\" id=\"metadata_as_of_year_".$item_id."\" class=\"text\" value=\"".date('Y')."\">";
+			$html .="</div>";
+
+			$html .= "</div>";
+
+			return json_encode(array(
+				'status' => TRUE,
+				'response' => $html
+			));
+		}
+		else
+		{
+			return json_encode(array(
+				'status' => FALSE,
+				'response' => Kohana::lang('ui_huduma.invalid_static_entity')
+			));
+		}		
+	}
+	
+	/**
+	 * Helper function for saving metadata items
+	 */
+	public static function save_new_metadata_items()
+	{
+		// Has the form been submitted
+		if ($_POST)
+		{
+			// Get the entity id
+			$entity_id  = $_POST['entity_id'];
+
+			if(Static_Entity_Model::is_valid_static_entity($entity_id))
+			{
+			    // Set up validation, add some filters and validation rules
+			    $post = Validation::factory($_POST)
+			                ->pre_filter('trim')
+			                ->add_rules('metadata_label.*', 'required')
+			                ->add_rules('metadata_value.*', 'required')
+			                ->add_rules('metadata_as_of_year.*', 'required', 'numeric');
+
+				// Test validation rules
+				if ($post->validate() AND count($_POST) > 1)
+				{
+					// To hold the new metadata
+					$new_metadata = array();
+
+					// Iterate over $_POST array and create a json structure for each item
+					for ($i=0; $i < count($post->metadata_value); $i++)
+					{
+						// Create metadata entry
+						$static_entity_metadata = new Static_Entity_Metadata_Model();
+						$static_entity_metadata->static_entity_id = $entity_id;
+						$static_entity_metadata->item_label = $post->metadata_label[$i];
+						$static_entity_metadata->item_value = $post->metadata_value[$i];
+						$static_entity_metadata->as_of_year = $post->metadata_as_of_year[$i];
+
+						// SAVE
+						$static_entity_metadata->save();
+
+						 // Construct JSON 
+						$json_item = "{";
+						$json_item .= "\"label\": \"".$post->metadata_label[$i]."\",";
+						$json_item .="\"value\": \"".$post->metadata_value[$i]."\",";
+						$json_item .= "\"as_of_year\": \"". $post->metadata_as_of_year[$i]."\"";
+						$json_item .="}";
+
+						array_push($new_metadata, $json_item);
+					}
+
+					print json_encode(array(
+						'status' => TRUE,
+						'metadata' => json_decode("[".implode(",", $new_metadata)."]"),
+						'message' => Kohana::lang('ui_huduma.metadata_item_added')
+					));
+				}
+				
+			}
+			else
+			{
+				print json_encode(array(
+					'status' => FALSE,
+					'message' => Kohana::lang('ui_huduma.error.invalid_metadata')
+				));
+			}
+		}
+		else
+		{
+			print json_encode(array(
+				'status' => FALSE,
+				'message' => Kohana::lang('ui_huduma.error.invalid_entity_id')
+			));
+		}
+		
+	}
 }
 ?>

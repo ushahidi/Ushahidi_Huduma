@@ -16,6 +16,7 @@
 	'entity' => 'Entity',
 	'entities' => 'Static Entities',
 	'entity_name'	=> 'Entity Name',
+	'entity_saved' => 'Static entity added/edited',
 	'entity_type' => 'Entity Type',
 	'entity_types' => 'Static Entity Types',
 	'entity_type_name' => 'Entity Type Name',
@@ -93,6 +94,7 @@
 	'county' => 'County',
 	'constituency' => 'Constituency',
 	'upload_geojson_file' => 'Upload GeoJSON File',
+	'metadata_item_added' => 'Metadata item added',
 
 	// Error Messages
 	'error'	=> array(

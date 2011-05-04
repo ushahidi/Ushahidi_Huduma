@@ -138,64 +138,70 @@
 
 		// Displays the dialog for adding metadata items
 		function showAddMetadataDialog(entity_id) {
-    		// Display the dialog
-    		$("#facebox .content").attr("class", "content body");
-    		$("#facebox").css("display", "block");
-            $("#facebox .content").css("width", "650px");
-    		
-    		// Reset item count
-    		metadataItemCount = 0;
-    		
-    		$.facebox(function(){
-    		    jQuery.get('<?php echo $add_metadata_dialog_url; ?>',
-    		        function(data){
-    		            // Set the dialog data
-    		            jQuery.facebox(data);
-    		            
-            		    // Event handler for the save button
-            		    $("#save_metadata").click(function(){
-            		        // Only post if the metadata count > 0
-            				if (metadataItemCount > 0) {
-            					// To hold the metadata items
-            					var metadata_label = [];
-            					var metadata_value = [];
-            					var metadata_as_of_year = [];
+			// Display the dialog
+			$("#facebox .content").attr("class", "content body");
+			$("#facebox").css("display", "block");
+			$("#facebox .content").css("width", "650px");
 
-            					for (i=1; i<=metadataItemCount; i++) {
-            						metadata_label.push($("#metadata_label_" + i).val());
-            						metadata_value.push($("#metadata_value_" + i).val());
-            						metadata_as_of_year.push($("#metadata_as_of_year_" + i).val());
-            					}
+			// Reset item count
+			metadataItemCount = 0;
+    		
+			$.facebox(function(){
+				jQuery.get('<?php echo $add_metadata_dialog_url; ?>',
+					function(data){
+						// Set the dialog data
+						jQuery.facebox(data);
 
-            					// Save an items that may be on the dialog
-            					$.post('<?php echo  url::site() . 'admin/entities/metadata_save'; ?>',
-            					        {
-            					            entity_id: unescape(entity_id), metadata_label: metadata_label,
-            					            metadata_value: metadata_value, metadata_as_of_year: metadata_as_of_year
-            					        },
-            					        function(data) {
-            					            if (data.status) {
-            					                // Display the newly added items on the edit page
-            					                if ($("#metadata-list") != null) {
-            					                    // To hold the HTML of the newly added items
-            					                    var items_html = '';
+						// Event handler for the save button
+						$("#save_metadata").click(function(){
+							// Only post if the metadata count > 0
+							if (metadataItemCount > 0) {
+								// To hold the metadata items
+								var metadata_label = [];
+								var metadata_value = [];
+								var metadata_as_of_year = [];
+
+								for (i=1; i<=metadataItemCount; i++) {
+									metadata_label.push($("#metadata_label_" + i).val());
+									metadata_value.push($("#metadata_value_" + i).val());
+									metadata_as_of_year.push($("#metadata_as_of_year_" + i).val());
+								}
+
+								// Save an items that may be on the dialog
+								$.post('<?php echo  $metadata_update_url; ?>',
+										{
+											entity_id: unescape(entity_id), metadata_label: metadata_label,
+											metadata_value: metadata_value, metadata_as_of_year: metadata_as_of_year,
+											action: $("#metadata_form_action").val()
+										},
+										function(data) {
+											if (data.status) {
+												// Display the newly added items on the edit page
+												if ($("#metadata-list") != null) {
+													// To hold the HTML of the newly added items
+													var items_html = '';
             					                    
-            					                    $.each(data.metadata, function(item, i){
-            					                        items_html += '<tr>';
-            					                        items_html += '<td>'+this.label+'</td>';
-            					                        items_html += '<td>'+this.value+'</td>';
-            					                        items_html += '<td>'+this.as_of_year+'</td>';
-            					                        items_html += '</tr>'
-            					                    });
+													$.each(data.metadata, function(item, i){
+														items_html += '<tr>';
+														items_html += '<td>'+this.label+'</td>';
+														items_html += '<td>'+this.value+'</td>';
+														items_html += '<td>'+this.as_of_year+'</td>';
+														items_html += '</tr>'
+													});
             					                    
-            					                    $("#metadata-list tr:last").after(items_html);
-            					                    
-            					                    $.facebox.close;
-            					                }
-            					            } else {
-            					                // Show error message
-            					                alert(data.message);
-            					            }
+													$("#metadata-list tr:last").after(items_html);
+												}
+												// Show success message
+												$("#success_message").html('<div class="green-box"><h4>'+data.message+'</h4></div>');
+												$("#success_message").show('fast');
+												
+												// Close the dialog after 1.5s
+												setTimeout(function(){ $.facebox.close(); }, 1500);
+											} else {
+												// Show error message
+												$("#error_message").html('<div class="red-box"><h4>'+data.message+'</h4></div>');
+												$("#error_message").show('fast');
+											}
             					        },
             					        
             					        "json"
@@ -219,7 +225,7 @@
         function addMetadataItem(entity_id) {
             // Incremenent the metadata item counter
             metadataItemCount++;
-            $.post('<?php echo url::site() . 'admin/entities/metadata_new' ?>',
+            $.post('<?php echo $new_metadata_item_url; ?>',
                     { entity_id: unescape(entity_id), item_id: metadataItemCount },
                     function(data){
                         if (data.status) {
@@ -284,7 +290,7 @@
     		    var postData = { id : itemId, action : action };
     		    $.post('<?php echo $metadata_update_url; ?>', 
     		            postData,
-    		            function(reponse) {
+    		            function(response) {
     		                if (response.success) {
     		                    $(editRow).remove();
     		                } else {

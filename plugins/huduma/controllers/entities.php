@@ -440,111 +440,111 @@ class Entities_Controller extends Frontend_Controller {
         $this->template->form_error = FALSE;
     }
     
-    /**
-     * Handles report submission via the static entity page
-     */
-    public function report_submit($entity_id)
-    {
-        // Set temlate to empty string and disable auto rendering
-        $this->template = "";
-        $this->auto_render = FALSE;
-        
-        header("Content-type: application/json; charset=utf-8");
-        if ($_POST)
-        {
-            $location = Static_Entity_Model::get_as_location($entity_id);
-            
-            // Proceed if location is valid
-            if ($location)
-            {
-                // Setup validation
-                $post = Validation::factory($_POST)
-                                ->pre_filter('trim')
-                                ->add_rules('incident_title', 'required', 'length[3,200]')
-                                ->add_rules('incident_description', 'required')
-                                ->add_rules('incident_date', 'required', 'date_mmddyyyy')
-                                ->add_rules('incident_hour', 'required', 'between[1,12]')
-                                ->add_rules('incident_minute', 'required', 'between[0,59]');
-                                
-    			// Merideim validation for the incident time
-    			if ($post->incident_ampm != "pm" AND $post->incident_ampm != "am")
-    			{
-    				$post->add_error('incident_ampm', 'values');
-    			}
-                
-                // Test validation
-                if ($post->validate())
-                {
-                    // Success! Save Location
-                    $location->save();
-                    
-                    // Create Incident_Model instance and set properties
-                    $incident = new Incident_Model();
-                    $incident->incident_title = $post->incident_title;
-                    $incident->incident_description = $post->incident_description;
-                    $incident->location_id = $location->id;
-                    $incident->static_entity_id = $entity_id;
-                    
-                    // TODO Set the boundary id - Fetch this from the static entity
-                    
-    				// Set additional incident properties
-    				$incident_date = explode("/", $post->incident_date);
+	/**
+	 * Handles report submission via the static entity page
+	 */
+	public function report_submit($entity_id)
+	{
+		// Set temlate to empty string and disable auto rendering
+		$this->template = "";
+		$this->auto_render = FALSE;
 
-    				// The $_POST['date'] is a value posted by form in mm/dd/yyyy format
-    				$incident_date = $incident_date[2]."-".$incident_date[0]."-".$incident_date[1];
-    				
-    				$incident_time = $post->incident_hour.":".$post->incident_minute.":00 ".$post->incident_ampm;
-    				
-    				// NOTE: The date and time stamps are MySQL specific
-    				$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
-                    $incident->incident_dateadd = date("Y-m-d H:i:s",time());
-                    $incident->save();
+		header("Content-type: application/json; charset=utf-8");
+		if ($_POST)
+		{
+			$location = Static_Entity_Model::get_as_location($entity_id);
+            
+			// Proceed if location is valid
+			if ($location)
+			{
+				// Setup validation
+				$post = Validation::factory($_POST)
+							->pre_filter('trim')
+							->add_rules('incident_title', 'required', 'length[3,200]')
+							->add_rules('incident_description', 'required')
+							->add_rules('incident_date', 'required', 'date_mmddyyyy')
+							->add_rules('incident_hour', 'required', 'between[1,12]')
+							->add_rules('incident_minute', 'required', 'between[0,59]');
+                                
+				// Merideim validation for the incident time
+				if ($post->incident_ampm != "pm" AND $post->incident_ampm != "am")
+				{
+					$post->add_error('incident_ampm', 'values');
+				}
+                
+				// Test validation
+				if ($post->validate())
+				{
+					// Success! Save Location
+					$location->save();
+
+					// Create Incident_Model instance and set properties
+					$incident = new Incident_Model();
+					$incident->incident_title = $post->incident_title;
+					$incident->incident_description = $post->incident_description;
+					$incident->location_id = $location->id;
+					$incident->static_entity_id = $entity_id;
                     
-                    // Extract personal information
-                    $incident_person_data = array($_POST, 'person_first', 'person_last', 'person_email');
-                    $incident_person_data = array_merge($incident_person_data, array(
-                        'person_date' => date("Y-m-d H:i:s",time()), 
-                        'incident_id' => $incident->id, 
-                        'location_id' => $location->id
-                    ));
+					// TODO Set the boundary id - Fetch this from the static entity
+
+					// Set additional incident properties
+					$incident_date = explode("/", $post->incident_date);
+
+					// The $_POST['date'] is a value posted by form in mm/dd/yyyy format
+					$incident_date = $incident_date[2]."-".$incident_date[0]."-".$incident_date[1];
+
+					$incident_time = $post->incident_hour.":".$post->incident_minute.":00 ".$post->incident_ampm;
+
+					// NOTE: The date and time stamps are MySQL specific
+					$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
+					$incident->incident_dateadd = date("Y-m-d H:i:s",time());
+					$incident->save();
                     
-                    $incident_person = new Incident_Person_Model();
+					// Extract personal information
+					$incident_person_data = array($_POST, 'person_first', 'person_last', 'person_email');
+					$incident_person_data = array_merge($incident_person_data, array(
+						'person_date' => date("Y-m-d H:i:s",time()), 
+						'incident_id' => $incident->id, 
+						'location_id' => $location->id
+					));
+
+					$incident_person = new Incident_Person_Model();
                     
-                    // Validate incident person data
-                    // TODO: Check if valiation goes through even when personal information is not provided
-                    if ($incident_person->validate($incident_person_data))
-                    {
-                        // SUCCESS! Save personal information
-                        $incident_person->save();
-                    }
+					// Validate incident person data
+					// TODO: Check if valiation goes through even when personal information is not provided
+					if ($incident_person->validate($incident_person_data))
+					{
+						// SUCCESS! Save personal information
+						$incident_person->save();
+					}
                     
-                    // Incident successfully submitted
-                    print json_encode(array(
-                        'success' => TRUE, 
-                        'data' => Kohana::lang('ui_main.reports_submitted')
-                    ));
-                }
-                else
-                {
-                    // FAIL
-                    print json_encode(array(
-                        'success' => FALSE, 
-                        'data'  => $post->as_array(),
-                        'error' => $post->errors('report')
-                    ));
-                }
-            }
-            else
-            {
-                // Location validation fail
-                print json_encode(array('success' => FALSE));
-            }
-        }
-        else
-        {
-            // Invalid REQUEST method
-            print json_encode(array('success' => FALSE));
-        }
-    }
+					// Incident successfully submitted
+					print json_encode(array(
+						'success' => TRUE, 
+						'data' => Kohana::lang('ui_main.reports_submitted')
+					));
+				}
+				else
+				{
+					// FAIL
+					print json_encode(array(
+						'success' => FALSE, 
+						'data'  => $post->as_array(),
+						'error' => $post->errors('report')
+					));
+				}
+			}
+			else
+			{
+				// Location validation fail
+				print json_encode(array('success' => FALSE));
+			}
+		}
+		else
+		{
+			// Invalid REQUEST method
+			print json_encode(array('success' => FALSE));
+		}
+	}
 }
 ?>

@@ -22,15 +22,6 @@
 			</a>]
 		</h4>
 		
-		<div id="facebox" style="display: none;">
-			<div class="popup">
-				<div class="content"></div>
-				<a href="#" class="close">
-					<img src="<?php echo url::base().'plugins/huduma/views/images/closelabel.png'; ?>", class="close_image">
-				</a>
-			</div>
-		</div>
-
 		<?php if ($metadata_items->count() > 0): ?>
 		<div class="metadata-box" style="border: 1px dashed #CCCCCC; padding:3px;">
 			<table class="metadata" id="metadata-list" width="100%">

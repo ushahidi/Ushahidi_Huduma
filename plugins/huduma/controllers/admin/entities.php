@@ -356,157 +356,154 @@ class Entities_Controller extends Admin_Controller {
 
 	}
 
-    /**
-     * Loads the page for editing/creating a static entity
-     *
-     * @param int $type_id
-     * @param int $entity_id
-     */
-    public function edit($entity_id = FALSE, $saved = FALSE)
-    {
-        $this->template->content = new View("admin/entities_edit");
+	/**
+	 * Loads the page for editing/creating a static entity
+	 *
+	 * @param int $type_id
+	 * @param int $entity_id
+	 */
+	public function edit($entity_id = FALSE, $saved = FALSE)
+	{
+		$this->template->content = new View("admin/entities_edit");
 
-        // Set up and initialize the form fields
-        $form = array(
-            'static_entity_id' => '',
-            'static_entity_type_id' => '',
-            'boundary_id' => '',
-            'agency_id' => '',
-            'entity_name' => '',
-            'latitude' => '',
-            'longitude' => ''
-        );
+		// Set up and initialize the form fields
+		$form = array(
+			'static_entity_id' => '',
+			'static_entity_type_id' => '',
+			'boundary_id' => '',
+			'agency_id' => '',
+			'entity_name' => '',
+			'latitude' => '',
+			'longitude' => ''
+		);
 
-        // Copy the forms as erros so that the errors are stored with keys corresponding for the field names
-        $errors = $form;
+		// Copy the forms as erros so that the errors are stored with keys corresponding for the field names
+		$errors = $form;
 
-        // Form submission status flags
-        $form_saved = ($saved == 'saved')? TRUE : FALSE;
-        $form_error = FALSE;
-        $form_action = "";
+		// Form submission status flags
+		$form_saved = ($saved == 'saved')? TRUE : FALSE;
+		$form_error = FALSE;
+		$form_action = "";
 		$entity_metadata = "";
 
-        // Load the static entity
-        $static_entity = "";
+		// Load the static entity
+		$static_entity = "";
 
-        // Check if the form has been submitted
-        if ($_POST)
-        {
-            // Instance for validation and subsequent saving
-            $static_entity = new Static_Entity_Model($entity_id);
+		// Check if the form has been submitted
+		if ($_POST)
+		{
+			// Instance for validation and subsequent saving
+			$static_entity = new Static_Entity_Model($entity_id);
+
+			// Manually extract the data to be validated
+			$data = arr::extract($_POST, 'static_entity_type_id', 'boundary_id', 'entity_name', 'latitude', 'longitude');
             
-            // Manually extract the data to be validated
-            $data = arr::extract($_POST, 'static_entity_type_id', 'boundary_id', 'entity_name', 'latitude', 'longitude');
-            
-            // Validate
-            if ($static_entity->validate($data))
-            {
-                // SUCCESS! Save the static entity
-                $static_entity->save();
+			// Validate
+			if ($static_entity->validate($data))
+			{
+				// SUCCESS! Save the static entity
+				$static_entity->save();
 
-                // Set the entity id
-                $entity_id = $static_entity->id;
+				// Set the entity id
+				$entity_id = $static_entity->id;
 
-                // Empty the form array
-                array_fill_keys($form, '');
+				// Empty the form array
+				array_fill_keys($form, '');
 
-                // Save and close?
-                if ($_POST['save'] == 1)
-                {
-                    url::redirect('admin/entities/edit/'.$static_entity->id.'/saved');
-                }
-                else
-                {
-                    url::redirect('admin/entities');
-                }
-            }
-            // Validation failed
-            else
-            {
-                // Repopulate the form fields
-                $form = arr::overwrite($form, $data->as_array());
+				// Save and close?
+				if ($_POST['save'] == 1)
+				{
+					url::redirect('admin/entities/edit/'.$static_entity->id.'/saved');
+				}
+				else
+				{
+					url::redirect('admin/entities');
+				}
+			}
+			// Validation failed
+			else
+			{
+				// Repopulate the form fields
+				$form = arr::overwrite($form, $data->as_array());
 
-                // Populate the form errors if any
-                $errors = arr::overwrite($errors, $data->errors('entity'));
+				// Populate the form errors if any
+				$errors = arr::overwrite($errors, $data->errors('entity'));
 
-                $form_error = TRUE;
-            }
-        }
-        else
-        {
-            // Has the entity id been specified, load data
-            if ($entity_id)
-            {
-                $static_entity = ORM::factory('static_entity', $entity_id);
+				$form_error = TRUE;
+			}
+		}
+		else
+		{
+			// Has the entity id been specified, load data
+			if ($entity_id)
+			{
+				$static_entity = ORM::factory('static_entity', $entity_id);
 
-                if ($static_entity->loaded)
-                {
-                    // Set the form data
-                    $form = array(
-                        'static_entity_id' => $static_entity->id,
-                        'static_entity_type_id' => $static_entity->static_entity_type_id,
-                        'boundary_id' => $static_entity->boundary_id,
-                        'agency_id' => $static_entity->agency_id,
-                        'entity_name' => $static_entity->entity_name,
-                        'latitude' => $static_entity->latitude,
-                        'longitude' => $static_entity->longitude
-                    );
-                
-                    // Check if the static entity has any metadata
-                    $entity_metadata = new View('admin/entity_metadata_view');
-                    $entity_metadata->static_entity_id = $entity_id;
-                    $entity_metadata->metadata_items = Static_Entity_Model::get_metadata($entity_id);
-                }
-            }
-        }
+				if ($static_entity->loaded)
+				{
+					// Set the form data
+					$form = array(
+						'static_entity_id' => $static_entity->id,
+						'static_entity_type_id' => $static_entity->static_entity_type_id,
+						'boundary_id' => $static_entity->boundary_id,
+						'agency_id' => $static_entity->agency_id,
+						'entity_name' => $static_entity->entity_name,
+						'latitude' => $static_entity->latitude,
+						'longitude' => $static_entity->longitude
+					);
 
-        // Get the entity types
-        $entity_types = ORM::factory('static_entity_type')->select_list('id', 'type_name');
+					// Check if the static entity has any metadata
+					$entity_metadata = new View('admin/entity_metadata_view');
+					$entity_metadata->static_entity_id = $entity_id;
+					$entity_metadata->metadata_items = Static_Entity_Model::get_metadata($entity_id);
+				}
+			}
+		}
 
-        // Get the administatrative boundaries
-        $boundaries = ORM::factory('boundary')->select_list('id', 'boundary_name');
-        $boundaries[0] = "-- National --";
-        ksort($boundaries);
+		// Get the entity types
+		$entity_types = ORM::factory('static_entity_type')->select_list('id', 'type_name');
 
-        $agencies = ORM::factory('agency')->select_list('id', 'agency_name');
+		// Get the administatrative boundaries
+		$boundaries = ORM::factory('boundary')->select_list('id', 'boundary_name');
+		$boundaries[0] = "-- National --";
+		ksort($boundaries);
 
-        $this->template->content->form = $form;
-        $this->template->content->errors = $errors;
-        $this->template->content->form_saved = $form_saved;
-        $this->template->content->form_error = $form_error;
-        $this->template->content->form_action = $form_action;
-        $this->template->content->entity = $static_entity;
-        $this->template->content->entity_types = $entity_types;
-        $this->template->content->boundaries = $boundaries;
-        $this->template->content->agencies = $agencies;
-        $this->template->content->static_entity_id = $entity_id;
-        $this->template->content->entity_metadata = $entity_metadata;
+		$this->template->content->form = $form;
+		$this->template->content->errors = $errors;
+		$this->template->content->form_saved = $form_saved;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->form_action = $form_action;
+		$this->template->content->entity = $static_entity;
+		$this->template->content->entity_types = $entity_types;
+		$this->template->content->boundaries = $boundaries;
+		$this->template->content->agencies = Agency_Model::get_agencies_dropdown();
+		$this->template->content->static_entity_id = $entity_id;
+		$this->template->content->entity_metadata = $entity_metadata;
 
-        // TODO Unpack the metadata on the frontend (view page)
+		//Javascript Header
+		$this->template->map_enabled = TRUE;
+		$this->template->js = new View('js/entity_edit_js');
+		$this->template->js->default_map = Kohana::config('settings.default_map');
+		$this->template->js->default_zoom = Kohana::config('settings.default_zoom');
 
-        //Javascript Header
-        $this->template->map_enabled = TRUE;
-        $this->template->js = new View('js/entity_edit_js');
-        $this->template->js->default_map = Kohana::config('settings.default_map');
-        $this->template->js->default_zoom = Kohana::config('settings.default_zoom');
+		if (!$form['latitude'] || !$form['latitude'])
+		{
+			$this->template->js->latitude = Kohana::config('settings.default_lat');
+			$this->template->js->longitude = Kohana::config('settings.default_lon');
+		}
+		else
+		{
+			$this->template->js->latitude = $form['latitude'];
+			$this->template->js->longitude = $form['longitude'];
+		}
 
-        if (!$form['latitude'] || !$form['latitude'])
-        {
-            $this->template->js->latitude = Kohana::config('settings.default_lat');
-            $this->template->js->longitude = Kohana::config('settings.default_lon');
-        }
-        else
-        {
-            $this->template->js->latitude = $form['latitude'];
-            $this->template->js->longitude = $form['longitude'];
-        }
-        
-        $this->template->js->add_metadata_dialog_url = url::site().'admin/entities/metadata_add/'.$entity_id;
-        $this->template->js->metadata_update_url = url::site().'admin/entities/metadata_save';
-    }
+		$this->template->js->add_metadata_dialog_url = url::site().'admin/entities/metadata_add/'.$entity_id;
+		$this->template->js->metadata_update_url = url::site().'admin/entities/metadata_save';
+		$this->template->js->new_metadata_item_url = url::site().'dashboards/home/metadata_new';
+	}
 
 	/**
-	 * Generates the HTML for adding a metadata item on the UI
+	 * Prints the HTML for adding a metadata item on the UI
 	 */
 	public function metadata_new()
 	{
@@ -514,45 +511,7 @@ class Entities_Controller extends Admin_Controller {
 		$this->auto_render = FALSE;
 		
 		// Verify that the entity id exists
-		if ($_POST AND Static_Entity_Model::is_valid_static_entity($_POST['entity_id']))
-		{
-			$item_id  = $_POST['item_id'];
-
-			// Build the HTML for the metadata item
-			$html = "<div class=\"row\">";
-
-			// Metadata label
-			$html .= "<div class=\"forms_item\">";
-			$html .= "<h4>".Kohana::lang('ui_huduma.item_label')."</h4>";
-			$html .= "<input type=\"text\" name=\"metadata_label\" id=\"metadata_label_".$item_id."\" class=\"text medium\" value=\"\">";
-			$html .="</div>";
-			
-			// Metadata value
-			$html .= "<div class=\"forms_item\">";
-			$html .= "<h4>".Kohana::lang('ui_huduma.value')."</h4>";
-			$html .= "<input type=\"text\" name=\"metadata_value\" id=\"metadata_value_".$item_id."\" class=\"text\" value=\"\">";
-			$html .="</div>";
-			
-			// Metadata date
-			$html .= "<div class=\"forms_item\">";
-			$html .= "<h4>".Kohana::lang('ui_huduma.as_of_year')."</h4>";
-			$html .= "<input type=\"text\" maxchars=\"4\" name=\"metadata_as_of_date\" id=\"metadata_as_of_year_".$item_id."\" class=\"text\" value=\"".date('Y')."\">";
-			$html .="</div>";
-
-			$html .= "</div>";
-
-			print json_encode(array(
-				'status' => TRUE,
-				'response' => $html
-			));
-		}
-		else
-		{
-			print json_encode(array(
-				'status' => FALSE,
-				'response' => Kohana::lang('ui_servicedeliery.invalid_static_entity')
-			));
-		}
+		print navigator::get_metadata_item_row();
 	}
 
 	/**
@@ -562,67 +521,9 @@ class Entities_Controller extends Admin_Controller {
 	{
 		$this->template = "";
 		$this->auto_render = FALSE;
-
-		$entity_id  = $_POST['entity_id'];
-
-		if ($_POST AND Static_Entity_Model::is_valid_static_entity($entity_id))
-		{
-		    // Set up validation, add some filters and validation rules
-		    $post = Validation::factory($_POST)
-		                ->pre_filter('trim')
-		                ->add_rules('metadata_label.*', 'required')
-		                ->add_rules('metadata_value.*', 'required')
-		                ->add_rules('metadata_as_of_year.*', 'required', 'numeric');
-			
-			// Test validation rules
-			if ($post->validate() AND count($_POST) > 1)
-			{
-				// To hold the new metadata
-				$new_metadata = array();
-				
-				// Iterate over $_POST array and create a json structure for each item
-				for ($i=0; $i < count($post->metadata_value); $i++)
-				{
-				    // Create metadata entry
-				    $static_entity_metadata = new Static_Entity_Metadata_Model();
-				    $static_entity_metadata->static_entity_id = $entity_id;
-				    $static_entity_metadata->item_label = $post->metadata_label[$i];
-				    $static_entity_metadata->item_value = $post->metadata_value[$i];
-				    $static_entity_metadata->as_of_year = $post->metadata_as_of_year[$i];
-				    
-				    // SAVE
-				    $static_entity_metadata->save();
-				    
-				    // Construct JSON 
-					$json_item = "{";
-					$json_item .= "\"label\": \"".$post->metadata_label[$i]."\",";
-					$json_item .="\"value\": \"".$post->metadata_value[$i]."\",";
-					$json_item .= "\"as_of_year\": \"". $post->metadata_as_of_year[$i]."\"";
-					$json_item .="}";
-
-					array_push($new_metadata, $json_item);
-				}
-
-				print json_encode(array(
-					'status' => TRUE,
-					'metadata' => json_decode("[".implode(",", $new_metadata)."]")
-				));
-			}
-			else
-			{
-				print json_encode(array(
-					'status' => FALSE,
-					'message' => Kohana::lang('ui_huduma.error.invalid_metadata')
-				));
-			}
-		}
-		else
-		{
-			print json_encode(array(
-				'status' => FALSE,
-				'message' => Kohana::lang('ui_huduma.error.invalid_entity_id')
-			));
-		}
+		
+		// Save the metadata items
+		navigator::save_new_metadata_items();
 	}
 	
 	/**
@@ -630,8 +531,8 @@ class Entities_Controller extends Admin_Controller {
 	 */
 	public function metadata_add($entity_id)
 	{
-	    $this->template = new View("admin/entity_metadata_dialog");
-	    $this->template->static_entity_id = $entity_id;
+		$this->template = new View("admin/entity_metadata_dialog");
+		$this->template->static_entity_id = $entity_id;
 	}
     
 }

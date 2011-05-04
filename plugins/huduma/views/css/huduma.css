@@ -50,6 +50,9 @@ h3.entity_name { color: #00ADE3; }
 
 #facebox .row { padding: 5px 0; }
 #facebox .row h4 { padding: 3px 0; }
+#facebox input { height: 20px; font-size: 12px; padding: 2px;}
+#facebox .forms_item h4{ padding: 3px 0; margin: 0;}
+.forms_item { float: left; margin: 0 15px 10px 0;}
 div#loginsection { float: right; clear: both; }
 
 div.login {
@@ -184,3 +187,37 @@ div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  
 .huduma-actions li a { padding: 0 3px; border-right: 1px solid #CCC; }
 .huduma-actions li a:last-child { border: none; }
 input.inline { width: 130px; font-size: 95%;}
+
+.btns ul{
+	margin:0;
+	padding:9px 10px 0;
+	clear:both;
+	overflow:hidden;
+}
+.btns ul li{
+	padding:0 4px;
+	float:left;
+	list-style:none;
+}
+.btns ul li a{
+	padding:0 9px;
+	color:#5c5c5c;
+	background:#f2f7fa;
+	float:left;
+	line-height:24px;
+	text-decoration:none;
+	border:1px solid #d1d1d1;
+}
+.btns ul li a.btns_red{
+	background:#FFE9EC;
+}
+.btns ul li a.btns_gray{
+	background:#eee;
+}
+.btns ul li a:hover{ text-decoration:underline; }
+div.green-box h4, div.red-box h4 {
+margin: 0;
+padding: 0 0 0 15px;
+font-size: 14px;
+color: #555;
+}

@@ -36,7 +36,7 @@
 			<table class="metadata" id="metadata-list" width="100%">
 				<thead>
 					<tr>
-						<th><?php echo Kohana::lang('ui_huduma.item'); ?></th>
+						<th><?php echo Kohana::lang('ui_huduma.item_label'); ?></th>
 						<th><?php echo Kohana::lang('ui_huduma.value'); ?></th>
 						<th><?php echo Kohana::lang('ui_huduma.as_of_year'); ?></th>
 					</tr>
