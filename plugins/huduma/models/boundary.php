@@ -63,8 +63,8 @@ class Boundary_Model extends ORM {
 		{
 			// Return list of boundaries
 			return self::factory('boundary')
-					->select_list('id',	'boundary_name')
-					->where(array('parent_id' => $parent_id));
+					->where(array('parent_id' => $parent_id))
+					->select_list('id',	'boundary_name');
 		}
 	}
 	
