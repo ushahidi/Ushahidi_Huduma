@@ -166,17 +166,27 @@
 					?>
 				</div>
 			</div>
+
 			<div class="report_right">
 				<?php if (!$multi_country)
 							{
+
 				?>
 				<div class="report_row">
 					<h4><?php echo Kohana::lang('ui_main.reports_find_location'); ?></h4>
-					<?php print form::dropdown('select_city',$cities,'', ' class="select" '); ?>
+					<?php print
+					form::dropdown('select_county',$counties,$form['county_id'],'class="select" '); ?>
 				</div>
+
+				<div class="report_row" id="constituency_selector">
+					<?php print
+					form::dropdown('select_constituency','',$form['constituency_id'],'class="select" '); ?>
+				</div>
+
 				<?php
 					 }
 				?>
+
 				<div class="report_row">
 					<div id="divMap" class="report_map"></div>
 					<div class="report-find-location">

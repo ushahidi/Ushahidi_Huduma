@@ -265,6 +265,8 @@ class Reports_Controller extends Frontend_Controller {
 			'longitude' => '',
 			'location_name' => '',
 			'country_id' => '',
+			'county_id' => '',
+			'constituency_id' => '',
 			'incident_category' => array(),
 			'incident_news' => array(),
 			'incident_video' => array(),
@@ -300,6 +302,7 @@ class Reports_Controller extends Frontend_Controller {
 		// check, has the form been submitted, if so, setup validation
 		if ($_POST)
 		{
+			//print_r($_POST);exit;
 			// Explicitly specify the $_POST data to be validated
 			$post_data = arr::extract($_POST, 'incident_hour', 'incident_minute', 'incident_ampm', 'incident_category', 
 			    'incident_news', 'incident_video', 'incident_photo');
@@ -367,9 +370,11 @@ class Reports_Controller extends Frontend_Controller {
 			    
 				// STEP 2: VALIDATE INCIDENT
 				$incident = new Incident_Model();
+
 				
 				// Manually extract the incident data to be validated
-				$incident_data = arr::extract($_POST, 'incident_title', 'incident_description', 'incident_date', 'form_id');
+				$incident_data = arr::extract($_POST, 'incident_title',
+				'incident_description', 'incident_date', 'form_id','');
 				
 				// Add extra info
 				$incident_data = array_merge($incident_data, array('user_id' => 0, 'location_id' => $location->id));
@@ -387,7 +392,14 @@ class Reports_Controller extends Frontend_Controller {
     				// NOTE: The date and time stamps are MySQL specific
     				$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
     				$incident->incident_dateadd = date("Y-m-d H:i:s",time());
-    				
+
+    			
+					//check whether county_id or constituency_id has been set
+						
+					$boundary_id = $_POST['select_constituency'];
+						
+					$incident->boundary_id = $boundary_id;
+
     				$incident->save();
     				
     				
@@ -550,16 +562,27 @@ class Reports_Controller extends Frontend_Controller {
 				$form_error = TRUE;
 			}
 		}
+
         
 		// Retrieve Country Cities
 		$default_country = Kohana::config('settings.default_country');
 		$this->template->content->cities = $this->_get_cities($default_country);
 		$this->template->content->multi_country = Kohana::config('settings.multi_country');
 
+		
+		// Retrieve Counties
+		$counties = Boundary_Model::get_parent_boundaries();
+		$counties[0] = "---".Kohana::lang('ui_huduma.reports_select_county')."---";
+		ksort($counties);
+
+		//Set the counties as content on the view	
+		$this->template->content->counties = $counties;
+		
 		$this->template->content->id = $id;
 		$this->template->content->form = $form;
 		$this->template->content->errors = $errors;
 		$this->template->content->form_error = $form_error;
+
 
 		$categories = $this->get_categories($form['incident_category']);
 		$this->template->content->categories = $categories;
@@ -589,6 +612,7 @@ class Reports_Controller extends Frontend_Controller {
 		// Rebuild Header Block
 		$this->template->header->header_block = $this->themes->header_block();
 	}
+
 
 	 /**
 	 * Displays a report.
@@ -1203,6 +1227,37 @@ class Reports_Controller extends Frontend_Controller {
 
 			return TRUE;
 		}
+	}
+
+	public function constituencies()
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+		$json_output = "";
+
+		if ($_POST)
+		{
+			// Get the county id
+			$county_id = $_POST['county_id'];
+
+			Kohana::log('debug', sprintf('Fetched county id: %s', $county_id));
+
+			// Build output JSON
+			$json_output  = json_encode(array(
+				'success' => TRUE,
+				'data' => Boundary_Model::get_child_boundaries($county_id)
+			));
+		}
+		else
+		{
+			$json_output = json_encode(array(
+				'success' => FALSE
+			));
+		}
+
+		// Flush the
+		header("Content-type: application/json; charset=utf-8");
+		print $json_output;
 	}
 
 

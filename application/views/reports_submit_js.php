@@ -296,6 +296,26 @@
 					$("#longitude").attr("value", lonlat[0]);
 				}
 			});
+
+
+			// onChange event handler for the county dropdown
+			$("#select_county").change(function() {
+				// Get the currently selected value
+				var value = $(this).val();
+
+				// Validation
+				if (value == 0) {
+					// Hide the constituency selector
+					$("#constituency_selector").hide('slow');
+				} else if (value != 0) {
+					// Show the constituency selector
+					$("#constituency_selector").show('slow');
+				}
+
+				// Fetch the constituencies
+				fetchConstituencies({ county_id: value});
+
+			});
 			
 			// GeoCode
 			$('.btn_find').live('click', function () {
@@ -327,3 +347,30 @@
 	      });
 	
 		});
+
+
+	// Fetches constituencies via JSON and populates the constituencies dropdown
+	function fetchConstituencies(data) {
+		// Clear the items from the constituencies dropdown
+		$("#select_constituency").html("");
+		
+		// Fetch the new items
+		$.post(
+			'<?php echo url::site().'reports/constituencies'?>',
+			data,
+			function(response) {
+				if (response.success) {
+					var htmlStr = "<option value=\"0\">---<?php echo
+					Kohana::lang('ui_huduma.reports_select_constituency'); ?>---</option>";
+
+					$.each(response.data, function(id, value){
+						htmlStr += "<option value=\""+id+"\">"+value+"</option>";
+					});
+
+					// Populate the dropdown
+					$("#select_constituency").html(htmlStr);
+				}
+			},
+			'json'
+		);
+	}
