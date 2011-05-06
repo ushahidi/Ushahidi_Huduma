@@ -837,9 +837,6 @@ CREATE TABLE IF NOT EXISTS `settings` (                                         
     `sms_no3` varchar(100) default NULL,                                            -- field description
     `google_analytics` text,                                                        -- field description
     `twitter_hashtags` text default NULL,                                           -- field description
-    `laconica_username` varchar(50) default NULL,                                   -- field description
-    `laconica_password` varchar(50) default NULL,                                   -- field description
-    `laconica_site` varchar(30) default NULL COMMENT 'a laconica site',             -- field description
     `date_modify` datetime default NULL,                                            -- field description
     `stat_id` BIGINT default NULL COMMENT 'comes from centralized stats',           -- field description
     `stat_key` VARCHAR(30) NOT NULL ,                                               -- field description
@@ -1228,8 +1225,7 @@ CREATE TABLE IF NOT EXISTS `service` (                                          
 INSERT INTO `service` (`id`, `service_name`, `service_description`, `service_url`, `service_api`) VALUES
 (1, 'SMS', 'Text messages from phones', NULL, NULL),
 (2, 'Email', 'Text messages from phones', NULL, NULL),
-(3, 'Twitter', 'Tweets tweets tweets', 'http://twitter.com', NULL),
-(4, 'Laconica', 'Tweets tweets tweets', NULL, NULL);
+(3, 'Twitter', 'Tweets tweets tweets', 'http://twitter.com', NULL);
 
 /**
 * Table structure for table `feedback`
