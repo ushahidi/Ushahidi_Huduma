@@ -117,9 +117,34 @@ class Boundary_Model extends ORM {
 	 *
 	 * @return  array
 	 */
-	public static function get_boundaries_dropdown()
+	public static function get_boundaries_dropdown($show_boundary_type)
 	{
-	    return self::factory('boundary')->select_list('id', 'boundary_name');
+		if ($show_boundary_type)	// Add the boundary type name to the name of the boundary
+		{
+			// To hold the return array
+			$list = array();
+			
+			// Fetch all the boundaries
+			$boundaries = self::factory('boundary')->select('id', 'boundary_name', 'boundary_type')->find_all();
+			
+			// Build an array containing the boundary + type name
+			foreach ($boundaries as $boundary)
+			{
+				// Append the boundary type name to the boundary name
+				$boundary_name = $boundary->boundary_name;
+				$boundary_name .= ($boundary->boundary_type == 1)
+									? " ".Kohana::lang('ui_huduma.county') 
+									: " ".Kohana::lang('ui_huduma.constituency');
+
+				$list[$boundary->id] = $boundary_name;
+			}
+			
+			return $list;
+		}
+		else
+		{
+		    return self::factory('boundary')->select_list('id', 'boundary_name');
+		}
 	}
 }
 ?>

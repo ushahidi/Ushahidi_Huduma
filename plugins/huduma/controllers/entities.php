@@ -499,6 +499,12 @@ class Entities_Controller extends Frontend_Controller {
 					$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
 					$incident->incident_dateadd = date("Y-m-d H:i:s",time());
 					$incident->save();
+					
+					// SAVE CATEGORY
+					$incident_category = new Incident_Category_Model();
+					$incident_category->incident_id = $incident->id;
+					$incident_category->category_id = ORM::factory('static_entity', $entity_id)->static_entity_type->category_id;
+					$incident_category->save();
                     
 					// Extract personal information
 					$incident_person_data = array($_POST, 'person_first', 'person_last', 'person_email');

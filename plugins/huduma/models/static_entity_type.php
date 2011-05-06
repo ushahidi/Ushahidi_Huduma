@@ -13,15 +13,35 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 class Static_Entity_Type_Model extends ORM {
-    // Table name
-    protected $table_name = 'static_entity_type';
+	// Table name
+	protected $table_name = 'static_entity_type';
 
-    // Relationships
-    protected $has_many  = array('static_entity');
-    
-    // A static entity type must be associated with a category
-    protected $belongs_to = array('category');
+	// Relationships
+	protected $has_many  = array('static_entity');
 
+	// A static entity type must be associated with a category
+	protected $belongs_to = array('category');
+	
+	/**
+	 * Validates and optionally saves a static entity type record from an array
+	 *
+	 * @param array $array Values to check
+	 * @param boolean $save Save the record when validation succeeds
+	 * @param return boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+		// Set up validation
+		$array = Validation::factory($array)
+					->pre_filter('trim')
+					->add_rules('type_name', 'required')
+					->add_rules('category_id', 'required', array('Category_Model', 'is_valid_category'))
+					->add_rules('entity_type_color', 'required', 'length[6,6]');
+		
+		// Pass validation to parent			
+		return parent::validate($array, $save);
+	}
+	
 	/**
 	 * Checks if the static entity type in @param $type_id exists in the database
 	 * 

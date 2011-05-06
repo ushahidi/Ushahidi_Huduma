@@ -15,14 +15,45 @@
  */
 class Agency_Model extends ORM {
     
-    // Database table name
-    protected $table_name = 'agency';
-    
-    // Relationships
-    protected $has_many = array('agency_staff');
-    
-    protected $belongs_to = array('boundary');
+	// Database table name
+	protected $table_name = 'agency';
 
+	// Relationships
+	protected $has_many = array('agency_staff');
+
+	protected $belongs_to = array('boundary');
+	
+	/**
+	 * Validates and optionally saves a new agency record from an array
+	 *
+	 * @param array $array Values to check
+	 * @param boolean $save Save record when validation succeeds
+	 * @return boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+		// Setup validation
+		$array = Validation($array)
+					->pre_filter('trim')
+					->add_rules('agency_name', 'required')
+					->add_rules('description', 'required')
+					->add_rules('category_id', 'required', array('Category_Model', 'is_valid_category'));
+		
+		// Parent ID validation
+		if ( ! empty($array->parent_id) AND $array->parent_id != 0)
+		{
+			$array->add_rules('parent_id', array('Agency_Model', 'is_valid_agency'));
+		}
+		
+		// Boundary validation
+		if ( ! empty($array->boundary_id) AND $array->boundary_id != 0)
+		{
+			$array->add_rules('boundary_id', array('Boundary_Model', 'is_valid_boundary'));
+		}
+		
+		// Pass on valdation to parent and return
+		return parent::validate($array, $save);
+	}
 	/**
 	 * Gets the list of agencies that fall within the category specified in @param $category_id
 	 * 

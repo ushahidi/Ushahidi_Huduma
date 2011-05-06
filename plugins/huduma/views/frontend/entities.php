@@ -25,14 +25,7 @@
                     $category_color = $entity->static_entity_type->category->category_color;
                     $category_image_thumb = $entity->static_entity_type->category->category_image_thumb;
 					
-					// Fetch the metadata and only display a portion of it
-					$metadata = $entity->metadata;
-
-					if ( !empty ($metadata))
-					{
-						$metadata = json_decode($metadata);
-						$metadata = array_splice($metadata, 0, count($metadata)/3);
-					}
+					// TODO: Fetch the metadata and only display a portion of it
                     
                     $entity_thumb = url::base().((! empty($entity_type_image))
                         ? Kohana::config('upload.relative_directory')."/".$entity_type_image
@@ -65,27 +58,10 @@
                                 <a href="<?php echo url::site(); ?>entities/view/<?php echo $entity_id; ?>#discussion" class="r_comments"><?php //echo $comment_count; ?></a>
                             </h3>
                             <!-- Metadata -->
-                            <?php if ( ! empty($metadata)): ?>
+                            <?php //if ( ! empty($metadata)): ?>
 							<p style="padding: 3px;">
-								<span style="font-size: 80%; font-family: Verdana; color:#000;">
-							   <?php
-									// To hold the metadata of the current item
-									$metadata_string = '';
-
-									foreach($metadata as $item)
-									{
-										if ( ! empty($item->value))
-										{
-											$metadata_string .= "<strong>".$item->label.":</strong> ". $item->value.", ";
-										}
-									}
-									
-									// Dispaly the metadata string
-									echo substr($metadata_string, 0, strlen($metadata_string)-2);
-							   ?>
-								</span>
 							</p>
-							<?php endif; ?>
+							<?php //endif; ?>
                             <!-- /Metadata -->
                             <p class="r_location">
                                 <a href="#"><?php echo Kohana::lang('ui_main.comment'); ?></a>
