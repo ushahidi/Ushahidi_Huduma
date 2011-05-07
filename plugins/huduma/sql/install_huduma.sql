@@ -142,9 +142,81 @@ CREATE TABLE IF NOT EXISTS `dashboard_user` (
 ) COMMENT = 'Maintains a list of users for the frontend dashboard';
 
 --
+-- Table report_priority
+--
+DROP TABLE IF EXISTS `report_priority`;
+CREATE TABLE IF NOT EXISTS `report_priority` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`priority_name` VARCHAR(15) NOT NULL,
+	PRIMARY KEY (`id`)
+) COMMENT = 'Priority codes for reports that are flagged as tickets';
+
+-- 
+-- Populate the table with predefined priority values
+--
+INSERT INTO `report_priority`(`id`, `priority_name`) VALUES
+(1, 'Low'), 
+(2, 'Normal'), 
+(3, 'High'), 
+(4, 'Urgent'),
+(5, 'Immediate');
+
+--
+-- Table report_status
+--
+DROP TABLE IF EXISTS `report_status`;
+CREATE TABLE IF NOT EXISTS `report_status` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`status_name` VARCHAR(15) NOT NULL,
+	PRIMARY KEY (`id`)
+) COMMENT = 'Status of the reports flagged as tickets';
+
+INSERT INTO `report_status`(`id`, `status_name`) VALUES
+(1, 'Open'),
+(2, 'Closed');
+
+
+--
+-- Table incident_ticket
+--
+CREATE TABLE IF NOT EXISTS `incident_ticket` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`incident_id` INT NOT NULL,
+	`agency_id` INT,
+	`static_entity_id` INT,
+	`report_priority_id` INT NOT NULL DEFAULT 2,
+	`report_status_id` INT NOT NULL DEFAULT 1,
+	`created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`)
+) COMMENT = 'Incident reports that have been flagged as tickets';
+
+--
+-- Table incident_ticket_history
+--
+CREATE TABLE IF NOT EXISTS `incident_ticket_history` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`incident_ticket_id` INT NOT NULL,
+	`report_status_id` INT NOT NULL,
+	`notes` TEXT,
+	`dashboard_user_id` INT NOT NULL,
+	`created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`)
+) COMMENT = 'Update log of incident reports that have been flagged as tickets';
+
+--
 -- Add extra columns to the comment and incident tables
 --
 ALTER TABLE `comment` ADD COLUMN `static_entity_id` INT;
 ALTER TABLE `comment` ADD COLUMN `dashboard_user_id` INT;
 ALTER TABLE `incident` ADD COLUMN `boundary_id` INT NOT NULL;
 ALTER TABLE `incident` ADD COLUMN `static_entity_id` INT;
+
+--
+-- Drop stale schema objects (just incase they exist in the current schema)
+--
+DROP TABLE IF EXISTS `static_entity_comment`;
+DROP TABLE IF EXISTS `ticket_history`;
+DROP TABLE IF EXISTS `ticket`;
+DROP TABLE IF EXISTS `agency_staff`;
+DROP TABLE IF EXISTS `boundary_type`;
+DROP TABLE IF EXISTS `dashboard_user_privilege`;
