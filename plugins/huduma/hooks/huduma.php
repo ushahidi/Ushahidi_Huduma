@@ -1,7 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
-
 /**
- * Service delivery plugin hook
+ * Hook for the huduma plugin
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -9,47 +8,77 @@
  * http://www.gnu.org/copyleft/lesser.html
  * @author     Ushahidi Team <team@ushahidi.com>
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     Service Delivery plugin
+ * @module     Huduma plugin
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
-
 class huduma
 {
-    /**
-     * Registers the main event method - add
-     */
-    public function __construct()
-    {
-        // Set Table Prefix
-        $this->table_prefix = Kohana::config('database.default.table_prefix');
+	/**
+	 * Registers the main event method - add
+	 */
+	public function __construct()
+	{
+		// To hold the values for the ticket associated with an incident
+		$this->ticket_id = "";
+		$this->agency_id = "";
+		$this->report_priority_id = "";
+		$this->report_status_id = "";
+		
+		// Set Table Prefix
+		$this->table_prefix = Kohana::config('database.default.table_prefix');
 
-        Event::add('system.pre_controller', array($this, 'add'));
-    }
+		Event::add('system.pre_controller', array($this, 'add'));
+	}
 
-    /**
-     * Adds all the events to the Ushahidi main application
-     */
-    public function add()
-    {
-        plugin::add_stylesheet('huduma/views/css/huduma');
-        plugin::add_stylesheet('huduma/views/css/facebox');
-        plugin::add_javascript('huduma/views/js/facebox');
+	/**
+	 * Adds all the events to the Ushahidi main application
+	 */
+	public function add()
+	{
+		plugin::add_stylesheet('huduma/views/css/huduma');
+		plugin::add_stylesheet('huduma/views/css/facebox');
+		plugin::add_javascript('huduma/views/js/facebox');
 
-        Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
-        Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
-        Event::add('ushahidi_action.orm_validate_comment', array($this, 'orm_validate_comment'));
-        
-        if (Router::$controller == 'main')
-        {
-            // Modify the header scripts
-            Event::add('ushahidi_action.huduma_overlay_js', array($this, 'overlay_js'));
-            
-            // Calls the Javascript used function to overlay data on the main map
-            Event::add('ushahidi_action.main_map_overlay', array($this, 'overlay_main_map_js_call'));
-        }
+		Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
+		Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
+		Event::add('ushahidi_action.orm_validate_comment', array($this, 'orm_validate_comment'));
 
-    }
+		if (Router::$controller == 'main')
+		{
+			// Modify the header scripts
+			Event::add('ushahidi_action.huduma_overlay_js', array($this, 'overlay_js'));
+
+			// Calls the Javascript used function to overlay data on the main map
+			Event::add('ushahidi_action.main_map_overlay', array($this, 'overlay_main_map_js_call'));
+		}
+		
+		if (Router::$controller == 'reports')
+		{
+			switch (Router::$method)
+			{
+				// Hook into report add/edit in admin
+				case 'edit':
+					// When the report is loaded
+					Event::add('ushahidi_action.report_form_admin', array($this, 'report_form'));
+					
+					// When the report is submitted for validation and saving
+					Event::add('ushahidi_action.report_submit_admin', array($this, 'report_submit_admin'));
+					
+					// When report validation succeeds
+					Event::add('ushahidi_action.report_edit', array($this, 'report_edit_admin'));
+					
+					break;
+				
+				// Hook into report view on the main reports page on frontend
+				case 'view':
+				break;
+				
+				// Hook into report view on the static entity reports page
+				
+			}
+		}
+	}
 
     /**
      * Adds a service delivery menu to the list of admin menus on the right of the admin console
@@ -83,9 +112,6 @@ class huduma
      */
     public function overlay_js()
     {
-        // Get the current event data
-        $data = Event::$data;
-
 		// Load the JavaScript header for rendering the overlay data
 		$overlay_js = new View('js/overlays_js');
 
@@ -98,70 +124,212 @@ class huduma
 
     }
 
-    /**
-     * Echoes the Javascript function for overlaying data on the main map. This JS function
-     * should already have been defined in the javascript header file loaded in this->modify_header_scripts()
-     * above
-     */
-    public function overlay_main_map_js_call()
-    {
-        // Call the JS function to render the overlay data
-        echo 'overlayMainMap();';
-    }
+	/**
+	 * Echoes the Javascript function for overlaying data on the main map. This JS function
+	 * should already have been defined in the javascript header file loaded in this->modify_header_scripts()
+	 * above
+	 */
+	public function overlay_main_map_js_call()
+	{
+		// Call the JS function to render the overlay data
+		echo 'overlayMainMap();';
+	}
     
-    /**
-     * Callback function for the "ushahidi.orm_validate_comment" event
-     *
-     * Performs validation on the extra columns added to the comment table by this (Huduma) plugin
-     */
-    public function orm_validate_comment()
-    {
-        // Get the current event data
-        $array = Event::$data;
-        
-        // Check if a static entity id has been specified
-        if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
-        {
-            $array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
-        }
-        
-	    // Check if the dashboard user id is in the validation data
-	    if ( ! empty($array->dashboard_user_id) AND $array->dashboard_user_id != 0)
-	    {
-	        // Ensure the dashboard user id is validated
-	        $array->add_rules('dashboard_user_id', array('Dashboard_User_Model', 'is_valid_dashboard_user'));
-	    }
-	    
-	    // Set the event data containing the updated set of rules
-	    Event::$data = $array;
-    }
-    
-    /**
-     * Callback function for the "ushahidi_action.orm_validate_incident" event
-     * 
-     * Performs validation on the extra columns added to the incident table by this plugin
-     */
-    public function orm_validate_incident()
-    {
-        // Get the current event data
-        $array = Event::$data;
-        
-        // Add validation for the boundary
-        if ( ! empty($array->boundary_id) AND $array->boundary_id != 0 AND ($array->static_entity_id == 0 OR empty($array->static_entity_id)))
-        {
-            $array->add_rules('boundary_id', 'required', array('Boundary_Model', 'is_valid_boundary'));
-        }
-        
-        // Static entity validation rule
-        if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
-        {
-            $array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
-        }
-        
-        // Set the event data containing the updated set of validation rules
-        Event::$data = $array;
-    }
+	/**
+	 * Callback function for the "ushahidi.orm_validate_comment" event
+	 *
+	 * Performs validation on the extra columns added to the comment table by this (Huduma) plugin
+	 */
+	public function orm_validate_comment()
+	{
+		// Get the event data for modification
+		$array = Event::$data;
 
+		// Check if a static entity id has been specified
+		if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
+		{
+			$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
+		}
+
+		// Check if the dashboard user id is in the validation data
+		if ( ! empty($array->dashboard_user_id) AND $array->dashboard_user_id != 0)
+		{
+			// Ensure the dashboard user id is validated
+			$array->add_rules('dashboard_user_id', array('Dashboard_User_Model', 'is_valid_dashboard_user'));
+		}
+	}
+    
+	/**
+	 * Callback function for the "ushahidi_action.orm_validate_incident" event
+	 * 
+	 * Performs validation on the extra columns added to the incident table by this plugin
+	 */
+	public function orm_validate_incident()
+	{
+		// Get the event data for modification
+		$array = Event::$data;
+
+		// Add validation for the boundary
+		if ( ! empty($array->boundary_id) AND $array->boundary_id != 0 AND ($array->static_entity_id == 0 OR empty($array->static_entity_id)))
+		{
+			$array->add_rules('boundary_id', 'required', array('Boundary_Model', 'is_valid_boundary'));
+		}
+
+		// Static entity validation rule
+		if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
+		{
+			$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
+		}
+	}
+	
+	/**
+	 * Callback for the ushahidi_action.report_form_admin event
+	 *
+	 * Loads the form for assigning an incident repor to a service agency
+	 */
+	public function report_form()
+	{
+		// Load the view
+		$report_form = View::factory('admin/report_action_form');
+		
+		// Set up form fields for the action view
+		$form = array(
+			'ticket_id' => '',
+			'report_agency_id' => '',
+			'report_status_id' => '',
+			'report_priority_id' => ''
+		);
+		
+		// Get the ID of the incident report
+		$id = Event::$data;
+		
+		// Load the incident and get the categories under it
+		$incident = new Incident_Model($id);
+		
+		// To hold the incident catgories
+		$categories = array();
+		foreach ($incident->incident_category as $category)
+		{
+			array_push($categories, $category->category_id);
+		}
+
+		// Get the boundary for the incident
+		$boundaries = array(0);
+		if ( ! empty($incident->boundary_id) AND $incident->boundary_id != 0)
+		{
+			array_push($boundaries, $incident->boundary_id);
+		}
+		
+		// Check for static entity report
+		if ( ! empty($incient->static_entity_id) AND $incident->static_entity_id != 0)
+		{
+			$entity = ORM::factory('static_entity', $incident->static_entity_id);
+			if ( ! empty($entity->boundary_id) AND $entity->boundary_id != 0)
+			{
+				// * NOTES
+				// Static entity reports are already assigned to the person in charge of the entity
+				// Assignment to an agency is more supervisory
+				array_push($boundaries, $entity->boundary_id);
+			}
+		}
+		
+		// Check if a ticket exists for the incident
+		$ticket = Incident_Ticket_Model::get_incident_ticket($id);
+		if ($ticket)
+		{
+			// Set the form fields
+			$form['ticket_id']  = $ticket->id;
+			$form['report_agency_id'] = $ticket->agency_id;
+			$form['report_priority_id'] = $ticket->report_priority_id;
+			$form['report_status_id'] = $ticket->report_status_id;
+		}
+		
+		// Get the list of agencies within the incidents category
+		$agencies = ORM::factory('agency')
+						->in('category_id', $categories)
+						->in('boundary_id', $boundaries)
+						->select_list('id', 'agency_name');
+
+		$agencies[0] = "---".Kohana::lang('ui_huduma.select_agency')."---";
+		ksort($agencies);
+		
+		// Set content for the view
+		$report_form->form = $form;
+		$report_form->agencies = $agencies;
+		$report_form->report_status = ORM::factory('report_status')->select_list('id', 'status_name');
+		$report_form->report_priority = ORM::factory('report_priority')->select_list('id', 'priority_name');
+		$report_form->incident_id = $id;
+		
+		// Display
+		$report_form->render(TRUE);
+	}
+	
+	/**
+	 * Event callback to be executed when the report edit form in the admin 
+	 *  is submitted (via POST)
+	 */
+	public function report_submit_admin()
+	{
+		// Get the validation object in the event data
+		$post = Event::$data;
+		if ( ! empty($post->ticket_id))
+		{
+			// Add validation rule
+			$post->add_rules('ticket_id', array('Incident_Ticket_Model', 'is_valid_incident_ticket'));
+			
+			// Save value to memory
+			$this->ticket_id = $post->ticket_id;
+		}
+		
+		// Agency id validation
+		if ( ! empty($post->report_agency_id) AND $post->report_agency_id != 0)
+		{
+			// Save the current agency id
+			$this->agency_id = $post->report_agency_id;
+			
+			// Add validation rule for the agency
+			$post->add_rules('report_agency_id', array('Agency_Model', 'is_valid_agency'));
+		}
+		
+		// Validation rules for report status and priotiy
+		$post->add_rules('report_status_id', array('Report_Status_Model', 'is_valid_report_status'));
+		$post->add_rules('report_priority_id', array('Report_Priority_Model', 'is_valid_report_priority'));
+		
+		// Save the status and priority id's to memory - for referencing when validation succeeds
+		$this->report_status_id = $post->report_status_id;
+		$this->report_priority_id = $post->report_priority_id;
+	}
+	
+	/**
+	 * Event callback to be executed when the validation of the report edit form in the admin
+	 * succeeds. Validation takes place after the form is posted.
+	 */
+	public function report_edit_admin()
+	{
+		// Get the incident
+		$incident = Event::$data;
+		
+		// Data values to check
+		$data = array(
+			'incident_id' => $incident->id,
+			'static_entity_id' => $incident->static_entity_id,
+			'agency_id' => $this->agency_id,
+			'report_status_id' => $this->report_status_id,
+			'report_priority_id' => $this->report_priority_id
+		);
+		
+		// Incident_Ticket_Model instance for validation and subsequent saving to the DB
+		$incident_ticket = ( ! empty($this->ticket_id))
+							? new Incident_Ticket_Model($this->ticket_id) 
+							: new Incident_Ticket_Model();
+		
+		// Validate
+		if ($incident_ticket->validate($data))
+		{
+			// SUCCESS! Save
+			$incident_ticket->save();
+		}
+	}
 }
 
 // Instantiate the hook

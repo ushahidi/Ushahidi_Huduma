@@ -175,7 +175,7 @@
 		/**
 		 * Adds the comment form below the comment container referenced by @param containerId
 		 */
-		function showCommentBox(containerId, commentId) {
+		function showCommentBox(containerId, incidentId) {
 		    // Verify specified container exists and commentForm is not null
 		    if ($("#"+containerId+"") != null && commentForm == null) {
 		        // Fetch and  Store the comment form
@@ -189,7 +189,7 @@
 		    $(".dashboard_comment_form").css("display", "block");
 		    
 		    // Set the comment being replied to
-		    $("#dashboard_comment_reply_to").val(unescape(commentId));
+		    $("#incident_id").val(unescape(incidentId));
 		    
 		    // Display the cancel button
 		    $("#comment_cancel").css("display", "block");
@@ -197,21 +197,6 @@
 		        // Hide the comment form
 		        $(commentForm).hide();
 		    });
-		}
-		
-		function rating(commentId, action, ratingContainer) {
-		    // Post the rating
-		    var postData = { comment_id: commentId, action: action };
-		    
-		    // Post for rating
-		    $.post('<?php echo url::site(); ?>entities/rate_comment', 
-		            postData, 
-		            function(response){
-		                if (response.success) {
-		                    $("#"+ratingContainer+"").html(response.data);
-		                }
-		            }
-		    );
 		}
 		
 		// Loads the form for submitting a report
@@ -272,4 +257,3 @@
 		        );
 		    });
 		}
-		

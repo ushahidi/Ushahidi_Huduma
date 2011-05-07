@@ -57,8 +57,7 @@
 							</div>
 
 							<?php echo $entity_reports_view; ?>
-
-							<?php echo $entity_comments_form; ?>
+							
 						</div>
 					<?php print form::close(); ?>
 				</div>

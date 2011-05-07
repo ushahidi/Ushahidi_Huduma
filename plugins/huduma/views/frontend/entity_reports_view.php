@@ -4,52 +4,45 @@
  */
 ?>
 <div id="entity_view_column">
-<ul class="dashboard_comments">
-    <h5><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?></h5>
-	<!-- comments -->
+	<div class="dash-page-header">
+		<h3><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?></h3>
+	</div>
+	<ul class="reports-list">
+		<!-- comments -->
 	<?php if ($reports): ?>
-	<?php foreach ($reports as $incident): ?>
-	    <li class="dashboard_comment_box" id="dashboard_comment_<?php echo $comment->id; ?>">
-			<div class="dashboard_comment_block">
-    			<div>
-                    <strong><?php echo $incident->incident_title ?></strong>&nbsp;
-                    <span class="comment_date_time">
-                        <?php echo date('g:m a', strtotime($incident->incident_date)); ?>&nbsp;on&nbsp;
-                        <?php echo date('F j, Y', strtotime($incident->incident_date)); ?>
-                    </span>
-    			</div>
-    			<div class="dashboard_comment_text">
-    			    <p><?php echo $incident->incident_description; ?></p>
-    			</div>
+		<?php foreach ($reports as $incident): ?>
+		<li class="report-box" id="dashboard_comment_<?php echo $incident->id; ?>">
+			<div class="dashboard-report-item">
+				<div class="report-item-status">
+				</div>
+				<div class="report-item-separator" style="clear:both;"></div>
+				<div class="report-item-content">
+					<strong><a href="<?php echo url::site().$report_view_controller.$incident->id; ?>"><?php echo $incident->incident_title; ?></a></strong>
+				</div>
+				<div class="report-item-separator" style="clear:both;"></div>
+				<div class="report-item-date">
+					<span class="comment_date_time"><?php echo Kohana::lang('ui_huduma.submitted_on'); ?></span>
+					<span class="comment_date_time">
+						<?php echo date('g:m a', strtotime($incident->incident_date)); ?>
+					</span>
+					<span class="comment_date_time">
+						<?php echo date('F j, Y', strtotime($incident->incident_date)); ?>
+					</span>
+					<div class="report-item-action">
+						<div class="report-item-action-box" id="cloader_<?php echo $incident->id; ?>">
+							<?php if ($incident->comment->count() > 0): ?>
+							<?php //TODO: Comments image ?>
+							<?php echo $incident->comment->count(); ?>
+							<span><?php echo Kohana::lang('ui_main.comments'); ?></span>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
 			</div>
-            <span class="dashboard_comment_actions">
-                <a href="#<?php echo Kohana::lang('ui_main.comment'); ?>" 
-                    onclick="showCommentBox('dashboard_comment_<?php echo $incident->id; ?>', '<?php echo urlencode($comment->id);?>')">
-                    <?php echo Kohana::lang('ui_main.comment'); ?>
-                </a>
-                <a href="#<?php echo Kohana::lang('ui_main.share'); ?>">
-                    <?php echo Kohana::lang('ui_main.share'); ?>
-                </a>
-            </span>
-			
-			<div class="dashboard_comment_credibility">
-                <div class="entity_rating_value" id="cloader_<?php echo $incident->id; ?>">
-                    <?php echo $comment->comment_rating; ?>
-                </div>
-                <span class="rating_tickers">
-                    <span class="ratelink">
-                        <a href="javascript:rating('<?php echo $incient->id; ?>','add', 'cloader_<?php echo $incident->id; ?>')">
-                        +</a>
-                        <a href="javascript:rating('<?php echo $incident->id; ?>','subtract','cloader_<?php echo $incident->id; ?>')">-</a>
-                    </span>
-                </span>
-			</div>
-			
-			<?php echo navigator::inline_comments($incident->id); ?>
-			<div class="comment_box_holder"></div>	
+				
 		</li>
-	<?php endforeach; ?>
+		<?php endforeach; ?>
 	<?php endif; ?>
 	<!-- /comments -->
-</ul>
+	</ul>
 </div>

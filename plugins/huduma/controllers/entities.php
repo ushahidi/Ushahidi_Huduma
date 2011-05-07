@@ -13,8 +13,17 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 class Entities_Controller extends Frontend_Controller {
-    var $logged_in;
-
+	var $logged_in;
+	private $is_dashboard_user;
+	
+	public function __construct(){
+		parent::__construct();
+		
+		// Check if there's a dashboard user currently logged in
+		$auth_lite = Authlite::instance('authlite');
+		$this->is_dashboard_user = $auth_lite->logged_in();
+	}
+	
     public function index()
     {
         // Cacheable controller
@@ -104,249 +113,66 @@ class Entities_Controller extends Frontend_Controller {
     }
 
 	public function view($entity_id = FALSE, $saved = FALSE)
-    {
+	{
 		// Entity id not specified, redirect to entity listing
-        if ( ! $entity_id OR $entity_id == 0)
-        {
-            url::redirect('frontend/entities');
-        }
+		if ( ! Static_Entity_Model::is_valid_static_entity($entity_id))
+		{
+			url::redirect('entities');
+		}
 
-        $this->template->content = new View("frontend/entity_view");
-		// Load Akismet API Key (Spam Blocker)
+		$this->template->content = new View("frontend/entity_view");
 
-        $api_akismet = Kohana::config('settings.api_akismet');
-        
-        // Get the entity
-        $entity = ORM::factory('static_entity', $entity_id);
+		// Get the entity
+		$entity = ORM::factory('static_entity', $entity_id);
 
-        // Check if there's a dashboard user currently logged in
-        $auth_lite = Authlite::instance('authlite');
-        $is_dashboard_user = $auth_lite->logged_in();
-        $current_user = ($is_dashboard_user) ? $auth_lite->get_user() : NULL;
-        
-        // Set up the form for comments
-        $form = array(
-            'comment_author' => '',
-            'comment_description' => '',
-            'comment_email' => '',
-            'comment_ip' => '',
-            'captcha' => ''
-        );
+		$current_user = ($this->is_dashboard_user) ? $auth_lite->get_user() : NULL;
+		
+		$show_metadata = FALSE;
 
+		// ucfirst() conversion each word in the string
+		$entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
 
-        // Copy the forms as erros so that the errors are stored with keys corresponding for the field names	
-        $errors = $form;
+		$this->template->content->entity_id = $entity->id;
+		$this->template->content->entity_name = $entity_name;
+		$this->template->content->boundary_id = $entity->boundary_id;
+		$this->template->content->latitude = $entity->latitude;
+		$this->template->content->longitude = $entity->longitude;		
+		$this->template->content->show_dashboard_panel = FALSE;
+		$this->template->content->show_metadata = $show_metadata;
 
-        // Form submission status flags
-        $captcha = Captcha::factory();
-        $form_saved = ($saved == 'saved')? TRUE : FALSE;
-        $form_error = FALSE;
-        $form_action = "";
-		$show_metadata = empty($entity->metadata) ? FALSE : TRUE;
+		// Show the reports
+		$entity_reports_view = new View('frontend/entity_reports_view');
+		$entity_reports_view->reports = Static_Entity_Model::get_reports($entity_id);
+		$entity_reports_view->report_view_controller = 'entities/reports/'.$entity_id.'/';
 
-        // Check if the form has been submitted and that the endity ID is valid
-        if ($_POST AND Static_Entity_Model::is_valid_static_entity($entity_id))
-        {            
-            // Manually extract the data to be passed on for validation and subsequent saving
-            $data = arr::extract($_POST, 'comment_description');
-            
-            // Check if dashboard user is logged in
-            if ($is_dashboard_user)
-            {
-                // Dashboard user is logged in, fetch name and email from ORM
-                $data = array_merge($data, array(
-                    'comment_author' => $current_user->name,
-                    'comment_email' => $current_user->email,
-                    'dashboard_user_id' => $current_user->id,
-                ));
-            }
-            else
-            {
-                // User not logged in, fetch author and email address from input
-                $data = array_merge($data, arr::extract($_POST, 'comment_author', 'comment_email'));
-            }
-            
-            // Add the the static entity id to the data array
-            $data = array_merge($data, array(
-                'static_entity_id' => $entity_id,
-                'parent_comment_id' => $_POST['dashboard_comment_reply_to']
-                ));
-            
-            // Validate the captcha
-            $valid_captcha = Captcha::valid($_POST['captcha']);
-            
-            // Static Entity Comment instance
-            $comment_model = new Comment_Model();
+		$this->template->content->entity_reports_view = $entity_reports_view;
 
-            // Validation check
-            if ($comment_model->validate($data) AND $valid_captcha)
-            {
-                // To hold the SPAM status of the comment
-                $comment_spam = 0;
-                
-                // Yes! everything is valid
-                if ($api_akismet != "")
-                {
-                    // Run Akismet Spam Checker
-                    $akismet = new Akismet();
+		//Javascript Header
+		$this->themes->map_enabled = TRUE;
+		$this->themes->js = new View('js/entity_view_js');
+		$this->themes->js->default_map = Kohana::config('settings.default_map');
+		$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
+		$this->themes->js->entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
+		$this->themes->js->entity_id = $entity_id;
 
-                    // Comment data
-                    $comment = array(
-                        'author' => $comment_model->comment_author,
-                        'email' => $comment_model->comment_email,
-                        'website' => "",
-                        'body' => $comment_model->comment_description,
-                        'user_ip' => $_SERVER['REMOTE_ADDR']
-                    );
+		if ( ! $entity->longitude OR ! $entity->latitude)
+		{
+			$this->themes->js->latitude = Kohana::config('settings.default_lat');
+			$this->themes->js->longitude = Kohana::config('settings.default_lon');
+		}
+		else
+		{
+			$this->themes->js->latitude = $entity->latitude;
+			$this->themes->js->longitude = $entity->longitude;
+		}
 
-                    $config = array(
-                        'blog_url' => url::site(),
-                        'api_key' => $api_akismet,
-                        'comment' => $comment
-                    );
-
-                    $akismet->init($config);
-						
-                    if ($akismet->errors_exist())
-                    {
-                        if ($akismet->is_error('AKISMET_INVALID_KEY'))
-                        {
-                            // throw new
-                            // Kohana_Exception('akismet.api_key');
-                        }
-                        elseif ($akismet->is_error('AKISMET_RESPONSE_FAILED'))
-                        {
-                            // throw new
-                            // Kohana_Exception('akismet.server_failed');
-                        }
-                        elseif($akismet->is_error('AKISMET_SERVER_NOT_FOUND'))
-                        {
-                            // throw new
-                            // Kohana_Exception('akismet.server_not_found');
-                        }
-
-                        // If the server is down, we have to post
-                        // the comment :(
-                        // $this->_post_comment($comment);
-
-                        $comment_spam = 0;
-                    }
-                    else
-                    {
-                        $comment_spam = ($akismet->is_spam())? 1:0;
-                    }
-                }
-                else
-                {
-                    // No API Key!!
-                    $comment_spam = 0;
-                }
-
-				// Activate comment for now
-                if ($comment_spam == 1)
-                {
-                    $comment_model->comment_spam = 1;
-                    $comment_model->comment_active = 0;
-                }
-                else
-                {
-                    $comment_model->comment_spam = 0;
-                    
-                    // Auto Approve
-                    // TODO Add configuration comment configuration setting under the static entity
-                    // dashboard
-                    $comment_model->comment_active = 1;
-                }
-
-                // Save the comment
-                $comment_model->save();
-                
-                // Success
-                $form_saved = TRUE;
-                
-                array_fill_keys($form, '');
-            }
-            // Validation failed
-            else
-            {
-                // Check if the captcha was valid
-                if ( ! $valid_captcha)
-                {
-                    $data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
-                }
-                
-                // Repopulate the form fields
-                $form = arr::overwrite($form, $data->as_array());
-
-                // Populate the form errors if any
-                $errors = arr::overwrite($errors, $data->errors('comment'));
-
-                $form_error = TRUE;
-            }
-        }
-        
-        // ucfirst() conversion each word in the string
-        $entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
-        
-        $this->template->content->entity_id = $entity->id;
-        $this->template->content->entity_name = $entity_name;
-        $this->template->content->boundary_id = $entity->boundary_id;
-        $this->template->content->latitude = $entity->latitude;
-        $this->template->content->longitude = $entity->longitude;		
-        $this->template->content->show_dashboard_panel = FALSE;
-        $this->template->content->show_metadata = $show_metadata;
-        
-        // Show the comments
-        $entity_reports_view = new View('frontend/entity_reports_view');
-        $entity_reports_view->reports = Static_Entity_Model::get_reports($entity_id);
-        
-        $this->template->content->entity_reports_view = $entity_reports_view;
-
-        // Load the comments form
-        $entity_comments_form = new View('frontend/entity_comments_form');
-        $entity_comments_form->is_dashboard_user = $is_dashboard_user;
-        
-        $entity_comments_form->captcha = Captcha::factory();
-        $entity_comments_form->form = $form;
-        $entity_comments_form->errors = $errors;
-        $entity_comments_form->form_error = $form_error;
-        $entity_comments_form->form_saved = $form_error;
-        
-        // Set the form content
-        $entity_comments_form->captcha = $captcha;
-        $entity_comments_form->form = $form;
-        $entity_comments_form->errors = $errors;
-        $entity_comments_form->form_error = $form_error;
-        $entity_comments_form->form_saved = $form_saved;
-        
-        $this->template->content->entity_comments_form = $entity_comments_form;
-
-        //Javascript Header
-        $this->themes->map_enabled = TRUE;
-        $this->themes->js = new View('js/entity_view_js');
-        $this->themes->js->default_map = Kohana::config('settings.default_map');
-        $this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
-        $this->themes->js->entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
-        $this->themes->js->entity_id = $entity_id;
-
-        if ( ! $entity->longitude OR ! $entity->latitude)
-        {
-            $this->themes->js->latitude = Kohana::config('settings.default_lat');
-            $this->themes->js->longitude = Kohana::config('settings.default_lon');
-        }
-        else
-        {
-            $this->themes->js->latitude = $entity->latitude;
-            $this->themes->js->longitude = $entity->longitude;
-        }
-
-        $this->template->header->header_block = $this->themes->header_block();
-    }
+		$this->template->header->header_block = $this->themes->header_block();
+	}
     
     /**
      * Performs comment rating
      */
-    public function rate_comment()
+    public function rate_report()
     {
         // No template, disable auto-rendering
         $this->template = "";
@@ -550,6 +376,116 @@ class Entities_Controller extends Frontend_Controller {
 		{
 			// Invalid REQUEST method
 			print json_encode(array('success' => FALSE));
+		}
+	}
+	
+	/**
+	 * Loads the report view for an entity
+	 */
+	public function reports($entity_id =  FALSE, $incident_id =  FALSE)
+	{
+		// Validate entity and incident 
+		if (Static_Entity_Model::is_valid_static_entity($entity_id) AND Incident_Model::is_valid_incident($incident_id))
+		{
+			$this->template->content = new View('frontend/single_report_view');
+			// Setup forms
+			$form = array(
+				'comment_author' => '',
+				'comment_email' => '',
+				'comment_description' => '',
+			);
+			$errors = $form;
+			$form_error = FALSE;
+			$form_saved = FALSE;
+		
+			// Get the ticket for the incident
+			$ticket = Incident_Ticket_Model::get_incident_ticket($incident_id);
+			
+			// Has the form been submitted
+			if ($_POST)
+			{
+				// Manually extract the data to be passed on for validation and subsequent saving
+				$data = arr::extract($_POST, 'incident_id', 'comment_description');
+
+				// Check if dashboard user is logged in
+				if ($this->is_dashboard_user)
+				{
+					// Dashboard user is logged in, fetch name and email from ORM
+					$data = array_merge($data, array(
+						'comment_author' => $current_user->name,
+						'comment_email' => $current_user->email,
+						'dashboard_user_id' => $current_user->id,
+					));
+				}
+				else
+				{
+					// User not logged in, fetch author and email address from input
+					$data = array_merge($data, arr::extract($_POST, 'comment_author', 'comment_email'));
+				}
+
+				// Add the the static entity id and comment date to the data array
+				$data = array_merge($data, array('static_entity_id' => $entity_id));
+
+				// Validate the captcha
+				$valid_captcha = Captcha::valid($_POST['captcha']);
+
+				// Static Entity Comment instance
+				$comment_model = new Comment_Model();
+				
+				if ($comment_model->validate($data) AND $valid_captcha)
+				{
+					// Success save
+					$comment_model->comment_date = date('Y-m-d H:i:s');
+					$comment_model->save();
+					$form_saved = TRUE;
+					array_fill_keys($form, '');
+				}
+				else
+				{
+					// Check if the captcha was valid
+					if ( ! $valid_captcha)
+					{
+						$data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
+					}
+					
+					// Turn on form error
+					$form_error = TRUE;
+					
+					// Overwrite form and error array key values
+					$form = arr::overwrite($form, $data->as_array());
+					$errors = arr::overwrite($errors, $data->errors('comment'));
+				}
+			}
+		
+			// Load the comments form
+			$comments_form = new View('frontend/report_comments_form');
+			$comments_form->incident_id = $incident_id;
+			$comments_form->is_dashboard_user = $this->is_dashboard_user;
+			
+			// Set the form content
+			$comments_form->captcha = Captcha::factory();
+			$comments_form->form = $form;
+			$comments_form->errors = $errors;
+			$comments_form->form_error = $form_error;
+			$comments_form->form_saved = $form_saved;
+			
+			$this->template->content->show_dashboard_panel = FALSE;
+			$this->template->content->form = $form;
+			$this->template->content->dashboard_panel = "";
+			$this->template->content->comments_form = $comments_form;
+			$this->template->content->incident = new Incident_Model($incident_id);
+			$this->template->content->ticket = $ticket;
+			$this->template->header->header_block = $this->themes->header_block();
+		}
+		elseif (Static_Entity_Model::is_valid_static_entity($entity_id))
+		{
+			// Entity id is valid, redirect to entity view page
+			url::redirect('entities/view/'.$entity_id);
+		}
+		else
+		{
+			// Invalid parameters, redirect to entities listing
+			url::redirect('entities');
 		}
 	}
 }

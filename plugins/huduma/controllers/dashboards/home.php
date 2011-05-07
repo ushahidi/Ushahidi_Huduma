@@ -21,6 +21,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	{
 		// Setup the form
 		$form = array(
+			'incident_id' => '',
 			'comment_description' => ''
 		);
 
@@ -29,64 +30,12 @@ class Home_Controller extends Dashboard_Template_Controller {
 		$form_error = FALSE;
 		$form_saved = FALSE;
 
-        // Load the dashboard panel view
-        $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-        $dashboard_panel->static_entity_panel = TRUE;
         
-		// Has the static entity role been specified, get content
 		if ($this->static_entity_role)
 		{
 			// Load the static entity view
 			$this->template->content = new View('frontend/entity_view');
 			
-			// TODO Has the form been submitted
-			if ($_POST)
-			{
-			    // Manually extract the data
-			    $data = arr::extract($_POST, 'comment_description');
-			    
-			    $data = array_merge($data, array(
-			        'dashboard_user_id' => $this->user->id, 
-			        'comment_author' => $this->user->name,
-			        'comment_email' => $this->user->email,
-			        'static_entity_id' => $this->static_entity_id
-			    ));
-			    			    
-			    // Entity comment instance
-			    $entity_comment = new Comment_Model();
-			    
-			    // Validation
-			    if ($entity_comment->validate($data))
-			    {
-			        // Success
-			        // Set extra properties
-			        $entity_comment->comment_active = 1;
-			        $entity_comment->comment_spam = 0;
-			        
-			        // Success, save!
-			        $entity_comment->save();
-			        $form_saved = TRUE;
-			        $form_error = FALSE;
-			        
-			        // Clear the form keys
-			        array_fill_keys($form, '');
-			    }
-			    // Validation failed
-			    else
-			    {
-			        // Repopulate form fields
-			        $form = arr::overwrite($form, $data->as_array());
-			        
-			        // Repopulate error fields
-			        $errors = arr::overwrite($errors, $data->errors('comments'));
-			        
-			        // Validation error
-			        $form_error = FALSE;
-			        $form_saved = FALSE;
-			    }
-			}
-			// end if
-						
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
 
@@ -99,25 +48,15 @@ class Home_Controller extends Dashboard_Template_Controller {
 			// Disable "view metadata" link
 			$this->template->content->show_metadata = FALSE;
 			$this->template->content->show_dashboard_panel = TRUE;
-			$this->template->content->dashboard_panel = $dashboard_panel;
-			
+			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
+
 			// Get the comments for the static entity
 			$entity_reports_view = new View('frontend/entity_reports_view');
 			$entity_reports_view->reports = Static_Entity_Model::get_reports($this->static_entity_id);
-			
+			$entity_reports_view->report_view_controller = 'dashboards/home/reports/';
+
 			$this->template->content->entity_reports_view = $entity_reports_view;
 
-			// Load the comments form
-			$entity_comments_form = new View('frontend/entity_comments_form');
-			$entity_comments_form->is_dashboard_user = TRUE;
-			
-			// Set the form content
-			$entity_comments_form->form = $form;
-			$entity_comments_form->errors = $errors;
-			$entity_comments_form->form_error = $form_error;
-			$entity_comments_form->form_saved = $form_saved;
-
-			$this->template->content->entity_comments_form = $entity_comments_form;
 			$this->template->content->entity_id = $this->static_entity_id;
 
 			// Javascript header
@@ -127,8 +66,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
 			$this->themes->js->entity_id = $entity->id;
 			$this->themes->js->entity_name = $entity_name;
-            $this->themes->js->latitude = $entity->latitude;
-            $this->themes->js->longitude = $entity->longitude;
+			$this->themes->js->latitude = $entity->latitude;
+			$this->themes->js->longitude = $entity->longitude;
 
 			// Set the header block
 			$this->template->header->header_block = $this->themes->header_block();
@@ -279,74 +218,74 @@ class Home_Controller extends Dashboard_Template_Controller {
 	 */
 	public function change_password()
 	{
-	    // Load the content view
-	    $this->template->content = new View('frontend/dashboards/change_password');
+		// Load the content view
+		$this->template->content = new View('frontend/dashboards/change_password');
+
+		// Set up form fields
+		$form = array(
+			'name' => $this->user->name,
+			'username' => $this->user->username,
+			'email' => '',
+			'password' => '',
+		);
 	    
-	    // Set up form fields
-	    $form = array(
-	        'name' => $this->user->name,
-	        'username' => $this->user->username,
-	        'email' => '',
-	        'password' => '',
-	    );
+		// Copy forms as errors so that the erros maintain the keys corresponding to the field names
+		$errors = $form;
+
+		$form_saved = FALSE;
+		$form_error = FALSE;
 	    
-	    // Copy forms as errors so that the erros maintain the keys corresponding to the field names
-	    $errors = $form;
-	    
-	    $form_saved = FALSE;
-	    $form_error = FALSE;
-	    
-	    // Has te form been submitted
-	    if ($_POST)
-	    {
-	        // Manually extract the data
-	        $data = arr::extract($_POST, 'email', 'password', 'confirm_password', 'name', 'email', 'username');
+		// Has te form been submitted
+		if ($_POST)
+		{
+			// Manually extract the data
+			$data = arr::extract($_POST, 'email', 'password', 'confirm_password', 'name', 'email', 'username');
+
+			// Add the other properties so that the validate method doesn't throw an error
+			$data = array_merge($data, array('is_active' => $this->user->is_active));
 	        
-	        // Add the other properties so that the validate method doesn't throw an error
-	        $data = array_merge($data, array('is_active' => $this->user->is_active));
-	        
-	        if ($this->user->validate($data) AND $_POST['save'] == 1)
-	        {
-	            // Success
-	            $this->user->save();
-	            
-	            $form_saved = TRUE;
-	            $form_error = FALSE;
-	            
-	            array_fill_keys($form, '');
-	        }
-	        else
-	        {
-	            $form = arr::overwrite($form, $data->as_array());
-	            $error = arr::overwrite($form, $data->errors());
-	            
-	            // Turn on form error
-	            $form_error = TRUE;
-	            
-	            $form_saved = FALSE;
-	        }
-	    }
-	    else
-	    {
-	        // Set the email key in the $forms array
-	        $form['email'] = $this->user->email;
-	    }
+			if ($this->user->validate($data) AND $_POST['save'] == 1)
+			{
+				// Success
+				$this->user->save();
+
+				$form_saved = TRUE;
+				$form_error = FALSE;
+
+				array_fill_keys($form, '');
+			}
+			else
+			{
+				$form = arr::overwrite($form, $data->as_array());
+				$error = arr::overwrite($form, $data->errors());
+
+				// Turn on form error
+				$form_error = TRUE;
+
+				$form_saved = FALSE;
+			}
+		}
+		else
+		{
+			// Set the email key in the $forms array
+			$form['email'] = $this->user->email;
+		}
 	    
-	    $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-	    $dashboard_panel->static_entity_panel = TRUE;
+		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+		$dashboard_panel->static_entity_panel = TRUE;
+
+		// Set content data
+		$this->template->content->dashboard_panel = $dashboard_panel;
+		$this->template->content->form = $form;
+		$this->template->content->errors = $errors;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->form_saved = $form_saved;
 	    
-	    // Set content data
-	    $this->template->content->dashboard_panel = $dashboard_panel;
-	    $this->template->content->form = $form;
-	    $this->template->content->errors = $errors;
-	    $this->template->content->form_error = $form_error;
-	    $this->template->content->form_saved = $form_saved;
-	    
-	    // Javscript header
-	    $this->themes->js = new View('js/dashboard_common_js');
-	    
-	    // Set the header block
-	    $this->template->header->header_block = $this->themes->header_block();
+		// Javscript header
+		$this->themes->js = new View('js/dashboard_common_js');
+
+		// Set the header block
+		$this->template->header->header_block = $this->themes->header_block();
 	}
 	
 	/**
@@ -354,113 +293,105 @@ class Home_Controller extends Dashboard_Template_Controller {
 	 */
 	 public function moderate_comments()
 	 {
-	     // Load template
-	     $this->template->content = new View('frontend/dashboards/moderate_comments');
+		// Load template
+		$this->template->content = new View('frontend/dashboards/moderate_comments');
+
+		// Get the no. of items per page
+		$items_per_page = (int)Kohana::config('settings.items_per_page_admin');
 	     
-	     // Get the no. of items per page
-	     $items_per_page = (int)Kohana::config('settings.items_per_page_admin');
+		// Setup pagination
+		$pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => $items_per_page,
+			'total_items' => ORM::factory('comment')->where('static_entity_id', $this->static_entity_id)->count_all()
+		));
 	     
-	     // Setup pagination
-	     $pagination = new Pagination(array(
-	         'query_string' => 'page',
-	         'items_per_page' => $items_per_page,
-	         'total_items' => ORM::factory('comment')->where('static_entity_id', $this->static_entity_id)->count_all()
-	     ));
-	     
-	     // Fetch comments for current page
+		// Fetch comments for current page
 	     $comments = ORM::factory('comment')
-	                        ->where('static_entity_id', $this->static_entity_id)
-	                        ->find_all($items_per_page, $pagination->sql_offset);
+					->where('static_entity_id', $this->static_entity_id)
+					->find_all($items_per_page, $pagination->sql_offset);
 	     
-	     $dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-	     $dashboard_panel->static_entity_panel = TRUE;
-	     $this->template->content->dashboard_panel = $dashboard_panel;
-	     $this->template->content->comments = $comments;
-	     $this->template->content->pagination = $pagination;
-	     $this->template->content->total_items = $pagination->total_items;
-	     $this->themes->js = new View('js/dashboard_common_js');
-	     $this->template->header->header_block = $this->themes->header_block();
-	 }
+		$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
+		$this->template->content->comments = $comments;
+		$this->template->content->pagination = $pagination;
+		$this->template->content->total_items = $pagination->total_items;
+		$this->themes->js = new View('js/dashboard_common_js');
+		$this->template->header->header_block = $this->themes->header_block();
+	}
 	 
-	 /**
-	  * Updates a static entity comment
-	  */
-	 public function update_comment()
-	 {
-	     $this->template = "";
-	     $this->auto_render = FALSE;
-	     
-         // Return value
-	     header("Content-type: application/json; charset=utf-8");
-	     
-	     // Check for form POST
-	     if ($_POST)
-	     {
-	         // Get the comment id
-	         $comment_id = $_POST['comment_id'];
-	         
-	         // Validate comment
-	         if (Static_Entity_Comment_Model::is_valid_static_entity_comment($comment_id))
-	         {
-	             // Get the action
-	             $action = $_POST['action'];
-	             
-	             // Load the entity comment and fetch the comment date
-	             $comment = ORM::factory('static_entity_comment', $comment_id);
-	             $comment_date = $comment->comment_date;
-	             
-	             // Check for the action
-	             if ($action == 'spam')
-	             {
-	                 // Mark comment as spam
-	                 $comment->comment_spam = 1;
-	             }
-	             elseif ($action == 'notspam')
-	             {
-	                 // Mark comment as not spam
-	                 $comment->comment_spam = 0;
-	             }
-	             elseif ($action == 'delete')
-	             {
-	                 // Mark comment as inactive
-	                 $comment->comment_active = 0;
-	             }
-	             elseif ($action == 'undelete')
-	             {
-	                 // Mark comment as active
-	                 $comment->comment_active  = 1;
-	             }
-	             
-	             // Maintain the original comment date
-	             $comment->comment_date = $comment_date;
-	             
-	             // Save comment
-	             $comment->save();
-	             
-	             // Success!
-        	     print json_encode(array(
-        	       'success' => TRUE
-        	     ));
-	         }
-	         else
-	         {
-        	     print json_encode(array(
-        	       'success' => FALSE
-        	     ));
-	         }
-	         
-	     }
-	     else
-	     {
-    	     print json_encode(array(
-    	       'success' => FALSE
-    	     ));
-	     }
-	 }
+	/**
+	 * Updates a static entity comment
+	 */
+	public function update_comment()
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+
+		 // Return value
+		header("Content-type: application/json; charset=utf-8");
+
+		// Check for form POST
+		if ($_POST)
+		{
+			// Get the comment id
+			$comment_id = $_POST['comment_id'];
+
+			// Validate comment
+			if (Comment_Model::is_valid_comment($comment_id))
+			{
+				// Get the action
+				$action = $_POST['action'];
+
+				// Load the entity comment and fetch the comment date
+				$comment = ORM::factory('comment', $comment_id);
+				$comment_date = $comment->comment_date;
+
+				// Check for the action
+				switch ($action)
+				{
+					case 'spam':
+						// Mark comment as spam
+						$comment->comment_spam = 1;
+					break;
+					
+					case 'notspam':
+						// Mark comment as spam
+						$comment->comment_spam = 0;
+					break;
+					
+					case 'delete':
+						// Mark comment as inactive
+						$comment->comment_active = 0;
+					break;
+					
+					case 'undelete':
+						// Mark comment as active
+						$comment->comment_active  = 1;
+					break;
+				}
+				// Maintain the original comment date
+				$comment->comment_date = $comment_date;
+
+				// Save comment
+				$comment->save();
+
+				// Success!
+				print json_encode(array('success' => TRUE));
+			}
+			else
+			{
+				print json_encode(array('success' => FALSE));
+			}
+		}
+		else
+		{
+			print json_encode(array('success' => FALSE));
+		}
+	}
 	 
-	 /**
-	  * Handles metadata update
-	  */
+	/**
+	 * Handles metadata update
+	 */
 	public function metadata_update()
 	{
 		// No template for this method
@@ -535,6 +466,135 @@ class Home_Controller extends Dashboard_Template_Controller {
 		
 		// Verify that the entity id exists
 		print navigator::get_metadata_item_row();
+	}
+	
+	/**
+	 * Loads the view page for the report
+	 */
+	public function reports($incident_id = FALSE)
+	{
+		// Validate incident id
+		if (Incident_Model::is_valid_incident($incident_id))
+		{
+			$this->template->content = new View('frontend/single_report_view');
+			// Setup forms
+			$form = array(
+				'comment_author' => '',
+				'comment_email' => '',
+				'comment_description' => '',
+			);
+			$errors = $form;
+			$form_error = FALSE;
+			$form_saved = FALSE;
+			
+			// ORM instances
+			$ticket = Incident_Ticket_Model::get_incident_ticket($incident_id);
+			$incident = new Incident_Model($incident_id);
+			
+			// Has the form been submitted?
+			if ($_POST)
+			{
+				// Data to be validated and saved
+				$data = array(
+					'incident_id' => $incident_id,
+					'comment_author' => $this->user->name, 
+					'comment_email'=>$this->user->email, 
+					'static_entity_id'=>$incident->static_entity_id,
+					'dashboard_user_id' => $this->user->id,
+					'comment_date' => date('Y-m-d H:i:s')
+				);
+				
+				// Extract the comment text
+				$data = array_merge($data, arr::extract($_POST, 'comment_description'));
+				
+				$comment = new Comment_Model();
+				if ($comment->validate($data))
+				{
+					// Success! Save the comment
+					$comment->comment_date = date('Y-m-d H:i:s');
+					$comment->save();
+					
+					// Is the ticket to be closed?
+					$close_ticket = ($_POST['comment_close']) ? TRUE : FALSE;
+					
+					// Update ticket history
+					$history_data = array(
+						'incident_ticket_id' => $ticket->id, 
+						'report_status_id' => ($close_ticket)? 2 : $ticket->report_status_id,
+						'notes' => $comment->comment_description,
+						'dashboard_user_id' => $this->user->id
+					);
+					
+					$history_model = new Incident_Ticket_History_Model();
+					if ($history_model->validate($history_data))
+					{
+						// Success! Save
+						$history_model->save();
+						
+						// Check if the ticket is to be closed
+						if ($close_ticket)
+						{
+							Kohana::log('info', sprintf('closing ticket #%s', $ticket->id));
+							// Close the ticket
+							$ticket->close();
+						}
+						
+						$form_saved = TRUE;
+						array_fill_keys($form, '');
+					}
+					else
+					{
+						Kohana::log('error', sprintf('Could not update the history for ticket #%s', $ticket->id));
+						Kohana::long('debug', Kohana::debug($history_data->errors()));
+					}
+				}
+				// Validation FAILED
+				else
+				{
+					$form_error = FALSE;
+					$form = arr::overwrite($form, $data->as_array());
+					$errors = arr::overwrite($errors, $data->errors('comment'));
+				}
+			}
+		
+			// Load the comments form
+			$comments_form = new View('frontend/report_comments_form');
+			$comments_form->incident_id = $incident_id;
+			$comments_form->is_dashboard_user =TRUE;
+			
+			// Set the form content
+			$comments_form->captcha = Captcha::factory();
+			$comments_form->form = $form;
+			$comments_form->errors = $errors;
+			$comments_form->form_error = $form_error;
+			$comments_form->form_saved = $form_saved;
+			
+			$this->template->content->show_dashboard_panel = TRUE;
+			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
+			$this->template->content->form = $form;
+			$this->template->content->comments_form = $comments_form;
+			$this->template->content->incident = $incident;
+			$this->template->content->ticket = $ticket;
+			
+			$this->template->header->header_block = $this->themes->header_block();
+		}
+		else
+		{
+			// Invalid parameter value, redirect to dashboard home page
+			$this->index();
+		}
+	}
+	
+	/**
+	 * Inner helper function to fetch the dashboard panel
+	 */
+	private function __get_dashboard_panel()
+	{
+		// Load the dashboard panel view
+		$dashboard_panel = View::factory('frontend/dashboards/dashboard_panel');
+		$dashboard_panel->static_entity_panel = !empty($this->static_entity_id)? TRUE : FALSE;
+		
+		return $dashboard_panel;
 	}
 }
 ?>

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /* 
- * Service Delivery Navigation Helper
+ * Miscellanious helper functions for the huduma plugin
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
@@ -14,40 +14,40 @@
  */
 class navigator_Core {
 
-    /**
-     * Generates the subtabs for the service delivery plugin
-     *
-     * @param String $this_page
-     */
-    public static function subtabs($this_sub_page = FALSE)
-    {
-        // To hold the menus for service delivery
-        $menu = "";
+	/**
+	 * Generates the subtabs for the service delivery plugin
+	 *
+	 * @param String $this_page
+	 */
+	public static function subtabs($this_sub_page = FALSE)
+	{
+		// To hold the menus for service delivery
+		$menu = "";
 
-        // Administrative boundaries
-        $menu .= ($this_sub_page == "boundaries")
-            ? Kohana::lang('ui_huduma.boundaries')
-            : "<a href=\"".url::site()."admin/servicedelivery\">".Kohana::lang('ui_huduma.boundaries')."</a>";
+		// Administrative boundaries
+		$menu .= ($this_sub_page == "boundaries")
+			? Kohana::lang('ui_huduma.boundaries')
+			: "<a href=\"".url::site()."admin/servicedelivery\">".Kohana::lang('ui_huduma.boundaries')."</a>";
 
-        // Service Providers
-        $menu .= ($this_sub_page == "agencies")
-            ? Kohana::lang('ui_huduma.agencies')
-            : "<a href=\"".url::site()."admin/agencies\">".Kohana::lang('ui_huduma.agencies')."</a>";
+		// Service Providers
+		$menu .= ($this_sub_page == "agencies")
+			? Kohana::lang('ui_huduma.agencies')
+			: "<a href=\"".url::site()."admin/agencies\">".Kohana::lang('ui_huduma.agencies')."</a>";
 
 
-        // Static Entities
-        $menu .= ($this_sub_page == "entities")
-            ? Kohana::lang("ui_huduma.entities")
-            : "<a href=\"".url::site()."admin/entities\">".Kohana::lang('ui_huduma.entities')."</a>";
+		// Static Entities
+		$menu .= ($this_sub_page == "entities")
+			? Kohana::lang("ui_huduma.entities")
+			: "<a href=\"".url::site()."admin/entities\">".Kohana::lang('ui_huduma.entities')."</a>";
 
-        // Dashboard users
-        $menu .= ($this_sub_page == "dashboard_users")
-            ? Kohana::lang("ui_huduma.dashboard_users")
-            : "<a href=\"".url::site()."admin/dashboard/users\">".Kohana::lang('ui_huduma.dashboard_users')."</a>";
+		// Dashboard users
+		$menu .= ($this_sub_page == "dashboard_users")
+			? Kohana::lang("ui_huduma.dashboard_users")
+			: "<a href=\"".url::site()."admin/dashboard/users\">".Kohana::lang('ui_huduma.dashboard_users')."</a>";
 		
-        // Output the menu
-        echo $menu;
-    }
+		// Output the menu
+		echo $menu;
+	}
 
     /**
      * Generates the breadcrumb for the boundary specified in @param $boundary_id
@@ -120,9 +120,9 @@ class navigator_Core {
 		$comment_tree = '';
 
 		// Fetch the inline commnets
-		$children = Incident_Model::get_comments($incident_id);
+		$children = ORM::factory('incident',$incident_id)->comment;
 
-		Kohana::log('info', sprintf('Fetch %d comments for entity %d', $children->count(), $entity_id));
+		Kohana::log('info', sprintf('Fetch %d comments for incident %d', $children->count(), $incident_id));
         
 		if ($children->count() > 0)
 		{
