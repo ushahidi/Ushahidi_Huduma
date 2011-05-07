@@ -302,26 +302,31 @@ class Reports_Controller extends Frontend_Controller {
 		// check, has the form been submitted, if so, setup validation
 		if ($_POST)
 		{
-			//print_r($_POST);exit;
-			// Explicitly specify the $_POST data to be validated
-			$post_data = arr::extract($_POST, 'incident_hour', 'incident_minute', 'incident_ampm', 'incident_category', 
-			    'incident_news', 'incident_video', 'incident_photo');
-			
-			// Instantiate validation    
-			$post = Validation::factory(array_merge($post_data, $_FILES))
-						->pre_filter('trim', TRUE)
-						->add_rules('incident_hour', 'required', 'between[1,12]')
-						->add_rules('incident_minute', 'required', 'between[0,59]');
-			
-			// Merideim validation for the incident time
-			if ($post->incident_ampm != "pm" AND $post->incident_ampm != "am")
+			// Instantiate Validation, use $post, so we don't overwrite $_POST fields with our own things
+			$post = Validation::factory(array_merge($_POST,$_FILES));
+
+			 //	 Add some filters
+			$post->pre_filter('trim', TRUE);
+
+			// Add some rules, the input field, followed by a list of checks, carried out in order
+			$post->add_rules('incident_title', 'required', 'length[3,200]');
+			$post->add_rules('incident_description', 'required');
+			$post->add_rules('incident_date', 'required', 'date_mmddyyyy');
+			$post->add_rules('incident_hour', 'required', 'between[1,12]');
+			$post->add_rules('incident_minute', 'required', 'between[0,59]');
+
+			if ($_POST['incident_ampm'] != "am" AND $_POST['incident_ampm'] != "pm")
 			{
-				$post->add_error('incident_ampm', 'values');
+				$post->add_error('incident_ampm','values');
 			}
-			
+
+			// Validate for maximum and minimum latitude values
+			$post->add_rules('latitude', 'required', 'between[-90,90]');
+			$post->add_rules('longitude', 'required', 'between[-180,180]');
+			$post->add_rules('location_name', 'required', 'length[3,200]');
+
 			//XXX: Hack to validate for no checkboxes checked
-			if ( ! isset($_POST['incident_category']))
-			{
+			if (!isset($_POST['incident_category'])) {
 				$post->incident_category = "";
 				$post->add_error('incident_category', 'required');
 			}
@@ -357,212 +362,188 @@ class Reports_Controller extends Frontend_Controller {
 			// Validate photo uploads
 			$post->add_rules('incident_photo', 'upload::valid', 'upload::type[gif,jpg,png]', 'upload::size[2M]');
 
-            // Setup location data for validation
-            $location = new Location_Model();
-            $location_data= arr::extract($_POST, 'longitude', 'latitude', 'location_name');
-            $location_data  = array_merge($location_data, array('location_date' => date("Y-m-d H:i:s",time())));
-            
-            // STEP 1: VALIDATE LOCATION
-            if ($location->validate($location_data) AND $post->validate())
+			// Validate Personal Information
+			if (!empty($_POST['person_first']))
 			{
-			    // Success!, SAVE
-			    $location->save();
-			    
-				// STEP 2: VALIDATE INCIDENT
-				$incident = new Incident_Model();
-
-				
-				// Manually extract the incident data to be validated
-				$incident_data = arr::extract($_POST, 'incident_title',
-				'incident_description', 'incident_date', 'form_id','');
-				
-				// Add extra info
-				$incident_data = array_merge($incident_data, array('user_id' => 0, 'location_id' => $location->id));
-				
-				if ($incident->validate($incident_data))
-				{
-    				// Set additional incident properties
-    				$incident_date = explode("/", $incident->incident_date);
-
-    				// The $_POST['date'] is a value posted by form in mm/dd/yyyy format
-    				$incident_date = $incident_date[2]."-".$incident_date[0]."-".$incident_date[1];
-    				
-    				$incident_time = $post->incident_hour.":".$post->incident_minute.":00 ".$post->incident_ampm;
-    				
-    				// NOTE: The date and time stamps are MySQL specific
-    				$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
-    				$incident->incident_dateadd = date("Y-m-d H:i:s",time());
-
-    			
-					//check whether county_id or constituency_id has been set
-						
-					$boundary_id = $_POST['select_constituency'];
-						
-					$incident->boundary_id = $boundary_id;
-
-    				$incident->save();
-    				
-    				
-    				// STEP 3: SAVE CATEGORIES
-    				foreach($post->incident_category as $item)
-    				{
-    					$incident_category = new Incident_Category_Model();
-    					$incident_category->incident_id = $incident->id;
-    					$incident_category->category_id = $item;
-    					$incident_category->save();
-    				}
-    				
-    				
-    				// STEP 4: SAVE MEDIA
-    				// a. News
-    				foreach($post->incident_news as $item)
-    				{
-    					if (!empty($item))
-    					{
-    						$news = new Media_Model();
-    						$news->location_id = $location->id;
-    						$news->incident_id = $incident->id;
-    						$news->media_type = 4;		// News
-    						$news->media_link = $item;
-    						$news->media_date = date("Y-m-d H:i:s",time());
-    						$news->save();
-    					}
-    				}
-
-    				// b. Video
-    				foreach($post->incident_video as $item)
-    				{
-    					if (!empty($item))
-    					{
-    						$video = new Media_Model();
-    						$video->location_id = $location->id;
-    						$video->incident_id = $incident->id;
-    						$video->media_type = 2;		// Video
-    						$video->media_link = $item;
-    						$video->media_date = date("Y-m-d H:i:s",time());
-    						$video->save();
-    					}
-    				}
-
-    				// c. Photos
-    				$filenames = upload::save('incident_photo');
-    				$i = 1;
-
-    				foreach ($filenames as $filename)
-    				{
-    					$new_filename = $incident->id."_".$i."_".time();
-
-    					$file_type = strrev(substr(strrev($filename),0,4));
-
-    					// IMAGE SIZES: 800X600, 400X300, 89X59
-
-    					// Large size
-    					Image::factory($filename)->resize(800,600,Image::AUTO)
-    						->save(Kohana::config('upload.directory', TRUE).$new_filename.$file_type);
-
-    					// Medium size
-    					Image::factory($filename)->resize(400,300,Image::HEIGHT)
-    						->save(Kohana::config('upload.directory', TRUE).$new_filename."_m".$file_type);
-
-    					// Thumbnail
-    					Image::factory($filename)->resize(89,59,Image::HEIGHT)
-    						->save(Kohana::config('upload.directory', TRUE).$new_filename."_t".$file_type);	
-
-    					// Remove the temporary file
-    					unlink($filename);
-
-    					// Save to DB
-    					$photo = new Media_Model();
-    					$photo->location_id = $location->id;
-    					$photo->incident_id = $incident->id;
-    					$photo->media_type = 1; // Images
-    					$photo->media_link = $new_filename.$file_type;
-    					$photo->media_medium = $new_filename."_m".$file_type;
-    					$photo->media_thumb = $new_filename."_t".$file_type;
-    					$photo->media_date = date("Y-m-d H:i:s",time());
-    					$photo->save();
-    					$i++;
-    				}
-    				
-    				
-    				// STEP 5: VALIDATE PERSONAL INFORMATION
-    				
-                    // Extract personal information from $_POST
-                    $incident_person_data = arr::extract($_POST, 'person_first', 'person_last', 'person_email');
-                    
-                    // Add incident, date and location information
-                    $incident_person_data =  array_merge($incident_person_data, 
-                        array(
-                            'person_date' => date("Y-m-d H:i:s",time()), 
-                            'incident_id' => $incident->id, 
-                            'location_id'=>$location->id
-                            ));
-                        
-                    $incident_person = new Incident_Person_Model();
-                    
-                    // Test validation
-                    if ($incident_person->validate($incident_person_data))
-                    {
-                        // Success! Save
-                        $incident_person->save();
-                    }
-    				// STEP 6: SAVE CUSTOM FORM FIELDS
-    				if (isset($post->custom_field))
-    				{
-    					foreach($post->custom_field as $key => $value)
-    					{
-    						$form_response = ORM::factory('form_response')
-    						                    ->where('form_field_id', $key)
-    						                    ->where('incident_id', $incident->id)
-    						                    ->find();
-    						                    
-    						if ($form_response->loaded == true)
-    						{
-    							$form_response->form_field_id = $key;
-    							$form_response->form_response = $value;
-    							$form_response->save();
-    						}
-    						else
-    						{
-    							$form_response = new Form_Response_Model();
-    							$form_response->form_field_id = $key;
-    							$form_response->incident_id = $incident->id;
-    							$form_response->form_response = $value;
-    							$form_response->save();
-    						}
-    					}
-    				}
-
-    				// Action::report_add - Added a New Report
-    				Event::run('ushahidi_action.report_add', $incident);
-
-    				url::redirect('reports/thanks');
-			    }
-			    else
-			    {
-			        // Delete location
-			        $location->delete();
-			        
-			        // Repopulate the form fields with all the data
-			        $form = arr::overwrite($form, array_merge($location_data->as_array(), $post->as_array(), $incident_data->as_array()));
-			        
-			        // Populate teh erors if any
-			        $errors = arr::overwrite($errors, $incident_data->errors('report'));
-			        $form_error = TRUE;
-			    }
+				$post->add_rules('person_first', 'length[3,100]');
 			}
+
+			if (!empty($_POST['person_last']))
+			{
+				$post->add_rules('person_last', 'length[3,100]');
+			}
+
+			if (!empty($_POST['person_email']))
+			{
+				$post->add_rules('person_email', 'email', 'length[3,100]');
+			}
+			
+			// Run pre-validation events on the data
+			Event::run('ushahidi_action.report_submit_frontend', $post);
+            
+			// Test to see if things passed the rule checks
+			if ($post->validate())
+			{
+				// STEP 1: SAVE LOCATION
+				$location = new Location_Model();
+				$location->location_name = $post->location_name;
+				$location->latitude = $post->latitude;
+				$location->longitude = $post->longitude;
+				$location->location_date = date("Y-m-d H:i:s",time());
+				$location->save();
+
+				// STEP 2: SAVE INCIDENT
+				$incident = new Incident_Model();
+				$incident->location_id = $location->id;
+				$incident->form_id = $post->form_id;
+				$incident->user_id = 0;
+				$incident->incident_title = $post->incident_title;
+				$incident->incident_description = $post->incident_description;
+
+				$incident_date=explode("/",$post->incident_date);
+
+				// The $_POST['date'] is a value posted by form in mm/dd/yyyy format
+				$incident_date=$incident_date[2]."-".$incident_date[0]."-".$incident_date[1];
+				$incident_time = $post->incident_hour
+					.":".$post->incident_minute
+					.":00 ".$post->incident_ampm;
+				$incident->incident_date = date( "Y-m-d H:i:s", strtotime($incident_date . " " . $incident_time) );
+				$incident->incident_dateadd = date("Y-m-d H:i:s",time());
+				$incident->save();
+				
+				// STEP 3: SAVE CATEGORIES
+				foreach($post->incident_category as $item)
+				{
+					$incident_category = new Incident_Category_Model();
+					$incident_category->incident_id = $incident->id;
+					$incident_category->category_id = $item;
+					$incident_category->save();
+				}
+
+				// STEP 4: SAVE MEDIA
+				// a. News
+				foreach($post->incident_news as $item)
+				{
+					if (!empty($item))
+					{
+						$news = new Media_Model();
+						$news->location_id = $location->id;
+						$news->incident_id = $incident->id;
+						$news->media_type = 4;		// News
+						$news->media_link = $item;
+						$news->media_date = date("Y-m-d H:i:s",time());
+						$news->save();
+					}
+				}
+
+				// b. Video
+				foreach($post->incident_video as $item)
+				{
+					if (!empty($item))
+					{
+						$video = new Media_Model();
+						$video->location_id = $location->id;
+						$video->incident_id = $incident->id;
+						$video->media_type = 2;		// Video
+						$video->media_link = $item;
+						$video->media_date = date("Y-m-d H:i:s",time());
+						$video->save();
+					}
+				}
+
+				// c. Photos
+				$filenames = upload::save('incident_photo');
+				$i = 1;
+
+				foreach ($filenames as $filename)
+				{
+					$new_filename = $incident->id."_".$i."_".time();
+
+					$file_type = strrev(substr(strrev($filename),0,4));
+
+					// IMAGE SIZES: 800X600, 400X300, 89X59
+
+					// Large size
+					Image::factory($filename)->resize(800,600,Image::AUTO)
+						->save(Kohana::config('upload.directory', TRUE).$new_filename.$file_type);
+
+					// Medium size
+					Image::factory($filename)->resize(400,300,Image::HEIGHT)
+						->save(Kohana::config('upload.directory', TRUE).$new_filename."_m".$file_type);
+
+					// Thumbnail
+					Image::factory($filename)->resize(89,59,Image::HEIGHT)
+						->save(Kohana::config('upload.directory', TRUE).$new_filename."_t".$file_type);	
+
+					// Remove the temporary file
+					unlink($filename);
+
+					// Save to DB
+					$photo = new Media_Model();
+					$photo->location_id = $location->id;
+					$photo->incident_id = $incident->id;
+					$photo->media_type = 1; // Images
+					$photo->media_link = $new_filename.$file_type;
+					$photo->media_medium = $new_filename."_m".$file_type;
+					$photo->media_thumb = $new_filename."_t".$file_type;
+					$photo->media_date = date("Y-m-d H:i:s",time());
+					$photo->save();
+					$i++;
+				}
+
+				// STEP 7: SAVE CUSTOM FORM FIELDS
+				if (isset($post->custom_field))
+				{
+					foreach($post->custom_field as $key => $value)
+					{
+						$form_response = ORM::factory('form_response')
+						->where('form_field_id', $key)
+						->where('incident_id', $incident->id)
+						->find();
+						if ($form_response->loaded == true)
+						{
+							$form_response->form_field_id = $key;
+							$form_response->form_response = $value;
+							$form_response->save();
+						}
+						else
+						{
+							$form_response = new Form_Response_Model();
+							$form_response->form_field_id = $key;
+							$form_response->incident_id = $incident->id;
+							$form_response->form_response = $value;
+							$form_response->save();
+						}
+					}
+				}
+
+				// STEP 5: SAVE PERSONAL INFORMATION
+				$person = new Incident_Person_Model();
+				$person->location_id = $location->id;
+				$person->incident_id = $incident->id;
+				$person->person_first = $post->person_first;
+				$person->person_last = $post->person_last;
+				$person->person_email = $post->person_email;
+				$person->person_date = date("Y-m-d H:i:s",time());
+				$person->save();
+
+				// Action::report_add - Added a New Report
+				Event::run('ushahidi_action.report_add', $incident);
+
+				url::redirect('reports/thanks');
+			}
+
 			// No! We have validation errors, we need to show the form again, with the errors
 			else
 			{
 				// repopulate the form fields
-				$form = arr::overwrite($form, array_merge($post->as_array(), $location_data->as_array()));
+				$form = arr::overwrite($form, $post->as_array());
 
-				// Populate the error fields, if any
-				$errors = arr::overwrite($errors, array_merge($post->errors('report'), $location_data->errors('report')));
+				// populate the error fields, if any
+				$errors = arr::overwrite($errors, $post->errors('report'));
 				$form_error = TRUE;
 			}
 		}
-
         
 		// Retrieve Country Cities
 		$default_country = Kohana::config('settings.default_country');
@@ -1241,11 +1222,23 @@ class Reports_Controller extends Frontend_Controller {
 			$county_id = $_POST['county_id'];
 
 			Kohana::log('debug', sprintf('Fetched county id: %s', $county_id));
+			
+			// Get the layer file
+			$boundary = new Boundary_Model($county_id);
+			$layer_file = $boundary->boundary_layer_file;
+			if ( ! empty($layer_file))
+			{
+				// Set the URL for the layer file
+				$layer_file = url::base().Kohana::config('upload.relative_directory').'/'.$layer_file;
+			}
 
 			// Build output JSON
 			$json_output  = json_encode(array(
 				'success' => TRUE,
-				'data' => Boundary_Model::get_child_boundaries($county_id)
+				'data' => Boundary_Model::get_child_boundaries($county_id),
+				'layer_name' => $boundary->boundary_name.' County',
+				'layer_url' => $layer_file,
+				'layer_color' => $boundary->boundary_color
 			));
 		}
 		else
