@@ -117,7 +117,7 @@ class Boundary_Model extends ORM {
 	 *
 	 * @return  array
 	 */
-	public static function get_boundaries_dropdown($show_boundary_type)
+	public static function get_boundaries_dropdown($show_boundary_type = TRUE)
 	{
 		if ($show_boundary_type)	// Add the boundary type name to the name of the boundary
 		{

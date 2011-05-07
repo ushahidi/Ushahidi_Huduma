@@ -291,7 +291,7 @@ class Incident_Model extends ORM
 	 */
 	public static function get_comments($incident_id)
 	{
-		if ( ! self::is_valid_incident_($incident))
+		if ( ! self::is_valid_incident($incident_id))
 		{
 			// Validation failed!
 			return FALSE;
@@ -301,7 +301,8 @@ class Incident_Model extends ORM
 			// Return list of comments for the incident
 			return self::factory('comment')
 					->where(array('incident_id' => $incident_id, 'comment_spam' => 0, 'comment_active' => 1))
-					->orderby('comment_date', 'desc');
+					->orderby('comment_date', 'desc')
+					->find_all();
 		}
 	}
 
