@@ -46,9 +46,6 @@ class Incident_Model extends ORM
                     ->add_rules('incident_date', 'required', 'date_mmddyyyy')
                     ->add_rules('location_id', 'required', array('Location_Model','is_valid_location'));
         
-        // Apply extra validation rules
-        Event::run('ushahidi_action.orm_validate_incident', $array);
-        
         return parent::validate($array, $save);
     }
 
