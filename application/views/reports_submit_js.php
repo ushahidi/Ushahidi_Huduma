@@ -381,7 +381,7 @@
 						var context = {
 							getColor: function(feature) {
 								var f = feature;
-								f.attributes.color = response.layer_color;
+								f.attributes.color = "#"+response.layer_color;
 								feature = f;
 
 								return feature.attributes["color"];
