@@ -297,26 +297,6 @@
 				}
 			});
 
-
-			// onChange event handler for the county dropdown
-			$("#select_county").change(function() {
-				// Get the currently selected value
-				var value = $(this).val();
-
-				// Validation
-				if (value == 0) {
-					// Hide the constituency selector
-					$("#constituency_selector").hide('slow');
-				} else if (value != 0) {
-					// Show the constituency selector
-					$("#constituency_selector").show('slow');
-				}
-
-				// Fetch the constituencies
-				fetchConstituencies({ county_id: value});
-
-			});
-			
 			// GeoCode
 			$('.btn_find').live('click', function () {
 				geoCode();
@@ -340,19 +320,44 @@
 			});
 			
 			// Category treeview
-	      $("#category-column-1,#category-column-2").treeview({
-	        persist: "location",
-	        collapsed: true,
-	        unique: false
-	      });
+			$("#category-column-1,#category-column-2").treeview({
+				persist: "location",
+				collapsed: true,
+				unique: false
+			});
+	
+			// onChange event handler for the county dropdown
+			$("#county_id").change(function() {
+				// Get the currently selected value
+				var value = $(this).val();
+
+				// Validation
+				if (value == 0) {
+					// Hide the constituency selector
+					$("#constituency_selector").hide('slow');
+				} else if (value != 0) {
+					// Show the constituency selector
+					$("#constituency_selector").show('slow');
+				}
+
+				// Fetch the constituencies
+				fetchConstituencies({ county_id: value});
+			});
 	
 		});
 
 
 	// Fetches constituencies via JSON and populates the constituencies dropdown
+	var tempLayers = [];
 	function fetchConstituencies(data) {
 		// Clear the items from the constituencies dropdown
-		$("#select_constituency").html("");
+		$("#constituency_id").html("");
+		
+		// Remove all layers in tempLayers from the map and the array itself
+		for (var i =0; i < tempLayers.length; i++) {
+			map.removeLayer(tempLayers[i]);
+			tempLayers.pop();
+		}
 		
 		// Fetch the new items
 		$.post(
@@ -368,7 +373,60 @@
 					});
 
 					// Populate the dropdown
-					$("#select_constituency").html(htmlStr);
+					$("#constituency_id").html(htmlStr);
+					
+					if (response.layer_url != null && response.layer_url != "") {
+						
+						//> Stlying for the GeoJSON layer
+						var context = {
+							getColor: function(feature) {
+								var f = feature;
+								f.attributes.color = response.layer_color;
+								feature = f;
+
+								return feature.attributes["color"];
+							}
+						};
+
+						var template = {
+							fillOpacity: 0.35,
+							strokeColor: "#888888",
+							strokeWidth: 2,
+							fillColor: "${getColor}"
+						};
+						
+						// Layer style
+						var layerStyle = new OpenLayers.StyleMap( { 'default': new OpenLayers.Style(template, {context: context}) });
+						
+						// Build the layer
+						var countyLayer = new OpenLayers.Layer.GML(response.layer_name, response.layer_url,
+							{
+								format: OpenLayers.Format.GeoJSON,
+								projection: proj_4326,
+								styleMap: layerStyle
+							}
+						);
+						
+						// Save the layer in the list of temporary layers
+						tempLayers.push(countyLayer);
+						
+						// Add the layer to the map
+						map.addLayer(countyLayer);
+						map.addControl(new OpenLayers.Control.SelectFeature(countyLayer, {hover: true} ));
+						
+						// TODO: Work on this issue of having to load the data twice
+						$.get(response.layer_url, function(data){
+							var vectors = new OpenLayers.Format.GeoJSON().read(data);
+							var centroid = vectors[0].geometry.getCentroid();
+							
+							// Move the map to the centre of the selected boundary
+							lonlat = new OpenLayers.LonLat(centroid.x, centroid.y).transform(proj_4326, map.getProjectionObject());
+							m = new OpenLayers.Marker(lonlat)
+							markers.clearMarkers();
+							markers.addMarker(m);
+							map.setCenter(lonlat, <?php echo $default_zoom; ?>);
+						});
+					}
 				}
 			},
 			'json'

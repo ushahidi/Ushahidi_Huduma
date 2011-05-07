@@ -24,6 +24,7 @@ class huduma
 		$this->agency_id = "";
 		$this->report_priority_id = "";
 		$this->report_status_id = "";
+		$this->boundary_id = "";
 		
 		// Set Table Prefix
 		$this->table_prefix = Kohana::config('database.default.table_prefix');
@@ -70,8 +71,18 @@ class huduma
 					
 					break;
 				
+				// Hook into report submit on the frontend
+				case 'submit':
+					// When the report is submitted for validation and saving
+					Event::add('ushahidi_action.report_submit_frontend', array($this, 'report_submit_frontend'));
+					
+					// When validation succeeds and the report has been saved
+					Event::add('ushahidi_action.report_add', array($this, 'report_add'));
+				break;
+				
 				// Hook into report view on the main reports page on frontend
 				case 'view':
+					// TODO: Define events to queue when this method is accessed
 				break;
 				
 				// Hook into report view on the static entity reports page
@@ -159,29 +170,6 @@ class huduma
 		}
 	}
     
-	/**
-	 * Callback function for the "ushahidi_action.orm_validate_incident" event
-	 * 
-	 * Performs validation on the extra columns added to the incident table by this plugin
-	 */
-	public function orm_validate_incident()
-	{
-		// Get the event data for modification
-		$array = Event::$data;
-
-		// Add validation for the boundary
-		if ( ! empty($array->boundary_id) AND $array->boundary_id != 0 AND ($array->static_entity_id == 0 OR empty($array->static_entity_id)))
-		{
-			$array->add_rules('boundary_id', 'required', array('Boundary_Model', 'is_valid_boundary'));
-		}
-
-		// Static entity validation rule
-		if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
-		{
-			$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
-		}
-	}
-	
 	/**
 	 * Callback for the ushahidi_action.report_form_admin event
 	 *
@@ -328,7 +316,46 @@ class huduma
 		{
 			// SUCCESS! Save
 			$incident_ticket->save();
+		}		
+	}
+	
+	/**
+	 * Event callback method to be executed when a report is submitted for validaton
+	 * from the frontend
+	 */
+	public function report_submit_frontend()
+	{
+		// Get the validation object
+		$post = Event::$data;
+		
+		// Add extra validation rules as necessary
+		if ( ! empty($post->county_id) AND $post->county_id != 0)
+		{
+			$post->add_rules('county_id', array('Boundary_Model', 'is_valid_boundary'));
+			$this->boundary_id = $post->county_id;
 		}
+		
+		if ( ! empty($post->constituency_id) AND $post->constituency_id != 0)
+		{
+			$post->add_rules('constituency_id', array('Boundary_Model', 'is_valid_boundary'));
+			$this->boundary_id = $post->constituency_id;
+		}
+	}
+	
+	/**
+	 * Event callback to be executed when a report is saved via the frontend
+	 */
+	public function report_add()
+	{
+		// Get the incident
+		$incident = Event::$data;
+		
+		// Set the boundary id
+		$incident->boundary_id = $this->boundary_id;
+		$incident->save();
+		
+		// Clear the property
+		$this->boundary_id = "";
 	}
 }
 

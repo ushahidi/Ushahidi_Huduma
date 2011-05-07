@@ -168,24 +168,17 @@
 			</div>
 
 			<div class="report_right">
-				<?php if (!$multi_country)
-							{
-
-				?>
+				<?php if ( ! $multi_country): ?>
 				<div class="report_row">
 					<h4><?php echo Kohana::lang('ui_main.reports_find_location'); ?></h4>
 					<?php print
-					form::dropdown('select_county',$counties,$form['county_id'],'class="select" '); ?>
+					form::dropdown('county_id', $counties, $form['county_id'], 'class="select" '); ?>
 				</div>
-
 				<div class="report_row" id="constituency_selector">
 					<?php print
-					form::dropdown('select_constituency','',$form['constituency_id'],'class="select" '); ?>
+					form::dropdown('constituency_id','',$form['constituency_id'],'class="select" '); ?>
 				</div>
-
-				<?php
-					 }
-				?>
+				<?php endif; ?>
 
 				<div class="report_row">
 					<div id="divMap" class="report_map"></div>
