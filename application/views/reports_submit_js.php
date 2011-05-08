@@ -376,54 +376,36 @@
 					$("#constituency_id").html(htmlStr);
 					
 					if (response.layer_url != null && response.layer_url != "") {
-						
-						//> Stlying for the GeoJSON layer
-						var context = {
-							getColor: function(feature) {
-								var f = feature;
-								f.attributes.color = "#"+response.layer_color;
-								feature = f;
-
-								return feature.attributes["color"];
-							}
-						};
-
-						var template = {
-							fillOpacity: 0.35,
-							strokeColor: "#888888",
-							strokeWidth: 2,
-							fillColor: "${getColor}"
-						};
-						
-						// Layer style
-						var layerStyle = new OpenLayers.StyleMap( { 'default': new OpenLayers.Style(template, {context: context}) });
-						
-						// Build the layer
-						var countyLayer = new OpenLayers.Layer.GML(response.layer_name, response.layer_url,
-							{
-								format: OpenLayers.Format.GeoJSON,
-								projection: proj_4326,
-								styleMap: layerStyle
-							}
-						);
-						
-						// Save the layer in the list of temporary layers
-						tempLayers.push(countyLayer);
-						
-						// Add the layer to the map
-						map.addLayer(countyLayer);
-						map.addControl(new OpenLayers.Control.SelectFeature(countyLayer, {hover: true} ));
+						// Get the vector layer to use
+						countyLayer = getVectorLayer(response.layer_name, response.layer_color);
 						
 						// TODO: Work on this issue of having to load the data twice
 						$.get(response.layer_url, function(data){
-							var vectors = new OpenLayers.Format.GeoJSON().read(data);
-							var centroid = vectors[0].geometry.getCentroid();
+							// Deserialize the JSON string
+							vectors = new OpenLayers.Format.GeoJSON().read(data);
+							// Get the the geometry
+							layerFeature = vectors[0];
 							
-							// Move the map to the centre of the selected boundary
-							lonlat = new OpenLayers.LonLat(centroid.x, centroid.y).transform(proj_4326, map.getProjectionObject());
+							// Transform the geometry and render it on the map
+							layerFeature.geometry.transform(proj_4326, proj_900913);
+							countyLayer.addFeatures(layerFeature);
+							map.addLayer(countyLayer);
+							map.addControl(new OpenLayers.Control.SelectFeature(countyLayer, {hover: true} ));
+							
+							// Add the layer with the geometry to the list of temporary layers
+							tempLayers.push(countyLayer);
+							
+							// Get the center point
+							centroid = layerFeature.geometry.getCentroid();
+							
+							// The layer has already undergone transformation, therefore no need to
+							// transform the LonLat object
+							lonlat = new OpenLayers.LonLat(centroid.x, centroid.y);
 							m = new OpenLayers.Marker(lonlat)
 							markers.clearMarkers();
 							markers.addMarker(m);
+							
+							// Move the map to the centre of the geometry rendered on the map
 							map.setCenter(lonlat, <?php echo $default_zoom; ?>);
 						});
 					}
@@ -431,4 +413,31 @@
 			},
 			'json'
 		);
+	}
+	
+	// Creates and returns an OpenLayers.Layer.Vector object including sytling (for the layer)
+	function getVectorLayer(layerName, layerColor) {
+		//> Stlying for the GeoJSON layer
+		context = {
+			getColor: function(feature) {
+				var f = feature;
+				f.attributes.color = "#"+layerColor;
+				feature = f;
+
+				return feature.attributes["color"];
+			}
+		};
+
+		template = {
+			fillOpacity: 0.35,
+			strokeColor: "#888888",
+			strokeWidth: 2,
+			fillColor: "${getColor}"
+		};
+		
+		// Layer style
+		layerStyle = new OpenLayers.StyleMap( { 'default': new OpenLayers.Style(template, {context: context}) });
+		vLayer = new OpenLayers.Layer.Vector(layerName, {projection: proj_4326, styleMap: layerStyle});
+		
+		return vLayer;
 	}
