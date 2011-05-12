@@ -44,16 +44,9 @@ class Dashboard_User_Model extends ORM {
 		$array = Validation::factory($array)
 			->pre_filter('trim', TRUE)
 			->add_rules('name', 'required')
-			->add_rules('email', 'required', 'email')
-			->add_rules('is_active', 'between[0,1]')
-			->add_callbacks('email', array($this, 'email_exists'));
-
-		// A new user, add validation rules for username and email
-		if (empty($array->id))
-		{
-			$array->add_rules('username', 'required', array($this, '_username_exists'));
-			
-		}
+			->add_rules('username', 'required', array($this, 'username_exists'))
+			->add_rules('email', 'required', 'email', array($this, 'email_exists'))
+			->add_rules('is_active', 'between[0,1]');
 
 		// Check if the password has been specified
 		if ( ! empty($array->password))
@@ -67,7 +60,7 @@ class Dashboard_User_Model extends ORM {
 		{
 			$array->is_active = 0;
 		}
-		elseif ($array->dashboard_role_id != '0')
+		elseif ( ! empty($array->dashboard_role_id) AND $array->dashboard_role_id != 0)
 		{
 			$array->add_rules('dashboard_role_id', array('Dashboard_Role_Model', 'is_valid_dashboard_role'));
 		}
@@ -100,13 +93,13 @@ class Dashboard_User_Model extends ORM {
 	 *
 	 * @param Validation $validation
 	 */
-	public function _username_exists($username)
+	public function username_exists($username)
 	{
 		// Build the where clause for the search
 		$where = array('username' => $username);
 
 		// If the user id has been set, add it to the list of predicates
-		if (isset($this->id) AND !empty($this->id))
+		if ( ! empty($this->id))
 		{
 			$where = array_merge($where, array('id != ' => $this->id));
 		}

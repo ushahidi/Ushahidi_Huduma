@@ -101,7 +101,7 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-
+		
 		// Load Authlite
 		$this->auth_lite = Authlite::instance('authlite');
 
@@ -109,7 +109,7 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 		{
 			// Set the user
 			$this->user = $this->auth_lite->get_user();
-
+			
 			// Load the users role
 			// Check if the user has a role
 			if ( ! empty($this->user->dashboard_role_id))
@@ -118,14 +118,14 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 				$this->role = $this->user->dashboard_role;
 				
 				$role_id = $this->role->id;
-
+			
 				// Check for static entity_id privilege
 				$entity_privilege = Dashboard_Role_Model::has_static_entity_privilege($role_id);
-
+			
 				if ($entity_privilege)
 				{
 					$this->static_entity_role = TRUE;
-
+			
 					// Set the entity id
 					$this->static_entity_id = json_decode($entity_privilege)->static_entity_id;
 				}
@@ -171,7 +171,7 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 		    $this->agency_role = TRUE;
 		    
 		    // Decode the return value
-		    $entity_privilege = json_decode($entity_privilege);
+		    $entity_privilege = json_decode($agency_privilege);
 		    
 		    // Set the agency and boundary id for the privilege
 		    $this->agency_id = $entity_privilege->agency_id;

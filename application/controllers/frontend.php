@@ -125,51 +125,40 @@ class Frontend_Controller extends Template_Controller {
 				// Get the item to be displayed under the name of the currently logged in user
 
 				// Load the privileges for the current role
-				$privileges = $this->db->where('dashboard_role_id', $logged_in_user->dashboard_role_id)
-								->get('dashboard_role_privileges', 1);
+				$dashboard_role = $logged_in_user->dashboard_role;
 
 				// Role associated with agency
-				if ($logged_in_user->dashboard_role->agency_id != 0)
+				if ( ! empty($dashboard_role->static_entity_id))
 				{
-					if ($privileges[0]->static_entity_id != 0)
-					{
-						// Get the name of the static entity
-						$entity_name = Static_Entity_Model::get_entity_name($privileges[0]->static_entity_id);
-					}
-					else
+					// Get the name of the static entity
+					$entity_name = Static_Entity_Model::get_entity_name($dashboard_role->static_entity_id);
+				}
+				else
+				{
+					if ( ! empty($dashboard_role->agency_id))
 					{
 						// Get agency name
-						$entity_name = ORM::factory('agency', $logged_in_user->dashboard_role->agency_id)->agency_name;
-
+						$entity_name = ORM::factory('agency', $dashboard_role->agency_id)->agency_name;
+				
 						// Check for agency access within boundary
-						if ($privileges[0]->boundary_id != 0)
+						if ( ! empty($dashboard_role->boundary_id))
 						{
 							// Get the boundary name including its type
-							$boundary = ORM::factory('boundary', $privileges[0]->boundary_id);
-
+							$boundary = ORM::factory('boundary', $dashboard_role->boundary_id);
+				
 							// Set the entity name
 							$entity_name .= ','.$boundary->boundary_name.' '.$boundary->boundary_type->boundary_type_name;
 						}
 					}
-
-				}
-				else
-				{
-					// Role not assoiciated with agency
-					//
-					// Check for static entity privilege
-					if ($privileges[0]->static_entity_id != 0)
-					{
-						$entity_name = Static_Entity_Model::get_entity_name($privileges[0]->static_entity_id);
-					}
-					elseif ($privileges[0]->boundary_id != 0)
+					elseif ( ! empty($dashboard_role->boundary_id))
 					{
 						// Get the boundary name including its type
-						$boundary = ORM::factory('boundary', $privileges[0]->boundary_id);
-
+						$boundary = ORM::factory('boundary', $dashboard_role->boundary_id);
+				
 						// Set the entity name
-						$entity_name .= ','.$boundary->boundary_name.' '.$boundary->boundary_type->boundary_type_name;
+						$entity_name .= ','.$boundary->boundary_name.' '.$boundary->get_boundary_type_name();
 					}
+				
 				}
 			}
 
@@ -188,14 +177,14 @@ class Frontend_Controller extends Template_Controller {
 
 		// Get tracking javascript for stats
 		$this->template->footer->ushahidi_stats = (Kohana::config('settings.allow_stat_sharing') == 1)
-                ? Stats_Model::get_javascript()
-                : '';
-
+		                ? Stats_Model::get_javascript()
+		                : '';
+		
 		// Add copyright info
 		$this->template->footer->site_copyright_statement = '';
 		$site_copyright_statement = trim(Kohana::config('settings.site_copyright_statement'));
 		
-        if ($site_copyright_statement != '')
+		        if ($site_copyright_statement != '')
 		{
 			$this->template->footer->site_copyright_statement = $site_copyright_statement;
 		}

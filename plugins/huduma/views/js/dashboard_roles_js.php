@@ -66,7 +66,7 @@
 					jQuery.facebox(data);
 
 					// Attach events to the save and close buttons
-					$('.btn_save_close').live('click', function() {
+					$('.btn_save_close').click(function() {
 						// Get the input data
 						var data = {
 							id: $("#role_id").val(),
@@ -75,8 +75,9 @@
 							agency_id: $("#role_agency_id").val(),
 							action: $("#role_action").val(),
 							static_entity_id: $("#role_static_entity_id").val(),
-							boundary_id: $("#role_administrative_boundary_id").val(),
-							category_id: $("#role_category_id").val()
+							boundary_id: $("#role_boundary_id").val(),
+							category_id: $("#role_category_id").val(),
+							can_close_issue: ($("#role_can_close_issue").attr('checked')) ? 1 : 0
 						}
 						
 						// Post the data

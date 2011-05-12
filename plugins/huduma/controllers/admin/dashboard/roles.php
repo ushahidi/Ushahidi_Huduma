@@ -103,7 +103,8 @@ class Roles_Controller extends Admin_Controller {
 		if ($_POST)
 		{
 			// Manually specify the fields to be validated
-			$data = arr::extract($_POST, 'id', 'name', 'description', 'agency_id', 'action');
+			$data = arr::extract($_POST, 'id', 'name', 'description', 'agency_id', 'action', 
+				'category_id', 'boundary_id', 'static_entity_id', 'can_close_issue');
 
 			$action = $data['action'];
 			
@@ -116,82 +117,20 @@ class Roles_Controller extends Admin_Controller {
 				// Success! Save
 				$role->save();
 
-				// Extract privilege fields from the $_POST data
-				$privileges = arr::extract($_POST, 'category_id', 'boundary_id', 'static_entity_id');
-
-				// Add the id of the dashboard role
-				$privileges = array_merge($privileges, array('dashboard_role_id' => $role->id));
-
-				// Get the dashboard privilege entries for the current role
-				
-				$role_privileges_array = Dashboard_Role_Model::get_privileges($role->id);
-
-				// To keep track of validation of privileges
-				$privilege_validate = FALSE;
-				
-				if (count($role_privileges_array) > 0)
-				{
-					// Debug
-					Kohana::log('info', sprintf('Updating %s privileges for role %s', count($role_privileges_array), $role->id));
-
-					foreach ($role_privileges_array as $role_privilege)
-					{
-						Kohana::log('info', 'Fetching item from result set');
-
-						// Validate selected privileges
-						if ($role_privilege->validate($privileges))
-						{
-							// Success! Save
-							$this->db->update('dashboard_role_privileges', 
-									array(
-										'category_id' => $role_privilege->category_id,
-										'static_entity_id' => $role_privilege->static_entity_id,
-										'boundary_id' => $role_privilege->boundary_id
-									),
-									array('dashboard_role_id' => $role->id));
-
-							Kohana::log('info', 'Afer saving:'.Kohana::debug($role_privilege->static_entity_id));
-
-							$privilege_validate = TRUE;
-						}
-						else
-						{
-							$privilege_validate = FALSE;
-							Kohana::log('info', 'Role privilege update failed');
-						}
-					}
-				}
-				else
-				{
-					// Debug
-					Kohana::log('debug', 'Creating new privilege row for the role');
-					
-					$role_privilege = new Dashboard_Role_Privileges_Model();
-
-					if ($role_privilege->validate($privileges))
-					{
-						// Success! Save
-						$role_privilege->save();
-
-						$privilege_validate = TRUE;
-					}
-				}
-
 				// Build output JSON string
 				$output_json = json_encode(array(
-					'success' => $privilege_validate,
-					'message' => ($privilege_validate)
-						? Kohana::lang('ui_huduma.dashboard_role_saved')
-						: Kohana::lang('ui_main.validation_error')
+					'success' => TRUE,
+					'message' => Kohana::lang('ui_huduma.dashboard_role_saved')
 				));
 				
 			}
 			else
 			{
+				Kohana::log('debug', Kohana::debug($data->errors()));
 				// Validation failed
 				$output_json = json_encode(array(
 					'success' => FALSE,
-					'message' => Kohana::lang('ui_main.validation_error').'<div>'.$data->errors().'<div>'
+					'message' => Kohana::lang('ui_main.validation_error').'<div>'.$data->errors('dashboard_privileges').'</div>'
 				));
 			}
 		}
@@ -212,15 +151,11 @@ class Roles_Controller extends Admin_Controller {
 		$this->template = new View('admin/dashboard/role_dialog');
 
 		// Set up form fields
-		$dialog_form = array(
+		$form = array(
 			'id' => '',
 			'name' => '',
 			'description' => '',
-			'agency_id' => ''
-		);
-
-		// To hold the privileges for the selected role
-		$privileges_form = array(
+			'agency_id' => '',
 			'static_entity_id' => '',
 			'boundary_id' => '',
 			'category_id' => ''
@@ -240,47 +175,24 @@ class Roles_Controller extends Admin_Controller {
 			Kohana::log('info', 'Successfully validated role');
 
 			// Load selected role
-			$selected_role = new Dashboard_Role_Model($dashboard_role_id);
+			$role = new Dashboard_Role_Model($dashboard_role_id);
 
 			// Setup the form fields for the dialog
-			$dialog_form = array(
+			$form = array(
 				'id' => $dashboard_role_id,
-				'name' => $selected_role->name,
-				'description' => $selected_role->description,
-				'agency_id' => $selected_role->agency_id
+				'name' => $role->name,
+				'description' => $role->description,
+				'agency_id' => $role->agency_id,
+				'static_entity_id' => $role->static_entity_id,
+				'boundary_id' => $role->boundary_id,
+				'category_id' => $role->category_id,
+				'can_close_issue' => $role->can_close_issue
 			);
 
-			$privileges = $this->db
-					->from('dashboard_role_privileges')
-					->where('dashboard_role_id', $dashboard_role_id)
-					->get();
-
-			// Log
-			Kohana::log('info', sprintf('Found %s privileges for current role', count($privileges)));
-
-			// Fetch privilege calues into $privileges_form
-			if (count($privileges) == 1)
-			{
-				foreach ($privileges as $privilege)
-				{
-					// Set the current privilege values for the role
-					Kohana::log('debug', sprintf('Static entity %d', $privilege->dashboard_role_id));
-
-					$privileges_form = array(
-						'static_entity_id' => $privilege->static_entity_id,
-						'boundary_id' => $privilege->boundary_id,
-						'category_id' => $privilege->category_id
-					);
-				}
-
-			}
-
-			unset ($privileges);
-
 			// Get the category for which the selected agency belongs to
-			if ($selected_role->agency_id != 0)
+			if ($role->agency_id != 0)
 			{
-				$agency_category = ORM::factory('agency', $selected_role->agency_id)->category_id;
+				$agency_category = ORM::factory('agency', $role->agency_id)->category_id;
 				$category_container_css = "display: none;";
 			}
 		}
@@ -297,15 +209,18 @@ class Roles_Controller extends Admin_Controller {
 		$categories = Category_Model::get_dropdown_categories();
 		$categories[0] = "---".Kohana::lang('ui_huduma.select_category')."---";
 		ksort($categories);
-
+		
+		$boundaries = Boundary_Model::get_boundaries_dropdown();
+		$boundaries[0] = "---".Kohana::lang('ui_huduma.select_boundary')."---";
+		ksort($boundaries);
+		
 		// Set the content for the view
-		$this->template->dialog_form = $dialog_form;
+		$this->template->form = $form;
 		$this->template->agencies = $agencies;
 		$this->template->categories = $categories;
 		$this->template->category_container_css = $category_container_css;
 		$this->template->entities = $entities;
-		$this->template->boundaries = array();
-		$this->template->privileges = $privileges_form;
+		$this->template->boundaries = $boundaries;
 
 	}
 

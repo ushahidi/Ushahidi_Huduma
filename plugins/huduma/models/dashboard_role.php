@@ -18,7 +18,7 @@ class Dashboard_Role_Model extends ORM {
 	protected $table_name = 'dashboard_role';
 	
 	// Relationships
-	protected $has_many = array('dasboard_user', 'dashboard_role_privileges');
+	protected $has_many = array('dashboard_user');
 
 
 	/**
@@ -32,16 +32,80 @@ class Dashboard_Role_Model extends ORM {
 	{
 		$array = Validation::factory($array)
 					->pre_filter('trim', TRUE)
-					->add_rules('name', 'required', 'length[4,35]')
-					->add_rules('description', 'length[0,255]');
+					->add_rules('name', 'required', 'length[4,35]', array($this, 'role_name_exists'))
+					->add_rules('description', 'length[0,255]')
+					->add_rules('can_close_issue', 'required', 'length[1,1]');
 
-		if  ($array->agency_id != 0)
+		if  ( ! empty($array->agency_id) AND $array->agency_id != 0)
 		{
 			// Check if the specified service agency exists
 			$array->add_rules('agency_id', array('Agency_Model', 'is_valid_agency'));
 		}
+		
+		// Check if role is associated with a service agency
+		if ($array->agency_id == 0 AND $array->category_id == 0 AND $array->boundary_id == 0 AND $array->static_entity_id = 0)
+		{
+			// Role not associated with agency, category, boundary or entity
+			Kohana::log('error', 'No privileges defined');
+			
+			// Add validation errors for all items in the privilege matrix
+			$array->add_error('agency_id', 'privileges');
+			$array->add_error('category_id', 'privileges');
+			$array->add_error('boundary_id', 'privileges');
+			$array->add_error('static_entity_id', 'privileges');
+		}
+		
+		// Category validation
+		if ( ! empty($array->category_id)  AND $array->category_id != 0)
+		{
+			$array->add_rules('category_id', array('Category_Model', 'is_valid_category'));
+			$array->agency_id = NULL;
+		}
+
+		// Administrative boundary validation
+		if ( ! empty($array->boundary_id) AND $array->boundary_id != 0)
+		{
+			$array->add_rules('boundary_id', array('Boundary_Model', 'is_valid_boundary'));
+		}
+
+		// Either category or boundary specified, entity level access is irrelevant
+		if ( ! empty($array->category_id) AND ! empty($array->boundary_id))
+		{
+			if ($array->category_id != 0 AND $array->boundary_id != 0)
+			{
+				$array->static_entity_id = NULL;
+				$array->agency_id = NULL;
+			}
+		}
+		
+		// Static entity
+		if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
+		{
+			// Add validation rule for static entity
+			$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
+
+			// Set
+			$array->category_id = NULL;
+			$array->boundary_id = NULL;
+		}
 
 		return parent::validate($array, $save);
+	}
+	
+	/**
+	 * Checks if the name of the current role already exists in the database
+	 *
+	 * @return boolean
+	 */
+	public function role_name_exists()
+	{
+		$where = array('name' => $this->name);
+		if ( ! empty($this->id))
+		{
+			$where = array_merge($where, array('id !=' => $this->id));
+			
+		}
+		return !(bool) ORM::factory($this->table_name)->where($where)->find_all()->count();
 	}
 
 
@@ -89,11 +153,8 @@ class Dashboard_Role_Model extends ORM {
 			// New database instance for this operation
 			$db = new Database();
 
-			// Delete all privileges for the role
-			$db->delete('dashboard_role_privileges', array('dashboard_role_id' => $role_id));
-
-			// Remove the role from all users; set dashboard_role_id = 0
-			$db->update('dashboard_user', array('dashboard_role_id' => 0, 'is_active' => 0), array('dashboard_role_id' => $role_id));
+			// Remove the role from all users; set dashboard_role_id = NULL
+			$db->update('dashboard_user', array('dashboard_role_id' => NULL, 'is_active' => 0), array('dashboard_role_id' => $role_id));
 
 			// Free the $db instance from memory
 			unset ($db);
@@ -102,53 +163,6 @@ class Dashboard_Role_Model extends ORM {
 			self::factory('dashboard_role', $role_id)->delete();
 
 			return TRUE;
-		}
-	}
-
-	/**
-	 * Gets the privileges for associated with the specified role
-	 * @param <type> $role_id
-	 * @return <type>
-	 */
-	public static function get_privileges($role_id)
-	{
-		if ( ! self::is_valid_dashboard_role($role_id))
-		{
-			return array();
-
-		}
-		else
-		{
-			// Database instance for this operation
-			$database = new Database;
-
-			// Get the privileges
-			$items = $database->where('dashboard_role_id', $role_id)->get('dashboard_role_privileges');
-
-			// To hold the return value
-			$privileges = array();
-
-			// Iterate over result set and fetch items into array
-			foreach ($items as $item)
-			{
-				// Create privilege instance
-				$privilege = new Dashboard_Role_Privileges_Model();
-
-				// Set properties
-				$privilege->dashboard_role_id = $item->dashboard_role_id;
-				$privilege->static_entity_id = $item->static_entity_id;
-				$privilege->category_id = $item->category_id;
-				$privilege->boundary_id = $item->boundary_id;
-
-				// Add to array
-				$privileges[] = $privilege;
-			}
-
-			// Release objects from memory
-			unset ($database);
-			unset ($items);
-
-			return $privileges;
 		}
 	}
 
@@ -168,17 +182,16 @@ class Dashboard_Role_Model extends ORM {
 		else
 		{
 			// Valid role
-			$database = new Database();
-
-			$results = $database->where(array('dashboard_role_id' => $role_id, 'static_entity_id !=' => 0))
-					->get('dashboard_role_privileges');
-
-			if (count($results) > 0)
+			$role = self::factory('dashboard_role', $role_id);
+						
+			if ( ! empty($role->static_entity_id) 
+				AND Static_Entity_Model::is_valid_static_entity($role->static_entity_id)
+			)
 			{
 				// Return json object
 				return json_encode(array(
 					'status' => TRUE,
-					'static_entity_id' => $results[0]->static_entity_id
+					'static_entity_id' => $role->static_entity_id
 				));
 			}
 			else
@@ -205,28 +218,20 @@ class Dashboard_Role_Model extends ORM {
 		}
 		else
 		{
-			// Role is valid
+			// Load the current role
+			$role = self::factory('dashboard_role', $role_id);
 			
-			// Database instance for this operation
-			$database = new Database();
-
-			// For agency privilege, agency_id MUST be non-zero and static_entity_id = 0
-			$results = $database->from('dashboard_role_privileges')
-								->where(array('dashboard_role_id' => $role_id, 'agency_id !=' => 0, 'static_entity_id' => 0))
-								->get();
-
-			// Fetch the data
-			if (count($results) > 0)
+			// Check if the role has agency
+			if ( ! empty($results->agency_id) AND Agency_Model::is_valid_agency($role->agency_id))
 			{
 				return json_encode(array(
 					'status' => TRUE,
-					'agency_id' => $results[0]->agency_id,
-					'boundary_id' => $results[0]->boundary_id
+					'agency_id' => $role->agency_id,
+					'boundary_id' => $role->boundary_id
 				));
 			}
 			else
 			{
-				// No records found, FAIL
 				return FALSE;
 			}
 		}
@@ -246,22 +251,17 @@ class Dashboard_Role_Model extends ORM {
 		}
 		else
 		{
-			// Database instance for the lookup
-			$database = new Database();
-
 			// Category ID must be non-zero and agency_id must be zero
-			$results = $database->from('dahboard_role_privileges')
-								->where(array('dahboard_role_id' => $role_id, 'category_id !=' => 0, 'agency_id' => 0))
-								->get();
+			$role = self::factory('dashboard_role', $role_id);
 
 			// Records found?
-			if (count($records) > 0)
+			if ( ! empty($role->category_id) AND Category_Model::is_valid_category($role->category_id))
 			{
 				// Success, return 
 				return json_encode(array(
 					'status' => TRUE,
-					'category_id' => $results[0]->category_id,
-					'boundary_id' => $results[0]->boundary_id
+					'category_id' => $role->category_id,
+					'boundary_id' => $role->boundary_id
 				));
 			}
 			else
@@ -282,38 +282,46 @@ class Dashboard_Role_Model extends ORM {
 	public static function has_boundary_privilege($role_id)
 	{
 		// Validate specified role
-		if ( ! self::is_valid_dahboard_role($role_id))
+		if ( ! self::is_valid_dashboard_role($role_id))
 		{
 			return FALSE;
 		}
 		else
 		{
-			// Success, proceed
-
-			// Database instance
-			$database = new Database();
-
-			$results = $database->from('dashboard_role_privileges')
-				->where(array(
-					'dashboard_role_id' => $role_id, 
-					'boundary_id !=' => 0, 
-					'category_id' => 0, 
-					'agency_id' => 0
-				))
-				->get();
+			$role = self::factory('dashboard_role', $role_id);
 
 			// Check if records have been returned
-			if (count($records) > 0)
+			if ( ! empty($role->boundary_id) AND Boundary_Model::is_valid_boundary($role->boundary_id))
 			{
 				return json_encode(array(
 					'status' => TRUE,
-					'boundary_id' => $results[0]->boundary_id
+					'boundary_id' => $role->boundary_id
 				));
 			}
 			else
 			{
 				return FALSE;
 			}
+		}
+	}
+	
+	/**
+	 * Retrives a role from the database using the role name
+	 *
+	 * @param string $role_name Name of the role to be retrieved
+	 * @return Dashboard_Role_Model
+	 */
+	public static function get_role_by_name($role_name)
+	{
+		$roles = self::factory('dashboard_role')->where('name', $role_name)->find_all();
+		if ($roles->count() == 0 OR $role->count() > 1)
+		{
+			return FALSE;
+		}
+		else
+		{
+			$role_items = $roles->as_array();
+			return $role_items[0];
 		}
 	}
 }

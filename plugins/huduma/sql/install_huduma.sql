@@ -106,20 +106,13 @@ CREATE TABLE IF NOT EXISTS `dashboard_role` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(35) NOT NULL,
 	`description` VARCHAR(255),
-	`service_agency_id` INT NOT NULL DEFAULT 0,
+	`agency_id` INT,
+	`static_entity_id` INT,
+	`boundary_id` INT,
+	`category_id` INT,
+	`can_close_issue` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`)
 ) COMMENT = 'Roles for the dashboard users';
-
-
---
--- Table dashboard_user_privileges
---
-CREATE TABLE IF NOT EXISTS `dashboard_role_privileges` (
-	`dashboard_role_id` INT NOT NULL,
-	`static_entity_id` INT NOT NULL DEFAULT 0,
-	`boundary_id` INT NOT NULL DEFAULT 0,
-	`category_id` INT NOT NULL DEFAULT 0
-) COMMENT = 'Privileges for the dashboard roes';
 
 --
 -- Table dashboard_user
@@ -128,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_user` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(100) NOT NULL,
 	`email` VARCHAR(50) NOT NULL,
-	`username` VARCHAR(10) NOT NULL,
+	`username` VARCHAR(15) NOT NULL,
 	`password`  VARCHAR(80) NOT NULL,
 	`is_active` TINYINT(1) NOT NULL DEFAULT 1,
 	`belongs_to_service_agency` TINYINT(1) NOT NULL DEFAULT 1, -- 1 means that the user is associated with a service agency
@@ -220,3 +213,4 @@ DROP TABLE IF EXISTS `ticket`;
 DROP TABLE IF EXISTS `agency_staff`;
 DROP TABLE IF EXISTS `boundary_type`;
 DROP TABLE IF EXISTS `dashboard_user_privilege`;
+DROP TABLE IF EXISTS `dashboard_role_privileges`;

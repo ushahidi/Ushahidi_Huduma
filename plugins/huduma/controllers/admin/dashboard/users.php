@@ -31,7 +31,7 @@ class Users_Controller extends Admin_Controller {
 		// TODO: Validation for form actions such as "delete"
 
 		// Get the no. of items to display per page
-		$items_per_page = (int) Kohana::lang('settings.items_per_page_admin');
+		$items_per_page = (int) Kohana::config('settings.items_per_page_admin');
 
 		// Pagination
 		$pagination = new Pagination(array(
