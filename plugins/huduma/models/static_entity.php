@@ -175,11 +175,21 @@ class Static_Entity_Model extends ORM {
 	    }
 	    else
 	    {
+			// Database instance
+			$db = new Database();
+			
+			// Query to be executed
+			$sql = 'SELECT i.id, i.incident_title, i.incident_description, i.incident_date, i.incident_mode, '
+				. 'COUNT(co.id) AS comment_count '
+				. 'FROM incident i '
+				. 'LEFT JOIN comment co ON (co.incident_id = i.id) '
+				. 'WHERE i.static_entity_id = %d '
+				. 'AND i.incident_active = 1 '
+				. 'GROUP BY i.id '
+				. 'ORDER BY i.incident_date DESC';
+				
 	        // Return list of reports
-	        return self::factory('incident')
-	                    ->where(array('static_entity_id' => $entity_id, 'incident_active' => 1))
-	                    ->orderby('incident_date', 'desc')
-	                    ->find_all();
+	        return $db->query(sprintf($sql, $entity_id));
 	    }
     }
 

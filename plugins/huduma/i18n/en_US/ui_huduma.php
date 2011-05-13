@@ -32,7 +32,6 @@
 	'agencies' => 'Agencies',
 	'parent_agency' => 'Parent/Governing Agency',
 	'tickets' => 'Tickets',
-	'agency_staff_name' => 'Staff Name',
 
 	// Actions
 	'save_agency' => 'Save Agency',
@@ -40,7 +39,6 @@
 	'edit_agency' => 'Edit Agency',
 	'delete_agency' => 'Delete Agency',
 	'add_edit_agency' => 'Add/Edit Agencies',
-	'add_edit_staff' => 'Add/Edit Staff',
 	'save_entity' => 'Save Entity',
 	'delete_entity' => 'Delete Entity',
 	'save_user' => 'Save User',
@@ -107,6 +105,13 @@
 	'comment_close' => 'Comment and Close',
 	'comment_on_issue' => 'Comment on this issue',
 	'submitted_on' => 'Submitted on',
+	'select_boundary' => 'Select Boundary',
+	'can_close_issue' => 'Can close service delivery issue?',
+	'view_map' => 'View Map',
+	'view_stats' => 'View Statistics',
+	'resolved' => 'Resolved',
+	'unresolved' => 'Unresolved',
+	'replied' => 'replied',
 
 	// Error Messages
 	'error'	=> array(

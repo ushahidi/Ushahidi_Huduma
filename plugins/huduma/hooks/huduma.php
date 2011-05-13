@@ -37,10 +37,21 @@ class huduma
 	 */
 	public function add()
 	{
+		// Log
+		Kohana::log('info', sprintf('Curremt URI is: %s', Router::$current_uri));
+		
+		// Add CSS and Javascript
 		plugin::add_stylesheet('huduma/views/css/huduma');
 		plugin::add_stylesheet('huduma/views/css/facebox');
 		plugin::add_javascript('huduma/views/js/facebox');
-
+		
+		if (Router::$current_uri == 'dashboards/home')
+		{
+			// Add the bar chart Javascript library
+			plugin::add_javascript('huduma/views/js/jquery.horiz-bar-graph.min');
+		}
+		
+		// Queue events
 		Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
 		Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
 		Event::add('ushahidi_action.orm_validate_comment', array($this, 'orm_validate_comment'));
@@ -53,8 +64,7 @@ class huduma
 			// Calls the Javascript used function to overlay data on the main map
 			Event::add('ushahidi_action.main_map_overlay', array($this, 'overlay_main_map_js_call'));
 		}
-		
-		if (Router::$controller == 'reports')
+		elseif (Router::$controller == 'reports')
 		{
 			switch (Router::$method)
 			{
@@ -327,6 +337,12 @@ class huduma
 	{
 		// Get the validation object
 		$post = Event::$data;
+		
+		// Ensure the either a constituency or a county is specified
+		if (empty($post->county_id) AND empty($post->constituency_id))
+		{
+			$post->add_error('constituency_county', 'boundaries');
+		}
 		
 		// Add extra validation rules as necessary
 		if ( ! empty($post->county_id) AND $post->county_id != 0)

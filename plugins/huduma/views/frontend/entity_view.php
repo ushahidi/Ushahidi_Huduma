@@ -47,8 +47,7 @@
 						<input type="hidden" name="action" value="a" />
                     
 						<div class="report-form">
-							<div id="report-map" class="entity-map">
-							<div class="map-holder" id="map"></div>
+							<div class="entity_map" id="map"></div>
 							<div style="clear:both"></div>
 						</div>
 

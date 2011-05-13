@@ -230,12 +230,12 @@ class Overlays_Controller extends Template_Controller {
         foreach ($clusters as $cluster)
         {
             // Calculate the cluster center
-            $bounds = $this->_calculate_cluster_center($cluster);
+            $bounds = cluster::calculate_cluster_center($cluster);
             $cluster_center = $bounds['center'];
 
             // Number of items in cluster
             $cluster_count = count($cluster);
-            $cluster_info = $this->_get_entity_cluster_info($cluster, $bounds);
+            $cluster_info = cluster::get_entity_cluster_info($cluster, $bounds);
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
@@ -283,172 +283,6 @@ class Overlays_Controller extends Template_Controller {
         header('Content-type: application/json; charst=utf-8');
         $this->template->json = $json;
 
-    }
-    /**
-     * Calculates the center point of a cluster
-     *
-     * @param array $cluster
-     */
-    private function _calculate_cluster_center($cluster)
-    {
-        // Calculate average lat and lon of clustered items
-        $south = 0;
-        $west = 0;
-        $north = 0;
-        $east = 0;
-
-        $lat_sum = $lon_sum = 0;
-        foreach ($cluster as $marker)
-        {
-            if (!$south)
-            {
-                $south = $marker['latitude'];
-            }
-            elseif ($marker['latitude'] < $south)
-            {
-                $south = $marker['latitude'];
-            }
-
-            if (!$west)
-            {
-                $west = $marker['longitude'];
-            }
-            elseif ($marker['longitude'] < $west)
-            {
-                $west = $marker['longitude'];
-            }
-
-            if (!$north)
-            {
-                $north = $marker['latitude'];
-            }
-            elseif ($marker['latitude'] > $north)
-            {
-                $north = $marker['latitude'];
-            }
-
-            if (!$east)
-            {
-                $east = $marker['longitude'];
-            }
-            elseif ($marker['longitude'] > $east)
-            {
-                $east = $marker['longitude'];
-            }
-
-            $lat_sum += $marker['latitude'];
-            $lon_sum += $marker['longitude'];
-        }
-        $lat_avg = $lat_sum / count($cluster);
-        $lon_avg = $lon_sum / count($cluster);
-
-        $center = $lon_avg.",".$lat_avg;
-        $sw = $west.",".$south;
-        $ne = $east.",".$north;
-
-        return array(
-            "center"=>$center,
-            "sw"=>$sw,
-            "ne"=>$ne
-        );
-    }
-
-    /**
-     * Gets the following information about an entities cluster
-     *  - No. of entities items in the cluster
-     *  - Distribution of the items i.e. per category, per entity type
-     *
-     * @param array $cluster
-     * @param array $bounds
-     */
-    private function _get_entity_cluster_info($cluster, $bounds)
-    {
-        $item_count = count($cluster);
-        $categories = array();
-
-        foreach ($cluster as $cluster_item)
-        {
-            // Get the category id
-            $category_id  = $cluster_item['category_id'];
-
-            if (! isset($categories[$category_id]))
-            {
-                $categories[$category_id] = array();
-            }
-
-            // Get entity type
-            $type_id = $cluster_item['static_entity_type_id'];
-
-            // Check if the entity exists in the catgegory
-            if ( ! isset($categories[$category_id][$type_id]))
-            {
-                $categories[$category_id][$type_id] = 1;
-            }
-            else
-            {
-                $categories[$category_id][$type_id]++;
-            }
-
-        }
-
-        // Get the sw and ne bounds
-        $southwest = $bounds['sw'];
-        $northeast = $bounds['ne'];
-
-        // Create the cluster info HTML
-        $info_html = "<h5>".$item_count." Entities </h5>";
-
-        foreach ($categories as $category => $category_data)
-        {
-            // Display the category icon
-            $category_model = ORM::factory('category', $category);
-
-            $category_image = $category_model->category_image;
-            $category_color = $category_model->category_color;
-
-            // URL for filtering the entities by category
-            $category_url = url::base().'entities/index/?c='.$category.'&sw='.$southwest.'&ne='.$northeast;
-
-            $info_html .= "<div>";
-            if ( ! empty($category_image))
-            {
-                $image_url = url::base().Kohana::config('upload.relative_directory')."/".$category_model->category_image_thumb;
-                $info_html .= "<img src='".$image_url."'/>";
-            }
-            else
-            {
-                $swatch_url = url::base()."swatch/?c=".$category_color."&w=16&h=16";
-                $info_html .= "<img src='".$swatch_url."' border='0' />";
-            }
-
-            $info_html .= "<span style='padding-left:3px; position:relative; top:-3px; font-weight:bold;'>";
-            $info_html .= "<a href='".$category_url."'>".$category_model->category_title."</a>";
-            $info_html .= "</span>";
-            $info_html .= "</div>";
-
-            // Breakdown table for each categegory
-            $info_html .= count($category_data) > 0 ? "<table class='popup-table'>" : "";
-
-            foreach ($category_data as $key => $value)
-            {
-                $entity_type = ORM::factory('static_entity_type', $key);
-
-                // Construct the entity type URL - for filtering entities by type
-                $entity_type_url = url::base().'entities/index/?e='.$key.'&sw='.$southwest.'&ne='.$northeast;
-
-                $info_html .= "<tr>";
-                $info_html .= "<td><a href='".$entity_type_url."'>". $entity_type->type_name ."</a></td>";
-                $info_html .= "<td align='right'><strong>". $value ."</strong></td>";
-                $info_html .= "</tr>";
-            }
-
-            $info_html .= count($category_data) > 0 ? "</table><br/>" : "";
-        }
-
-        // Destroy the $categories reference
-        unset($categories);
-
-        return $info_html;
     }
     
 }

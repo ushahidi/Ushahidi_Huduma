@@ -6,7 +6,7 @@ ul.boundary-list li { list-style-type: none; }
 ul.boundary-list li a { padding-left: 5px; text-decoration: none; }
 .popup-table { font-size:12px; }
 
-.entity-map .map-holder {
+.entity_map {
 	clear:both;
 	width:645px;
 	height:150px;
@@ -127,21 +127,21 @@ div.report_comments_area {
 	border-top: 1px solid #E5E5E5;
 }
 .dashboard_comment_form h4, .dashboard_container h4 { font-size: 13px; padding:5px 0 0 0; margin: 8px 0 0 0; }
-div.dashboard_container { float: left; left: 40px; position: relative; padding-top: 20px; min-height: 40em;}
+div.dashboard_container { float: left; left: 40px; position: relative; padding: 0; min-height: 40em; width:650px;}
 .dash-page-header { background-color: #7AD1EC; margin: 20px 0 0 5px; height:27px;}
 .dash-page-header h3 { color: #333333; float: left; padding: 5px 0 0 10px; width: 20%; font-size: 14px;}
 ul.comment_form_buttons { position: relative; margin: 0 !important; }
 .comment_form_buttons li { float: left; list-style-type: none; padding: 0 8px 0 0; }
 ul.reports-list { padding: 10px; margin-bottom: 5px; list-style-type: none; }
-li.report-box { border-bottom: 1px dotted #C0C2B8; margin-bottom: 50px; padding: 10px; overflow:hidden; }
+li.report_box { border-bottom: 1px dotted #C0C2B8; margin-bottom: 5px; padding: 10px; overflow:hidden; }
 .reports-list .comment_box_holder { position: relative; top: 50px; padding: 0; margin-left: -15px; width:615px; }
 .reports-list .dashboard_comment_actions { position: absolute; right: 10px; top: 0; padding: 3px 0;}
 .dashboard_comment_actions a { font-size: 90%; color: #888; border-right: 1px solid #E5E5E5; padding-left: 3px; }
 .dashboard_comment_actions a:last-child { border: none; }
-div.dashboard-report-item { float: left; width: 100%; }
+div.dashboard_report_item { float: left; width: 100%; }
 .dashboard_comment_text { padding: 4px 0;}
-div.report-item-action { float: right; margin: 0 !important; padding:0;}
-.comment_date_time { font-weight: bold; font-size: 90%; color: #888;}
+.report_comment_info { width: 100%; position: relative; margin-left: 300px; }
+.comment_date_time, .report_comment_info { font-weight: bold; font-size: 90%; color: #888;}
 
 .report-item-action-box {
 	color: #888;
@@ -186,7 +186,8 @@ div.panel_content { border-top: 1px solid #CCC; border-bottom: 1px solid #CCC;  
 .dashboard_container .location-info { margin-bottom: 5px; }
 .dashboard_container div.left-col { float: left;  width: 300px; padding: 0; margin: 0 !important; }
 .dashboard_container div.right-col { float: left; width: 350px; padding: 0; margin-left: 10px; clear: bottom;}
-.dashboard_container .location-info input { width: 100px;}
+.dashboard_container .location-info input { width: 100px; }
+.dashboard_container li { list-style-type: none; }
 .metadata { font-size: 95%;}
 .metadata th { text-align: left;}
 .metadata td { padding: 0 3px;}
@@ -215,9 +216,9 @@ div.green-box h4, div.red-box h4 { margin: 0; padding: 0 0 0 15px; font-size: 14
 div.ticket-box { border: 1px solid #E5E5E5; margin: 15px 0 0 0; padding: 15px 5px;}
 .ticket-box h4 { padding: 10px 0 0 0; font-size: 13px; color: blue;}
 div.ticket-notes { margin: 3px 0; padding: 15px 0 0 0;}
-div.report-item-status { float: left; overflow: hidden; width: 100px;}
-div.report-item-content { float: left; overflow: hidden; }
-div.report-item-date { margin-top: 5px; }
+div.report_item_media { float: left; overflow: hidden; width: 34px; padding: 0; margin:0;}
+div.report_item_content { float: left; overflow: hidden; padding: 5px 0 0 10px;}
+div.report_item_date { margin-top: 5px; }
 div.report-header { float: left; }
 .report-header h3 { color: #00ADE3; padding:5px 0; font-size: 18px; margin: 0;}
 .description { font-size: 115%; padding: 0; width: 95%; }
@@ -236,3 +237,17 @@ div.report-ticket-info { float: right; margin: 0 35px 0 0; }
 .report-ticket-info .state-open { background-color: #6CC644; }
 .report-ticket-info .state-closed { background-color: #FF0000; }
 .report-ticket-info p { margin: 10px 0; color: #888;}
+
+.dashboard_map {
+	width: 645px;
+	height: 300px;
+}
+div#dashboardContentFilters { float: right; margin: 0!important; position: relative; top: -20px;}
+#dashboardContentFilters li { float: left; list-style-type: none; width: 100px; }
+#dashboardContentFilters li a { text-decoration: none; padding: 2px 5px; display: block; color: #414958; font-weight: bold;}
+.hbg-bar { margin-bottom: 5px; padding: 3px 5px; background-color: #369; color: #fff; font-weight: bold; }
+.hbg-title { text-align: center; font-weight: bold; }
+.hbg-label { margin: 3px 0 5px 0; font-weight: bold; font-size: 105%; width: 100px; }
+.dashboard_stats_panel th { padding: 0 15px; font-size: 250%; color: #369; }
+.dashboard_stats_panel th span { font-size: 11px; color: #888;}
+.dashboard_stats_panel td { border-left: 1px solid #F3F3F3; padding: 0 15px; border-left: 2px solid #F3F3F3;}

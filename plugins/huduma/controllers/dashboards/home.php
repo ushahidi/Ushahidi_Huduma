@@ -29,8 +29,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		$errors = $form;
 		$form_error = FALSE;
 		$form_saved = FALSE;
-
-        
+		
 		if ($this->static_entity_role)
 		{
 			// Load the static entity view
@@ -38,27 +37,27 @@ class Home_Controller extends Dashboard_Template_Controller {
 			
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
-
+			
 			// ucfirst() type conversion on the entity name
 			$entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
-
+			
 			// Set the entity name
 			$this->template->content->entity_name = $entity_name;
-
+			
 			// Disable "view metadata" link
 			$this->template->content->show_metadata = FALSE;
 			$this->template->content->show_dashboard_panel = TRUE;
 			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
-
+			
 			// Get the comments for the static entity
 			$entity_reports_view = new View('frontend/entity_reports_view');
 			$entity_reports_view->reports = Static_Entity_Model::get_reports($this->static_entity_id);
 			$entity_reports_view->report_view_controller = 'dashboards/home/reports/';
-
+			
 			$this->template->content->entity_reports_view = $entity_reports_view;
-
+			
 			$this->template->content->entity_id = $this->static_entity_id;
-
+			
 			// Javascript header
 			$this->themes->map_enabled = TRUE;
 			$this->themes->js = new View('js/entity_view_js');
@@ -68,7 +67,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->themes->js->entity_name = $entity_name;
 			$this->themes->js->latitude = $entity->latitude;
 			$this->themes->js->longitude = $entity->longitude;
-
+			
 			// Set the header block
 			$this->template->header->header_block = $this->themes->header_block();
 		}
@@ -88,8 +87,76 @@ class Home_Controller extends Dashboard_Template_Controller {
 		elseif ($this->boundary_role)
 		{
 			// Role for specific admin boundary
-
-			// Get content for that boundary
+			$this->template->content = new View('frontend/dashboards/boundary_dashboard');
+			
+			// Load the boundary from the database
+			$boundary = ORM::factory('boundary', $this->boundary_id);
+			$boundary_name = $boundary->boundary_name.' '.$boundary->get_boundary_type_name();
+			
+			$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+			$dashboard_panel->static_entity_panel = !empty($this->static_entity_id);
+			
+			$boundary_reports_view = new View('frontend/entity_reports_view');
+			$boundary_reports_view->report_view_controller = 'dashboards/home/reports/';
+			$reports  = Boundary_Model::get_boundary_reports($this->boundary_id);
+			$boundary_reports_view->reports = $reports;
+			
+			// Compute stats
+			$total_resolved = 0;
+			$total_unresolved = 0;
+			$total_reports = $reports->count();
+			foreach ($reports as $report)
+			{
+				$total_resolved += ($report->report_status == 2)? 1 : 0;
+				$total_unresolved += ($report->report_status == 1 OR empty($report->report_status))? 1 : 0;
+			}
+			
+			$total_resolved = round(($total_resolved/$total_reports),2) * 100;
+			$total_unresolved = round(($total_unresolved/$total_reports),2) * 100;
+			
+			$this->template->content->dashboard_panel = $dashboard_panel;
+			$this->template->content->boundary_name = $boundary_name;
+			$this->template->content->total_reports = $total_reports;
+			$this->template->content->total_resolved = $total_resolved;
+			$this->template->content->total_unresolved = $total_unresolved;
+			$this->template->content->boundary_reports_view = $boundary_reports_view;
+			
+			$marker_radius = Kohana::config('map.marker_radius');
+			$marker_opacity = Kohana::config('map.marker_opacity');
+			$marker_stroke_width = Kohana::config('map.marker_stroke_width');
+			$marker_stroke_opacity = Kohana::config('map.marker_stroke_opacity');
+			
+			// Javascript
+			$this->themes->map_enabled = TRUE;
+			$this->themes->js = new View('js/boundary_dashboard_js');
+			$this->themes->js->default_map = Kohana::config('settings.default_map');
+			$this->themes->js->default_zoom = 2 + (int)Kohana::config('settings.default_zoom');
+			$this->themes->js->layer_file_url = !empty($boundary->boundary_layer_file)
+						? url::base().Kohana::config('upload.relative_directory').'/'.$boundary->boundary_layer_file
+						: "";
+			$this->themes->js->layer_color = $boundary->boundary_color;
+			$this->themes->js->layer_name = $boundary_name;
+			$this->themes->js->boundary_id = $this->boundary_id;
+			
+	        $this->themes->js->marker_radius =
+	            ($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
+	        $this->themes->js->marker_opacity =
+	            ($marker_opacity >=1 && $marker_opacity <= 10 )
+	            ? $marker_opacity * 0.1  : 0.9;
+	        $this->themes->js->marker_stroke_width =
+	            ($marker_stroke_width >=1 && $marker_stroke_width <= 5 ) ? $marker_stroke_width : 2;
+	        $this->themes->js->marker_stroke_opacity =
+	            ($marker_stroke_opacity >=1 && $marker_stroke_opacity <= 10 )
+	            ? $marker_stroke_opacity * 0.1  : 0.9;
+			
+			// Header block
+			$this->template->header->header_block = $this->themes->header_block();
+		}
+		else
+		{
+			Kohana::log('error', 'No role found for this user');
+			
+			url::redirect('dashboards/logout');
 		}
 	}
 	
@@ -272,7 +339,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		}
 	    
 		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-		$dashboard_panel->static_entity_panel = TRUE;
+		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
 
 		// Set content data
 		$this->template->content->dashboard_panel = $dashboard_panel;
@@ -595,6 +662,34 @@ class Home_Controller extends Dashboard_Template_Controller {
 		$dashboard_panel->static_entity_panel = !empty($this->static_entity_id)? TRUE : FALSE;
 		
 		return $dashboard_panel;
+	}
+	
+	/**
+	 * Prints a GeoJSON string for the entities in a speicific boundary
+	 */
+	public function boundary_entities()
+	{
+		$this->template = new View('json');
+		$json = "";
+		
+		// Fetch the zoom level entities
+		if (isset($_GET['boundary_id']) AND Boundary_Model::is_valid_boundary($_GET['boundary_id']))
+		{
+			// Fetch the boundary id
+			$boundary_id = $_GET['boundary_id'];
+			
+			// Fetch the zoom level
+			$zoom = (isset($_GET['zoom']) AND (int)$_GET['zoom'] > 0)? (int)$_GET['zoom'] : 10;
+			
+			Kohana::log('info', sprintf('Fetching incidents for boundary %d at zoom level %s', $boundary_id, $zoom));
+			
+			// Pass URL parmaeters to the clustering helper
+			$json = cluster::get_clustered_entities($boundary_id, $zoom);
+		}
+		
+		// Print out the GeoJSON string
+		header("Content-type: application/json; charset=utf-8");
+		$this->template->json = $json;
 	}
 }
 ?>
