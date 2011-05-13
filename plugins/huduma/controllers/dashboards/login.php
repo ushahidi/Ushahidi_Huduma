@@ -77,9 +77,6 @@ class Login_Controller extends Template_Controller {
 				// Set the remember flag
 				$remember = isset($validation['dashboard_remember'])? TRUE : FALSE;
 				
-				// Sanitize $_POST data removing all input without rules
-//				$validation->safe_array();
-
 				// Attempt login
 				if ($auth->login($validation->dashboard_username, $validation->dashboard_password, $remember))
 				{
@@ -91,13 +88,9 @@ class Login_Controller extends Template_Controller {
 					Kohana::log('info', sprintf('Account status for user: %s', $user->is_active));
 
 					// Check if the user is active
-					if ($user->is_active)
+					if ($user->is_active AND ! empty($user->dashboard_role_id))
 					{
-						// Determine the role and privileges
-						if ( ! empty($user->dashboard_role_id))
-						{
-							$this->session->set('dashboard_role', $user->dashboard_role_id);
-						}
+						$this->session->set('dashboard_role', $user->dashboard_role_id);
 						
 						// Redirect to dashboards home page
 						url::redirect('dashboards/home');
