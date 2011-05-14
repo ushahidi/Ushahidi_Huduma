@@ -50,11 +50,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 			
 			// Get the comments for the static entity
-			$entity_reports_view = new View('frontend/entity_reports_view');
-			$entity_reports_view->reports = Static_Entity_Model::get_reports($this->static_entity_id);
-			$entity_reports_view->report_view_controller = 'dashboards/home/reports/';
-			
-			$this->template->content->entity_reports_view = $entity_reports_view;
+			$reports = Static_Entity_Model::get_reports($this->static_entity_id);
+			$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/');
 			
 			$this->template->content->entity_id = $this->static_entity_id;
 			
@@ -93,13 +90,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$boundary = ORM::factory('boundary', $this->boundary_id);
 			$boundary_name = $boundary->boundary_name.' '.$boundary->get_boundary_type_name();
 			
-			$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-			$dashboard_panel->static_entity_panel = !empty($this->static_entity_id);
-			
-			$boundary_reports_view = new View('frontend/entity_reports_view');
-			$boundary_reports_view->report_view_controller = 'dashboards/home/reports/';
+			// Get the reports for the boundary
 			$reports  = Boundary_Model::get_boundary_reports($this->boundary_id);
-			$boundary_reports_view->reports = $reports;
 			
 			// Compute stats
 			$total_resolved = 0;
@@ -114,12 +106,15 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$total_resolved = round(($total_resolved/$total_reports),2) * 100;
 			$total_unresolved = round(($total_unresolved/$total_reports),2) * 100;
 			
-			$this->template->content->dashboard_panel = $dashboard_panel;
+			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 			$this->template->content->boundary_name = $boundary_name;
+			$this->template->content->categories = !empty($this->boundary_role)
+													? Category_Model::get_dropdown_categories()
+													: NULL;
 			$this->template->content->total_reports = $total_reports;
 			$this->template->content->total_resolved = $total_resolved;
 			$this->template->content->total_unresolved = $total_unresolved;
-			$this->template->content->boundary_reports_view = $boundary_reports_view;
+			$this->template->content->boundary_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/');
 			
 			$marker_radius = Kohana::config('map.marker_radius');
 			$marker_opacity = Kohana::config('map.marker_opacity');
@@ -653,13 +648,21 @@ class Home_Controller extends Dashboard_Template_Controller {
 	}
 	
 	/**
-	 * Inner helper function to fetch the dashboard panel
+	 * Helper method for generating the dashboard panel
 	 */
 	private function __get_dashboard_panel()
 	{
 		// Load the dashboard panel view
 		$dashboard_panel = View::factory('frontend/dashboards/dashboard_panel');
-		$dashboard_panel->static_entity_panel = !empty($this->static_entity_id)? TRUE : FALSE;
+		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
+		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
+		if ( ! empty($this->boundary_id))
+		{
+			$dashboard_panel->boundary_type_name = ORM::factory('boundary', $this->boundary_id)
+													->get_boundary_type_name();
+		}
+		$dashboard_panel->category_panel = ! empty($this->category_id);
+		$dashboard_panel->agency_panel = ! empty($this->agency_id);
 		
 		return $dashboard_panel;
 	}
@@ -690,6 +693,59 @@ class Home_Controller extends Dashboard_Template_Controller {
 		// Print out the GeoJSON string
 		header("Content-type: application/json; charset=utf-8");
 		$this->template->json = $json;
+	}
+	
+	/**
+	 * Prints a HTML string for displaying reports for a specific category
+	 * 
+	 * @param int $category_id Category of reports to fetch
+	 */
+	public function category_reports($category_id)
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+		
+		if ( ! Category_Model::is_valid_category($category_id) OR !$this->boundary_role)
+		{
+			// Fail
+			print "";
+		}
+		else
+		{
+			// Success
+			
+			// Get the reports for the specified category in the current boundary
+			$report_html = View::factory('frontend/dashboard_report_items');
+			$reports = Boundary_Model::get_boundary_reports($this->boundary_id, 'all', $category_id);
+			$report_html->reports = $reports;
+			$report_html->report_view_controller = 'dashboards/home/reports/';
+			
+			// Print the reports
+			print $report_html;
+		}
+		
+	}
+	
+	/**
+	 * Displays a page with detailed stats about the boundary
+	 *
+	 * Stats include area, population, no. of facilities and their breakdown, 
+	 * rate of response to queries, performance of service agencies, no. of agencies
+	 * in the area and the categories under which they fall etc
+	 */
+	public function boundary_profile()
+	{
+		// TODO Implement the view pages for this
+	}
+	
+	/**
+	 * Breakdown of reports by location
+	 */
+	public function report_locations()
+	{
+		// TODO View pages and logic for this
+		
+		// Will require reverse Geo-coding, clustering of reports using a user defined radius
 	}
 }
 ?>

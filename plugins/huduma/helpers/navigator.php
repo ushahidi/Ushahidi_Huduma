@@ -280,7 +280,28 @@ class navigator_Core {
 				'message' => Kohana::lang('ui_huduma.error.invalid_entity_id')
 			));
 		}
+	}
+	
+	/**
+	 * Generates and returns the view for displaying reports (entity + dashboard reports)
+	 * 
+	 * @param array $reports List of reports to be displayed in the view
+	 * @param string $controller Relative path of the controller to be used to view individual reports
+	 */
+	public static function get_reports_view($reports, $controller)
+	{
+		// Get the parent view
+		$reports_view = View::factory('frontend/entity_reports_view');
 		
+		// Get the child view and set the content to be rendered
+		$report_list_items = View::factory('frontend/dashboard_report_items');
+		$report_list_items->reports = $reports;
+		$report_list_items->report_view_controller = $controller;
+		
+		$reports_view->report_list_items = $report_list_items;
+		
+		// Return
+		return $reports_view;
 	}
 }
 ?>

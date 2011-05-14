@@ -57,7 +57,7 @@ class Category_Model extends ORM_Tree
 	}
 
 	/**
-	 * Gets the list of available categories into an array to be used within a dropdown list
+	 * Gets the list of active categories into an array to be used within a dropdown list
 	 *
 	 * @param	voolean $parent_only
 	 * @return	array
@@ -65,7 +65,11 @@ class Category_Model extends ORM_Tree
 	public static function get_dropdown_categories($parent_only = TRUE)
 	{
 		return ($parent_only)
-			? self::factory('category')->where('parent_id', 0)->select_list('id', 'category_title')
-			: self::factory('category')->select_list('id', 'category_title');
+			? self::factory('category')
+				->where(array('parent_id' => 0, 'category_visible' => 1))
+				->select_list('id', 'category_title')
+			: self::factory('category')
+				->where('category_visible', 1)
+				->select_list('id', 'category_title');
 	}
 }

@@ -82,6 +82,29 @@
 				// Graphing JS
 				$(".dash_bar_graphs").horizontalBarGraph({interval: 1});
 				
+				// Event handler for the category filters
+				$("a[id^='category_']").click(function()
+				{
+					// Get the category id
+					var categoryID = this.id.substring('category_'.length);
+					// Remove all active
+					$("a[id^='category_']").removeClass("active");
+					// Set selected category as active
+					$("#category_"+categoryID).addClass("active");
+					
+					// Get the reports for the specified category
+					$.get('<?php echo url::site().'dashboards/home/category_reports/'?>'+categoryID, function(data) {
+						if(data != "" && data != null)
+						{
+							// Clear the current list of reports
+							$('ul.reports-list').html("");
+							
+							// Display the reports
+							$('ul.reports-list').html(data);
+						}
+					});
+				});
+				
 			});
 			
 			// Callback function to be executed when the map is done zooming

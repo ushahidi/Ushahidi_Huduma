@@ -238,16 +238,32 @@ div.report-ticket-info { float: right; margin: 0 35px 0 0; }
 .report-ticket-info .state-closed { background-color: #FF0000; }
 .report-ticket-info p { margin: 10px 0; color: #888;}
 
-.dashboard_map {
+.dashboard-map {
 	width: 645px;
 	height: 300px;
 }
 div#dashboardContentFilters { float: right; margin: 0!important; position: relative; top: -20px;}
 #dashboardContentFilters li { float: left; list-style-type: none; width: 100px; }
 #dashboardContentFilters li a { text-decoration: none; padding: 2px 5px; display: block; color: #414958; font-weight: bold;}
+ul.dash-cat-filter { padding-bottom: 50px; }
+.dash-category-panel li { 
+	list-style-type: none; 
+	float: left;
+	background-color: #414958;
+	margin:3px 5px;
+	border-radius: 3px; 
+	-webkit-border-radius: 3px; 
+	-moz-border-radius: 3px;
+}
+.dash-category-panel li a { 
+	padding: 5px 10px; 
+	font-weight: bold; 
+	display: block;
+	color: #FFF;	
+}
+.dash-category-panel th { padding: 0 15px; font-size: 250%; color: #369; }
+.dash-category-panel th span { font-size: 11px; color: #888;}
+.dash-category-panel td { border-left: 1px solid #F3F3F3; padding: 0 15px; border-left: 2px solid #F3F3F3; }
 .hbg-bar { margin-bottom: 5px; padding: 3px 5px; background-color: #369; color: #fff; font-weight: bold; }
 .hbg-title { text-align: center; font-weight: bold; }
 .hbg-label { margin: 3px 0 5px 0; font-weight: bold; font-size: 105%; width: 100px; }
-.dashboard_stats_panel th { padding: 0 15px; font-size: 250%; color: #369; }
-.dashboard_stats_panel th span { font-size: 11px; color: #888;}
-.dashboard_stats_panel td { border-left: 1px solid #F3F3F3; padding: 0 15px; border-left: 2px solid #F3F3F3;}

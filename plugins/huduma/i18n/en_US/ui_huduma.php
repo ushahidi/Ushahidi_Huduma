@@ -108,10 +108,10 @@
 	'select_boundary' => 'Select Boundary',
 	'can_close_issue' => 'Can close service delivery issue?',
 	'view_map' => 'View Map',
-	'view_stats' => 'View Statistics',
 	'resolved' => 'Resolved',
 	'unresolved' => 'Unresolved',
 	'replied' => 'replied',
+	'profile' => 'Profile',
 
 	// Error Messages
 	'error'	=> array(

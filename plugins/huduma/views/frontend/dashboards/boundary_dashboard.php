@@ -27,13 +27,13 @@
 				<div id="dashboardContentFilters">
 					<ul>
 						<li>
-							<a href="javascript:toggleItemDisplay('dashboard_map', 'dashboard_stats_panel')">
+							<a href="javascript:toggleItemDisplay('dashboard-map', 'dash-category-panel')">
 								<?php echo Kohana::lang('ui_huduma.view_map'); ?>
 							</a>
 						</li>
 						<li>
-							<a href="javascript:toggleItemDisplay('dashboard_stats_panel', 'dashboard_map')">
-								<?php echo Kohana::lang('ui_huduma.view_stats'); ?>
+							<a href="javascript:toggleItemDisplay('dash-category-panel', 'dashboard-map')">
+								<?php echo Kohana::lang('ui_main.all_categories'); ?>
 							</a>
 						</li>
 					</ul>
@@ -41,7 +41,16 @@
 			</div>
 	
 			<div class="dashboard_container">
-				<div class="dashboard_stats_panel" style="display:none;">
+				<div class="dash-category-panel" style="display:none;">
+					<!-- category filters -->
+					<?php if ($categories): ?>
+					<ul class="dash-cat-filter">
+						<?php foreach ($categories as $key => $value): ?>
+						<li><a href="#" id="category_<?php echo $key; ?>"><?php echo $value; ?></a></li>
+						<?php endforeach; ?>
+					</ul>
+					<?php endif; ?>
+					<!-- /category filters -->
 					<table width="100%" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<th>
@@ -56,7 +65,7 @@
 							</td>
 					</table>
 				</div>
-				<div id="divMap" class="dashboard_map"></div>
+				<div id="divMap" class="dashboard-map"></div>
 				<div style="clear: both;"></div>
 				
 				<div class="row">

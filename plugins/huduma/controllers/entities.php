@@ -152,11 +152,9 @@ class Entities_Controller extends Frontend_Controller {
 		$this->template->content->show_metadata = $show_metadata;
 
 		// Show the reports
-		$entity_reports_view = new View('frontend/entity_reports_view');
-		$entity_reports_view->reports = Static_Entity_Model::get_reports($entity_id);
-		$entity_reports_view->report_view_controller = 'entities/reports/'.$entity_id.'/';
+		$reports = Static_Entity_Model::get_reports($entity_id);
 
-		$this->template->content->entity_reports_view = $entity_reports_view;
+		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'entities/reports/'.$entity_id.'/');
 
 		//Javascript Header
 		$this->themes->map_enabled = TRUE;

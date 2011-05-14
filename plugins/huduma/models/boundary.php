@@ -204,7 +204,7 @@ class Boundary_Model extends ORM {
 	 * @param string $status Status filter for the reports to be fetched
 	 * @return array
 	 */
-	public static function get_boundary_reports($boundary_id, $status = 'all')
+	public static function get_boundary_reports($boundary_id, $status = 'all', $category_id = FALSE)
 	{
 		if ( ! Boundary_Model::is_valid_boundary($boundary_id))
 		{
@@ -217,58 +217,68 @@ class Boundary_Model extends ORM {
 			$table_prefix = Kohana::config('database.table_prefix');
 			
 			// Base query for fetching the incidents
-			$sql = 'SELECT i.id, i.incident_title, i.incident_description, i.incident_date, ';
-			$sql .= 'i.incident_mode, COUNT(co.id) AS comment_count,  it.report_status_id AS report_status ';
-			$sql .= 'FROM '.$table_prefix.'incident i ';
-			$sql .= 'INNER JOIN '.$table_prefix.'incident_category ic ON (ic.incident_id = i.id) ';
-			$sql .= 'INNER JOIN '.$table_prefix.'category c ON (ic.category_id = c.id) ';
-			$sql .= 'LEFT JOIN '.$table_prefix.'comment co ON (co.incident_id = i.id) ';
+			$sql = 'SELECT i.id, i.incident_title, i.incident_description, i.incident_date, '
+				. 'i.incident_mode, COUNT(co.id) AS comment_count,  it.report_status_id AS report_status '
+				. 'FROM '.$table_prefix.'incident i '
+				. 'INNER JOIN '.$table_prefix.'incident_category ic ON (ic.incident_id = i.id) '
+				. 'INNER JOIN '.$table_prefix.'category c ON (ic.category_id = c.id) '
+				. 'LEFT JOIN '.$table_prefix.'comment co ON (co.incident_id = i.id) '
+				. 'LEFT JOIN '.$table_prefix.'boundary b ON (i.boundary_id = b.id) '
+				. 'LEFT JOIN '.$table_prefix.'static_entity se ON (i.static_entity_id = se.id) ';
+				
 			// Add join depending on the value of @param $status
 			$sql .= (strtolower($status) == 'all')? 'LEFT JOIN incident_ticket it ON (it.incident_id = i.id) ': '';
 			$sql .- (strtolower($status) == 'resolved' OR $status = 'unresolved')
 					? 'INNER JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) ' 
 					: '';
 			
-			$sql .= 'WHERE c.category_visible = 1 ';
-			$sql .= 'AND i.incident_active = 1 ';
-			$sql .= 'AND i.boundary_id = %d ';
+			$sql .= 'WHERE c.category_visible = 1 '
+				. 'AND i.incident_active = 1 '
+				. 'AND se.boundary_id = b.id '
+				. 'AND i.boundary_id = %d ';
+			
 			$sql .- (strtolower($status) == 'resolved')? 'AND it.report_status_id = 2 ' : '';
 			$sql .- (strtolower($status) == 'unresolved')? 'AND it.report_status_id = 1 ' : '';
 			
 			// Apply string formatting
 			$sql = sprintf($sql, $boundary_id);
 			
-			// Get the static entities for the boundary in @param $boundary_id
-			$entities_query = 'SELECT e.id FROM '.$table_prefix.'static_entity e '
-							. 'INNER JOIN '.$table_prefix.'boundary b ON (e.boundary_id = b.id) '
-							. 'WHERE e.boundary_id > 0 '
-							. 'AND e.boundary_id IS NOT NULL '
-							. 'AND b.id = %d '
-							. 'OR (b.parent_id = %d AND b.parent_id > 0) ';
+			// Get all boundaries associated with the specified boundary
+			$boundaries_query = 'SELECT b.id FROM '.$table_prefix.'boundary b '
+							. 'WHERE b.id = %d '
+							. 'OR b.parent_id = %d';
 			
-			$entities = $db->query(sprintf($entities_query, $boundary_id, $boundary_id));
+			$boundaries = $db->query(sprintf($boundaries_query, $boundary_id, $boundary_id));
 			// Any records?
-			if ($entities->count() > 0)
+			if ($boundaries->count() > 0)
 			{
 				// To hold the static entity ids
-				$entity_ids = array();
-				foreach ($entities as $entity)
+				$boundary_ids = array();
+				foreach ($boundaries as $boundary)
 				{
-					$entity_ids[] = $entity->id;
+					$boundary_ids[] = $boundary->id;
 				}
 				
 				// Split the ids array into a string
-				$entity_ids = implode(",", $entity_ids);
+				$boundary_ids = implode(",", $boundary_ids);
 				
 				// Extra conditions - where the boundary_id column is NULL
 				// Necessary because of the parent > child relationship of boundaries
-				$sql .= 'OR (((i.boundary_id IS NULL AND i.static_entity_id IS NOT NULL) '
-					. 'OR i.boundary_id IS NOT NULL) '
-					. 'AND i.static_entity_id > 0 '
-					. 'AND i.static_entity_id IN (%s)) ';
+				
+				// Check if a valid category has been specified
+				if ($category_id AND Category_Model::is_valid_category($category_id))
+				{
+					$sql .= 'OR (c.id = '.$category_id.' AND b.id IN (%s)) '
+						. 'OR (c.id = '.$category_id.' AND se.boundary_id IN (%s)) ';
+				}
+				else
+				{
+					$sql .= 'OR (b.id IN (%s)) '
+						. 'OR (se.boundary_id IN (%s)) ';
+				}
 				
 				// Apply string formatting
-				$sql = sprintf($sql, $entity_ids);
+				$sql = sprintf($sql, $boundary_ids, $boundary_ids);
 			}
 			
 			// Group the incidents by id
@@ -277,8 +287,7 @@ class Boundary_Model extends ORM {
 			// Order the incidents by date in descending order
 			$sql .= 'ORDER BY i.incident_date DESC';
 			
-			// Debug
-			Kohana::log('debug', sprintf('Report fetch query for "%s" incidents: %s', $status, $sql));
+			Kohana::log('debug', sprintf('Query for fetching the data: %s', $sql));
 			
 			// Return
 			return $db->query($sql);
