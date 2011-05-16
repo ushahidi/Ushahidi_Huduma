@@ -158,7 +158,8 @@ class Roles_Controller extends Admin_Controller {
 			'agency_id' => '',
 			'static_entity_id' => '',
 			'boundary_id' => '',
-			'category_id' => ''
+			'category_id' => '',
+			'can_close_issue' => ''
 		);
 
 		Kohana::log('info', sprintf('Validating dashboard role id %d', $dashboard_role_id));

@@ -48,7 +48,7 @@
                 <?php if ($form_saved): ?>
             		<!-- green-box -->
             		<div class="green-box" id="submitStatus">
-            			<h3><?php echo Kohana::lang('ui_huduma.dashboard_user');?> <?php echo $form_action; ?>
+            			<h3><?php echo Kohana::lang('ui_huduma.dashboard_user_saved');?> <?php echo $form_action; ?>
             			    <a href="#" id="hideMessage" class="hide"><?php echo Kohana::lang('ui_main.hide_this_message');?></a>
             			</h3>
             		</div>
