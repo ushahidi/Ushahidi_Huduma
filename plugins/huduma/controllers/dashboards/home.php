@@ -103,8 +103,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 				$total_unresolved += ($report->report_status == 1 OR empty($report->report_status))? 1 : 0;
 			}
 			
-			$total_resolved = round(($total_resolved/$total_reports),2) * 100;
-			$total_unresolved = round(($total_unresolved/$total_reports),2) * 100;
+			$total_resolved = ($total_resolved > 0)? round(($total_resolved/$total_reports),2) * 100 : 0;
+			$total_unresolved = ($total_unresolved > 0)? round(($total_unresolved/$total_reports),2) * 100 : 0;
 			
 			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 			$this->template->content->boundary_name = $boundary_name;
