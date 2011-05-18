@@ -1,12 +1,13 @@
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$('#d_login_button').click(function(){
-			var display = $(".login").css("display");
+	jQuery.noConflict();
+	jQuery(document).ready(function(){
+		jQuery('#d_login_button').click(function(){
+			var display = jQuery(".login").css("display");
 
 			if (display == "none") {
-				$(".login").show('fast');
+				jQuery(".login").show('fast');
 			} else {
-				$(".login").hide('fast');
+				jQuery(".login").hide('fast');
 			}
 			
 		});

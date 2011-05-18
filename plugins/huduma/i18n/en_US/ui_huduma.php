@@ -112,6 +112,9 @@
 	'unresolved' => 'Unresolved',
 	'replied' => 'replied',
 	'profile' => 'Profile',
+	'click_to_view_reports' => 'Click to view reports on',
+	'total' => 'Total',
+	'unassigned_reports' => 'Unassigned',
 
 	// Error Messages
 	'error'	=> array(

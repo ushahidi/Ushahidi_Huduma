@@ -63,7 +63,7 @@
             if(activeZoom == '') {
                 // Run the map overlay event
                 <?php Event::run('ushahidi_action.main_map_overlay'); ?>
-                return $.timeline({categoryId: catID,
+                return jQuery.timeline({categoryId: catID,
                            startTime: new Date(startDate * 1000),
                            endTime: new Date(endDate * 1000),
                            mediaType: mediaType
@@ -77,7 +77,7 @@
                 if(currZoom == activeZoom){
                     // Run the map overlay event
                     <?php Event::run('ushahidi_action.main_map_overlay'); ?>
-                    return $.timeline({categoryId: catID,
+                    return jQuery.timeline({categoryId: catID,
                            startTime: new Date(startDate * 1000),
                            endTime: new Date(endDate * 1000),
                            mediaType: mediaType
@@ -489,7 +489,7 @@
             gMap = map;
 			
 			// Category Switch Action
-			$("a[id^='cat_']").click(function()
+			jQuery("a[id^='cat_']").click(function()
 			{
 				var catID = this.id.substring(4);
 				var catSet = 'cat_' + this.id.substring(4);
@@ -518,7 +518,8 @@
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
-								
+				
+				<?php if ($show_timeline): ?>				
 				graphData = "";
 				$.getJSON("<?php echo url::site()."json/timeline/"?>"+catID, function(data) {
 					graphData = data[0];
@@ -538,12 +539,13 @@
 				$.getJSON("<?php echo url::site()."json/timeline/"?>"+currentCat, function(data) {
 					allGraphData = data[0];
 				});
+				<?php endif; ?>
 
 				return false;
 			});
 			
 			// Sharing Layer[s] Switch Action
-			$("a[id^='share_']").click(function()
+			jQuery("a[id^='share_']").click(function()
 			{
 				var shareID = this.id.substring(6);
 				
@@ -576,14 +578,14 @@
 			});
 
 			// Exit if we don't have any incidents
-			if (!$("#startDate").val())
+			if (!jQuery("#startDate").val())
 			{
 				map.setCenter(new OpenLayers.LonLat(<?php echo $longitude ?>, <?php echo $latitude ?>), 5);
 				return;
 			}
 			
 			//Accessible Slider/Select Switch
-			$("select#startDate, select#endDate").selectToUISlider({
+			jQuery("select#startDate, select#endDate").selectToUISlider({
 				labels: 4,
 				labelSrc: 'text',
 				sliderOptions: {
@@ -625,40 +627,45 @@
 			
 			var allGraphData = "";
 			var dailyGraphData = "";
+			gCategoryId = '0';
+			gMediaType = 0;
 			
 			var startTime = <?php echo $active_startDate ?>;	// Default to most active month
 			var endTime = <?php echo $active_endDate ?>;		// Default to most active month
 					
+			<?php if ($show_timeline): ?>
 			// get the closest existing dates in the selection options
-			options = $('#startDate > optgroup > option').map(function()
+			options = jQuery('#startDate > optgroup > option').map(function()
 			{
 				return $(this).val(); 
 			});
-			startTime = $.grep(options, function(n,i)
+			startTime = jQuery.grep(options, function(n,i)
 			{
 			  return n >= ('' + startTime) ;
 			})[0];
 			
-			options = $('#endDate > optgroup > option').map(function()
+			options = jQuery('#endDate > optgroup > option').map(function()
 			{
-				return $(this).val(); 
+				return jQuery(this).val(); 
 			});
-			endTime = $.grep(options, function(n,i)
+			endTime = jQuery.grep(options, function(n,i)
 			{
 			  return n >= ('' + endTime) ;
 			})[0];
 			
-			gCategoryId = '0';
-			gMediaType = 0;
 			//$("#startDate").val(startTime);
 			//$("#endDate").val(endTime);
+			<?php endif; ?>
 			
 			// Initialize Map
 			addMarkers(gCategoryId, startTime, endTime, '', '', gMediaType);
+			
+			<?php if ($show_timeline): ?>
 			refreshGraph(startTime, endTime);
+			<?php endif; ?>
 
 			// Media Filter Action
-			$('.filters li a').click(function()
+			jQuery('.filters li a').click(function()
 			{
 				var startTimestamp = $("#startDate").val();
 				var endTimestamp = $("#endDate").val();
@@ -676,22 +683,24 @@
 				addMarkers(currentCat, startTimestamp, endTimestamp, 
 				           currZoom, currCenter, gMediaType);
 				
-				$('.filters li a').attr('class', '');
-				$(this).addClass('active');
-				gTimeline = $.timeline({categoryId: gCategoryId, startTime: startTime, 
+				jQuery('.filters li a').attr('class', '');
+				jQuery(this).addClass('active');
+				gTimeline = jQuery.timeline({categoryId: gCategoryId, startTime: startTime, 
 				    endTime: endTime, mediaType: gMediaType,
 					url: "<?php echo url::site(); ?>json_url+'/timeline/'"
 				});
 				gTimeline.plot();
 			});
 			
-			$('#playTimeline').click(function()
+			<?php if ($show_timeline): ?>
+			jQuery('#playTimeline').click(function()
 			{
 			    gTimelineMarkers = gTimeline.addMarkers(gStartTime.getTime()/1000,
 					$.dayEndDateTime(gEndTime.getTime()/1000), gMap.getZoom(),
 					gMap.getCenter(),null,null,null,null,"json");
 				gTimeline.playOrPause('raindrops');
 			});
+			<?php endif; ?>
 
 		});
 

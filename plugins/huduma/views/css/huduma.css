@@ -267,3 +267,31 @@ ul.dash-cat-filter { padding-bottom: 50px; }
 .hbg-bar { margin-bottom: 5px; padding: 3px 5px; background-color: #369; color: #fff; font-weight: bold; }
 .hbg-title { text-align: center; font-weight: bold; }
 .hbg-label { margin: 3px 0 5px 0; font-weight: bold; font-size: 105%; width: 100px; }
+.slider-holder { display: none; }
+div.dash-snapshots { margin-top: -130px; }
+.snapshot-item { border-bottom: 1px dotted #999999; float: left; width: 100%; margin-top: 20px; padding-bottom: 5px;}
+.snapshot-item h1 { text-align: left; font-size: 22px; color: #858585; font-family: Verdana,Arial,Helvetica,sans-serif; font-weight: normal;}
+.snapshot-item a { color: #00ADE2; float:left; font-size: 102%; text-decoration:none; padding: 5px;}
+.snap-item-header { padding-bottom: 20px; }
+.dash-stats { float: left; padding: 10px; width: 97%; background-color: #FAFAFA;}
+.cat-report-totals { float: left; padding-right: 10px; width: 200px; border-right: 1px solid #93979A; }
+.cat-report-count { font-size:30px; float: right; width: 67%; }
+.cat-response-graphs { float: left; padding: 0 10px; width: 300px; }
+#pieChartHolder { 
+	background: url(../images/rOverV.png) no-repeat scroll right top transparent; 
+	float: right;
+	height: 375px;
+	width: 263px;
+	padding-top: 40px;
+}
+.stat-overview-right { float: right; margin: 0; padding: 0; width: 114px; }
+.total-reports { float: right; margin-top: 120px; width: 114px; }
+.total-reports p { color: #00ADE7; font-size: 24px; margin: 0; padding-left: 21px; text-align: left; }
+#unresolvedStats, #resolvedStats { float: left; width: 145px;}
+#resolvedStats { margin-top: 32px; }
+#unresolvedStats { margin-top: 27px; }
+#unresolvedStats p, #resolvedStats p { float: left; font-size: 26px; font-weight: bold; margin: 0; padding: 0; width:120px; text-align: right; }
+#resolvedStats p { color: #640235; }
+#unresolvedStats p {color: #CA669A; } 
+#unresolvedStats span, #resolvedStats span { float: right; font-size: 15px; text-align: left; padding: 9px 7px 0 0;}
+#pieChartSummary { position: relative; width: 360px; height:450px; left: -100px; top: -140px; padding:0; margin:0;}

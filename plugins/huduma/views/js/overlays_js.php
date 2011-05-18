@@ -205,7 +205,7 @@
                     {
                         if (feature.attributes.count > 1)
                         {
-                            if($.browser.msie && $.browser.version=="6.0")
+                            if(jQuery.browser.msie && $.browser.version=="6.0")
                             { // IE6 Bug with Labels
                                 return "";
                             }
@@ -305,3 +305,7 @@
             "featureunselected": onFeatureUnselect
         });
     }
+
+	jQuery(document).ready(function(){
+		jQuery(".cat-stats-graph").horizontalBarGraph({interval: 0.55});
+	});

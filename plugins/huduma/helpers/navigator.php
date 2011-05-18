@@ -303,5 +303,87 @@ class navigator_Core {
 		// Return
 		return $reports_view;
 	}
+	
+	/**
+	 * @return Result
+	 */
+	public static function get_category_stats()
+	{
+		// Database instance for the fetch
+		$db = new Database();
+		
+		$sql = 'SELECT c.id, c.category_title, c.category_color, COUNT(i.id) AS total_reports, '
+			. '(SELECT COUNT(it.id) FROM incident_ticket it INNER JOIN incident_category ic2 ON (ic2.incident_id = it.incident_id)'
+			. ' WHERE ic2.category_id = c.id AND it.report_status_id = 1) AS unresolved, '
+			. '(SELECT COUNT(it.id) FROM incident_ticket it INNER JOIN incident_category ic2 ON (ic2.incident_id = it.incident_id)'
+			. ' WHERE ic2.category_id = c.id AND it.report_status_id = 2) AS resolved '
+			. 'FROM category c '
+			. 'INNER JOIN incident_category ic ON (ic.category_id = c.id) '
+			. 'INNER JOIN incident i on (ic.incident_id = i.id) '
+			. 'WHERE i.incident_active = 1 '
+			. 'AND c.category_visible = 1 '
+			. 'GROUP BY c.id';
+		
+		// Return
+		return $db->query($sql);
+	}
+	
+	/**
+	 * Generates a linear color progression between two colors. Unless specified, the end color
+	 * shall default to white (#FFFFFF). The progression/gradient is generated using linear
+	 * interpolation
+	 *
+	 * Credits to: http://www.herethere.net/~samson/php/color_gradient/
+	 *
+	 * @param string $start_color First color in the gradient map
+	 * @param string end_color Last color in the gradient map
+	 * @param int $steps No. of colors to generate
+	 * @return array
+	 */
+	public static function get_color_gradient_map($start_color, $end_color = "FFFFFF", $steps = 16)
+	{
+		// To hold the return value
+		$gradient_map = array();
+		
+		// Convert the start and end colors to HEX
+		$start_color = hexdec($start_color);
+		$end_color = hexdec($end_color);
+		
+		// Log
+		Kohana::log('info', sprintf('Color gradient starts at: 0x%06X and ends at: 0x%06X', $start_color, $end_color));
+		
+		// Extract the RGB components for the start and end colors
+		$start_red = ($start_color & 0xff0000) >> 16;
+		$start_green = ($start_color & 0x00ff00) >> 8;
+		$start_blue = ($start_color & 0x0000ff) >> 0;
+		
+		$end_red = ($end_color & 0xff0000) >> 16;
+		$end_green = ($end_color & 0x00ff00) >> 8;
+		$end_blue = ($end_color & 0x0000ff) >> 0;
+		
+		// Build the gradient map
+		for ($i = 0; $i < $steps; $i++)
+		{
+			$red = self::interpolate($start_red, $end_red, $i, $steps);
+			$green = self::interpolate($start_green, $end_green, $i, $steps);
+			$blue = self::interpolate($start_blue, $end_blue, $i, $steps);
+			
+			// Generate final color and add it to the map
+			$color_item = ((($red << 8) | $green) << 8) | $blue;
+			$gradient_map[] = sprintf("%06X", $color_item);
+		}
+		return $gradient_map;
+	}
+	
+	/**
+	 * Gets the interpolated value between p_begin and p_end
+	 * @return int
+	 */
+	public static function interpolate($p_begin, $p_end, $p_step, $p_max)
+	{
+		return ($p_begin < $p_end)
+			? (($p_end  - $p_begin) * ($p_step / $p_max)) + $p_begin
+			: (($p_begin - $p_end) * (1- ($p_step / $p_max))) + $p_end;
+	}
 }
 ?>

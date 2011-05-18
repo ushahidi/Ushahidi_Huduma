@@ -37,19 +37,11 @@ class huduma
 	 */
 	public function add()
 	{
-		// Log
-		Kohana::log('info', sprintf('Curremt URI is: %s', Router::$current_uri));
-		
 		// Add CSS and Javascript
 		plugin::add_stylesheet('huduma/views/css/huduma');
 		plugin::add_stylesheet('huduma/views/css/facebox');
 		plugin::add_javascript('huduma/views/js/facebox');
-		
-		if (Router::$current_uri == 'dashboards/home')
-		{
-			// Add the bar chart Javascript library
-			plugin::add_javascript('huduma/views/js/jquery.horiz-bar-graph.min');
-		}
+		plugin::add_javascript('huduma/views/js/jquery.horiz-bar-graph.min');
 		
 		// Queue events
 		Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
@@ -58,6 +50,15 @@ class huduma
 
 		if (Router::$controller == 'main')
 		{
+			// Add charting javascript
+			plugin::add_javascript('../media/js/raphael');
+			plugin::add_javascript('huduma/views/js/g.raphael-min');
+			plugin::add_javascript('huduma/views/js/g.pie-min');
+			
+			// Queue up events
+			Event::add('ushahidi_action.main_sidebar', array($this, 'add_main_page_sidebar'));
+			Event::add('huduma_action.main_content', array($this, 'add_dashboard_snapshots'));
+			
 			// Modify the header scripts
 			Event::add('ushahidi_action.huduma_overlay_js', array($this, 'overlay_js'));
 
@@ -124,6 +125,9 @@ class huduma
 	 */
 	public function modify_header_scripts()
 	{
+		// $no_conflict = View::factory('js/no_conflict_js');
+		// $no_conflict->render(TRUE);
+		
 		$toggle_button_js = new View('js/toggle_login_button_js');
 		$toggle_button_js->render(TRUE);
 	}
@@ -373,6 +377,77 @@ class huduma
 		// Clear the property
 		$this->boundary_id = "";
 	}
+	
+	/**
+	 * Event callback to be executed when the main controller is accessed
+	 *
+	 * Loads the view containing the dashboard stats summary -  The view
+	 * is rendered in the middle column of the main page
+	 */
+	public function add_dashboard_snapshots()
+	{
+		$view = View::factory('frontend/dashboard_snapshots');
+		$view->category_snapshots = navigator::get_category_stats();
+		$view->render(TRUE);
+	}
+	
+	/**
+	 * Event callback to be executed when the main controller is accessed
+	 * Loads the view for the left sidebar of the main page
+	 */
+	public function add_main_page_sidebar()
+	{
+		// Statistics
+		$stats = array(
+			'total_reports' => 0,
+			'resolved' => 0,
+			'unresolved' => 0,
+			'unassigned' => 0,
+		);
+		
+		// Get the category stats
+		$categories = navigator::get_category_stats();
+		
+		// Update the statistics
+		foreach ($categories as $category)
+		{
+			$stats['total_reports'] += $category->total_reports;
+			$stats['resolved'] += $category->resolved;
+			$stats['unresolved'] += $category->unresolved;
+		}
+		$chart_colors = array_reverse(array("'#640235'", "'#CA669A'", "'#CC0033'"));
+		$stats_data = array(
+			$stats['resolved'], 
+			$stats['unresolved'], 
+			$stats['total_reports'] - ($stats['unresolved'] + $stats['resolved'])
+		);
+		
+		// Generate the Raphael JS
+		$raphael_js = View::factory('js/main_sidebar_js');
+		$raphael_js->chart_data = implode(",", $stats_data);
+		$raphael_js->chart_colors = implode(",", $chart_colors);
+		
+		
+		// Compute the percentages
+		if ($stats['resolved'] > 0)
+		{
+			$stats['resolved'] = round(($stats['resolved']/$stats['total_reports']) * 100, 2);
+		}
+		
+		if ($stats['unresolved'] > 0)
+		{
+			$stats['unresolved'] = round(($stats['unresolved']/$stats['total_reports']) * 100, 2);
+		}
+		
+		// TODO: Compute issue resolution rate
+		
+		// Load the view
+		$view = View::factory('frontend/main_page_sidebar');
+		$view->stats = $stats;
+		$view->main_sidebar_js = $raphael_js;
+		$view->render(TRUE);
+	}
+	
 }
 
 // Instantiate the hook

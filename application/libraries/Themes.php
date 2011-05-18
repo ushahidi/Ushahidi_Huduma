@@ -162,7 +162,7 @@ class Themes_Core {
 		$inline_js = "<script type=\"text/javascript\">
                         <!--//
 function runScheduler(img){img.onload = null;img.src = '".url::site().'scheduler'."';}
-			".'$(document).ready(function(){$(document).pngFix();});'.$this->js.
+			".'jQuery(document).ready(function(){jQuery(document).pngFix();});'.$this->js.
                         "//-->
                         var BASE_URL = '".url::base()."';
                         </script>";
