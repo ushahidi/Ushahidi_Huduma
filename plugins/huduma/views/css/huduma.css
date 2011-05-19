@@ -4,7 +4,8 @@
 
 ul.boundary-list li { list-style-type: none; }
 ul.boundary-list li a { padding-left: 5px; text-decoration: none; }
-.popup-table { font-size:12px; }
+.infowindow_list h5 { font-size: 90%; }
+.popup-table { font:11px Arial,Helvetica,sans-serif; }
 
 .entity_map {
 	clear:both;
@@ -127,7 +128,15 @@ div.report_comments_area {
 	border-top: 1px solid #E5E5E5;
 }
 .dashboard_comment_form h4, .dashboard_container h4 { font-size: 13px; padding:5px 0 0 0; margin: 8px 0 0 0; }
-div.dashboard_container { float: left; left: 40px; position: relative; padding: 0; min-height: 40em; width:650px;}
+.dashboard_container { 
+	float: left; 
+	left: 40px;
+	position: relative;
+	padding: 0;
+	min-height: 40em; 
+	width:650px;
+	font: 12px Arial,Helvetica,sans-serif
+}
 .dash-page-header { background-color: #7AD1EC; margin: 20px 0 0 5px; height:27px;}
 .dash-page-header h3 { color: #333333; float: left; padding: 5px 0 0 10px; width: 20%; font-size: 14px;}
 ul.comment_form_buttons { position: relative; margin: 0 !important; }
@@ -175,7 +184,7 @@ div.nav_dashboard_panel {
 	border-radius: 4px; 
 	border: 1px solid #CCCCCC;
 }
-.dashboard_menu { padding: 3px; font-size: 105%;}
+.dashboard_menu { padding: 3px; }
 .dashboard_menu li { list-style: none outside none; text-align: right; padding: 8px 5px; border-bottom: 1px solid #E5E5E5; }
 .dashboard_menu li a { text-decoration: none; height: 20px; }
 .dashboard_menu li a img {position: relative; top: 5px; right: 0;}
@@ -264,19 +273,26 @@ ul.dash-cat-filter { padding-bottom: 50px; }
 .dash-category-panel th { padding: 0 15px; font-size: 250%; color: #369; }
 .dash-category-panel th span { font-size: 11px; color: #888;}
 .dash-category-panel td { border-left: 1px solid #F3F3F3; padding: 0 15px; border-left: 2px solid #F3F3F3; }
+
 .hbg-bar { margin-bottom: 5px; padding: 3px 5px; background-color: #369; color: #fff; font-weight: bold; }
 .hbg-title { text-align: center; font-weight: bold; }
 .hbg-label { margin: 3px 0 5px 0; font-weight: bold; font-size: 105%; width: 100px; }
+
 .slider-holder { display: none; }
 div.dash-snapshots { margin-top: -130px; }
+
 .snapshot-item { border-bottom: 1px dotted #999999; float: left; width: 100%; margin-top: 20px; padding-bottom: 5px;}
 .snapshot-item h1 { text-align: left; font-size: 22px; color: #858585; font-family: Verdana,Arial,Helvetica,sans-serif; font-weight: normal;}
 .snapshot-item a { color: #00ADE2; float:left; font-size: 102%; text-decoration:none; padding: 5px;}
+
 .snap-item-header { padding-bottom: 20px; }
+
 .dash-stats { float: left; padding: 10px; width: 97%; background-color: #FAFAFA;}
+
 .cat-report-totals { float: left; padding-right: 10px; width: 200px; border-right: 1px solid #93979A; }
 .cat-report-count { font-size:30px; float: right; width: 67%; }
 .cat-response-graphs { float: left; padding: 0 10px; width: 300px; }
+.cat-response-graphs .hbg-bar, .cat-response-graphs .hbg-label { font-size: 95%; }
 
 #pieChartHolder { 
 	background: url(../images/rOverV.png) no-repeat scroll right top transparent; 
@@ -287,8 +303,10 @@ div.dash-snapshots { margin-top: -130px; }
 }
 
 .stat-overview-right { float: right; margin: 0; padding: 0; width: 114px; }
+
 .total-reports { float: right; margin-top: 120px; width: 114px; }
 .total-reports p { color: #00ADE7; font-size: 24px; margin: 0; padding-left: 21px; text-align: left; }
+
 #unresolvedStats, #resolvedStats { float: left; width: 145px;}
 #resolvedStats { margin-top: 32px; }
 #unresolvedStats { margin-top: 27px; }
@@ -326,7 +344,8 @@ div.dash-snapshots { margin-top: -130px; }
 	width: 68%;
 }
 
-.dashboard-title h1 { padding: 0 0 0 5px; margin: 0; font-size: 18px; }
+.dashboard-title h1 { padding: 0 0 3px 5px; margin: 0; font-size: 120%; }
+
 .report-filter-tabs { margin: 10px 0; padding-bottom: 20px; }
 .report-filter-tabs ul { float: left; margin: 0; padding: 0; border-bottom:1px solid #CCCCCC; width:100%;}
 .report-filter-tabs li { float: left; list-style: none; margin-left:2px;}
@@ -347,7 +366,9 @@ div.dash-snapshots { margin-top: -130px; }
 	border-top-right-radius: 5px;
 }
 .report-filter-tabs li a.active { background-color: #FFFFFF; }
+
 #emptyFilterResults { width: 96%; padding: 30px 15px; border-bottom: 1px solid #F3F3F3; text-align:center; }
+
 .report-additional-reports { 
 	border: 1px solid #C0C2B8;
 	margin: 10px 0;

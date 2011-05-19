@@ -166,7 +166,7 @@
                         <div class="additional-content">
 
                             <h5><?php echo Kohana::lang('ui_main.how_to_report'); ?></h5>
-                            <div style="float: left; margin-left: 120px; margin-top: -26px;">
+                            <div style="float: left; margin-left: 100px; margin-top: -23px;">
                             <ol>
         					<?php if (!empty($phone_array)): ?>
                                 <li><?php echo Kohana::lang('ui_main.sms').": "; ?>

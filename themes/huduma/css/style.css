@@ -39,10 +39,10 @@ a:hover{
 
 /* header elements */
 h1, h2, h3, h4, h5, h6{
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    margin-top: 0;
-    padding: 0;
+	/*font-family: Arial, Helvetica, sans-serif;*/
+	/*font-weight: bold;*/
+	margin-top: 0;
+	padding: 0 15px;
 }
 
 h1{
@@ -79,9 +79,10 @@ h6{
 
 /* page setup */
 body{
-    font-family: Arial, Helvetica, sans-serif;
-    color: #333333;
-    font-size: 12px;
+	font: 75% Verdana,Arial,Helvetica,sans-serif;
+	color: #000000;
+	/*color: #333333;*/
+	/*font-size: 12px;*/
 }
 
 body#page{
@@ -378,18 +379,21 @@ div#mainmenu li{
     float: left;
     display: block;
     margin-right: 15px;
-	margin-top: 0.7%;
+    padding: 0;
+    margin-top: 0.7%;
 }
 
 div#mainmenu a{
     display: block;
     position: relative;
-    padding: 7px 12px;
+    padding: 2px 12px;
     color: #000;
     overflow: hidden;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 85%;
+    /*text-transform: uppercase;*/
+    /*font-weight: bold;*/
+    /*font-size: 85%;*/
+    font-size: 13px;
+    height: 20px;
 }
 
 div#mainmenu a:hover{
@@ -398,13 +402,13 @@ div#mainmenu a:hover{
     background: #00ade3;
 }
 
-div#mainmenu a.active{
+div#mainmenu a.active {
     display: block;
     position: relative;
-    padding: 7px 12px;
+    padding: 2px 12px;
     overflow: hidden;
-    text-transform: uppercase;
-    font-weight: bold;
+    /*text-transform: uppercase;*/
+    /*font-weight: bold;*/
     text-decoration: none;
     color: #fff;
     background: #00ade3;
@@ -560,7 +564,9 @@ ul.category-filters li{
 ul.category-filters li a{
     display: block;
     padding: 8px 10px 8px 5px;
-    font-size: 15px;
+    font: 17px "Trebuchet MS"; 
+    font-weight: normal;
+    letter-spacing: 1px;
     text-transform: uppercase;
     text-align: right;
     text-decoration: none;
@@ -586,8 +592,10 @@ div.additional-content{
     padding: 10px;
     background: #00ade3;
     color: #fff;
+    font-size: 8pt;
 }
 
+.additional-content h5 { font-size: 100%; }
 div.additional-content a, div.additional-content h5 {
     color: #fff;
 }
@@ -862,17 +870,18 @@ ul.map-toggles li a:active { display:inline-block; padding:3px 5px 3px 17px; out
 
 div.report-additional-reports {
 	padding-top: 5px;
-	border-bottom:1px dotted #C0C2B8;
+	/*border-bottom:1px dotted #C0C2B8;*/
 }
 div.report-additional-reports .rb_report {  }
 div.report-additional-reports h4 {
-	padding:0px 0px 5px 0px;
+	/*padding:0px 0px 5px 0px;*/
+	padding: 10px;
 	margin:0px;
 	font-size:14px;
 	text-transform: capitalize;
 }
 
-div.report-additional-reports h5 { font-size:12px; margin:4px 120px 2px 0; }
+div.report-additional-reports h5 { font-size:95%; margin:4px 120px 2px 0; }
 div.report-additional-reports .r_date { font-size:10px; background:#f2f2f2 url(../images/icon_sprite.png) 0px -133px no-repeat; }
 div.report-additional-reports .r_location { font-size:10px; padding:3px 0 3px 18px; color:#828784; }
 

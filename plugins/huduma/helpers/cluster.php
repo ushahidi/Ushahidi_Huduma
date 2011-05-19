@@ -286,7 +286,7 @@ class cluster_Core {
             $info_html .= "</div>";
 
             // Breakdown table for each categegory
-            $info_html .= count($category_data) > 0 ? "<table class='popup-table'>" : "";
+            $info_html .= count($category_data) > 0 ? "<table class='popup-table' width='100%'>" : "";
 
             foreach ($category_data as $key => $value)
             {
