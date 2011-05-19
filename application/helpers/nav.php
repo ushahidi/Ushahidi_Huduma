@@ -34,12 +34,12 @@ class nav_Core {
 		 }
 
 		// Reports List
-		if( ! in_array('reports',$dontshow))
-		{
-			$menu .= "<li><a href=\"".url::site()."reports\" ";
-			$menu .= ($this_page == 'reports') ? " class=\"active\"" : "";
-		 	$menu .= ">".Kohana::lang('ui_main.reports')."</a></li>";
-		 }
+		// if( ! in_array('reports',$dontshow))
+		// {
+		// 	$menu .= "<li><a href=\"".url::site()."reports\" ";
+		// 	$menu .= ($this_page == 'reports') ? " class=\"active\"" : "";
+		//  	$menu .= ">".Kohana::lang('ui_main.reports')."</a></li>";
+		//  }
 		
 		// Reports Submit
 		if( ! in_array('reports_submit',$dontshow))

@@ -93,7 +93,8 @@ class huduma
 				
 				// Hook into report view on the main reports page on frontend
 				case 'view':
-					// TODO: Define events to queue when this method is accessed
+					Event::add('ushahidi_action.report_extra', array($this, 'load_report_comments_form'));
+					Event::add('ushahidi_action.report_meta', array($this, 'show_report_ticket_info'));
 				break;
 				
 				// Hook into report view on the static entity reports page
@@ -446,6 +447,70 @@ class huduma
 		$view->stats = $stats;
 		$view->main_sidebar_js = $raphael_js;
 		$view->render(TRUE);
+	}
+	
+	/**
+	 * Event callback for the ushahidi_action.report_extra event
+	 *
+	 * Loads a custom comments form
+	 */
+	public function load_report_comments_form()
+	{
+		// Get the incident id
+		$incident_id = Event::$data;
+		
+		// Setup forms
+		$form = array(
+			'comment_description' => '', 
+			'comment_author' => '', 
+			'comment_email' => ''
+		);
+		
+		// Check if a dashboard user is logged in
+		$auth_lite = Authlite::instance('authlite');
+		$is_dashboard_user = $auth_lite->logged_in();
+		$can_close_issue = FALSE;
+		
+		// If user is logged in, check if they can close an issue
+		if ($is_dashboard_user)
+		{
+			$role = $auth_lite->get_user()->dashboard_role;
+			$can_close_issue = (bool) $role->can_close_issue;
+		}
+								
+		// Load and display the view
+		$comments_form = View::factory('frontend/report_comments_form');
+		$comments_form->incident_id = $incident_id;
+		$comments_form->form = $form;
+		$comments_form->form_error = FALSE;
+		$comments_form->form_saved = FALSE;
+		$comments_form->captcha = Captcha::factory();
+		$comments_form->is_dashboard_user = $is_dashboard_user;
+		$comments_form->can_close_issue = $can_close_issue;
+		$comments_form->render(TRUE);
+	}
+	
+	public function show_report_ticket_info()
+	{
+		// Get the incident id
+		$incident_id = Event::$data;
+		$ticket = Incident_Ticket_Model::get_incident_ticket($incident_id);
+		
+		// Build the HTML
+		if ($ticket)
+		{
+			$incident = ORM::factory('incident', $incident_id);
+			$meta_html = '<div class="report-ticket-info"><span class="state state-';
+			$meta_html .= ($ticket->report_status_id==1)? 'open' : 'closed';
+			$meta_html .= '">'
+						. $ticket->report_status->status_name
+						. '</span>'
+						. '<p><strong>'.$incident->comment->count().'</strong>'.strtolower(Kohana::lang('ui_main.comments')).'</p>'
+						. '</div>';
+
+			Kohana::log('debug', $meta_html);
+			print $meta_html;
+		}
 	}
 	
 }

@@ -623,6 +623,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$comments_form = new View('frontend/report_comments_form');
 			$comments_form->incident_id = $incident_id;
 			$comments_form->is_dashboard_user =TRUE;
+			$comments_form->can_close_issue = $this->can_close_issue;
 			
 			// Set the form content
 			$comments_form->captcha = Captcha::factory();

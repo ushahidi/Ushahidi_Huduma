@@ -140,7 +140,7 @@ li.report_box { border-bottom: 1px dotted #C0C2B8; margin-bottom: 5px; padding: 
 .dashboard_comment_actions a:last-child { border: none; }
 div.dashboard_report_item { float: left; width: 100%; }
 .dashboard_comment_text { padding: 4px 0;}
-.report_comment_info { width: 100%; position: relative; margin-left: 300px; }
+.report_comment_info { width: 100%; position: relative; margin-left: 250px; text-align:right; }
 .comment_date_time, .report_comment_info { font-weight: bold; font-size: 90%; color: #888;}
 
 .report-item-action-box {
@@ -217,12 +217,12 @@ div.ticket-box { border: 1px solid #E5E5E5; margin: 15px 0 0 0; padding: 15px 5p
 .ticket-box h4 { padding: 10px 0 0 0; font-size: 13px; color: blue;}
 div.ticket-notes { margin: 3px 0; padding: 15px 0 0 0;}
 div.report_item_media { float: left; overflow: hidden; width: 34px; padding: 0; margin:0;}
-div.report_item_content { float: left; overflow: hidden; padding: 5px 0 0 10px;}
+div.report_item_content { float: left; overflow: hidden; padding: 5px 0 0 10px; /*width: 522px;*/}
 div.report_item_date { margin-top: 5px; }
 div.report-header { float: left; }
 .report-header h3 { color: #00ADE3; padding:5px 0; font-size: 18px; margin: 0;}
 .description { font-size: 115%; padding: 0; width: 95%; }
-div.report-ticket-info { float: right; margin: 0 35px 0 0; }
+div.report-ticket-info { float: right; margin: -10px 35px 0 0; }
 .report-ticket-info .state { 
 	display: block; 
 	padding: 7px 10px;
@@ -277,6 +277,7 @@ div.dash-snapshots { margin-top: -130px; }
 .cat-report-totals { float: left; padding-right: 10px; width: 200px; border-right: 1px solid #93979A; }
 .cat-report-count { font-size:30px; float: right; width: 67%; }
 .cat-response-graphs { float: left; padding: 0 10px; width: 300px; }
+
 #pieChartHolder { 
 	background: url(../images/rOverV.png) no-repeat scroll right top transparent; 
 	float: right;
@@ -284,14 +285,75 @@ div.dash-snapshots { margin-top: -130px; }
 	width: 263px;
 	padding-top: 40px;
 }
+
 .stat-overview-right { float: right; margin: 0; padding: 0; width: 114px; }
 .total-reports { float: right; margin-top: 120px; width: 114px; }
 .total-reports p { color: #00ADE7; font-size: 24px; margin: 0; padding-left: 21px; text-align: left; }
 #unresolvedStats, #resolvedStats { float: left; width: 145px;}
 #resolvedStats { margin-top: 32px; }
 #unresolvedStats { margin-top: 27px; }
-#unresolvedStats p, #resolvedStats p { float: left; font-size: 26px; font-weight: bold; margin: 0; padding: 0; width:120px; text-align: right; }
+
+#unresolvedStats p, #resolvedStats p { 
+	float: left;
+	font-size: 26px;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	width:120px;
+	text-align: right; 
+}
+
 #resolvedStats p { color: #640235; }
 #unresolvedStats p {color: #CA669A; } 
 #unresolvedStats span, #resolvedStats span { float: right; font-size: 15px; text-align: left; padding: 9px 7px 0 0;}
-#pieChartSummary { position: relative; width: 360px; height:450px; left: -100px; top: -140px; padding:0; margin:0;}
+
+#pieChartSummary {
+	position: relative;
+	width: 360px;
+	height:450px;
+	left: -105px;
+	top: -140px;
+	padding:0;
+	margin:0;
+}
+
+.dashboard-title {
+	position: relative;
+	padding: 0;
+	border-bottom: 1px solid #F5F5F5;
+	float: left; 
+	margin:-20px 0 0 31px; 
+	width: 68%;
+}
+
+.dashboard-title h1 { padding: 0 0 0 5px; margin: 0; font-size: 18px; }
+.report-filter-tabs { margin: 10px 0; padding-bottom: 20px; }
+.report-filter-tabs ul { float: left; margin: 0; padding: 0; border-bottom:1px solid #CCCCCC; width:100%;}
+.report-filter-tabs li { float: left; list-style: none; margin-left:2px;}
+.report-filter-tabs li a {
+	font-weight: bold;
+	text-decoration: none;
+	padding: 8px 10px;
+	background-color: #EFEFEF;
+	border-left:1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	display: block;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+.report-filter-tabs li a.active { background-color: #FFFFFF; }
+#emptyFilterResults { width: 96%; padding: 30px 15px; border-bottom: 1px solid #F3F3F3; text-align:center; }
+.report-additional-reports { 
+	border: 1px solid #C0C2B8;
+	margin: 10px 0;
+	border-radius: 3px;
+	-moz-border-radius:3px;
+	-webkit-border-radius: 3px;
+	padding:5px 3px;
+}
+.report-additional-reports h4 { text-align: right; color: #666666; }

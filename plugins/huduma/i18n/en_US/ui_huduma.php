@@ -115,6 +115,12 @@
 	'click_to_view_reports' => 'Click to view reports on',
 	'total' => 'Total',
 	'unassigned_reports' => 'Unassigned',
+	'dashboard' => 'Dashboard',
+	'report_analysis' => 'Report Analysis',
+	'report_locations' => 'Report Locations',
+	'all_reports' => 'All Reports',
+	'no_reports_found' => 'No reports matched your chosen filters.',
+	'report_details' => 'Report Details',
 
 	// Error Messages
 	'error'	=> array(

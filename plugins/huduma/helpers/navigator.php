@@ -307,7 +307,7 @@ class navigator_Core {
 	/**
 	 * @return Result
 	 */
-	public static function get_category_stats()
+	public static function get_category_stats($category_id = FALSE)
 	{
 		// Database instance for the fetch
 		$db = new Database();
@@ -321,8 +321,10 @@ class navigator_Core {
 			. 'INNER JOIN incident_category ic ON (ic.category_id = c.id) '
 			. 'INNER JOIN incident i on (ic.incident_id = i.id) '
 			. 'WHERE i.incident_active = 1 '
-			. 'AND c.category_visible = 1 '
-			. 'GROUP BY c.id';
+			. 'AND c.category_visible = 1 ';
+			
+		$sql .= (Category_Model::is_valid_category($category_id))? 'AND c.id = '.$category_id.' ' : '';
+		$sql .= 'GROUP BY c.id';
 		
 		// Return
 		return $db->query($sql);

@@ -72,4 +72,59 @@ class Category_Model extends ORM_Tree
 				->where('category_visible', 1)
 				->select_list('id', 'category_title');
 	}
+	
+	/**
+	 * Gets reports for a specific category
+	 *
+	 * @param int $category_id Database ID of the category
+	 * @return Result
+	 */
+	public static function get_category_reports($category_id, $status = 'all')
+	{
+		if ( ! self::is_valid_category($category_id))
+		{
+			return FALSE;
+		}
+		else
+		{
+			// Database instance for the fetch
+			$db = new Database;
+			
+			// Get the prefix for the DB tables
+			$table_prefix = Kohana::config('database.table_prefix');
+			
+			// SQL to be executed
+			$sql = 'SELECT i.id, i.incident_title, i.incident_description, i.incident_date, '
+				. 'i.incident_mode, COUNT(co.id) AS comment_count, it.report_status_id AS report_status '
+				. 'FROM '.$table_prefix.'incident i '
+				. 'INNER JOIN '.$table_prefix.'incident_category ic ON (ic.incident_id = i.id) '
+				. 'INNER JOIN '.$table_prefix.'category c ON (ic.category_id = c.id) '
+				. 'LEFT JOIN '.$table_prefix.'comment co ON (co.incident_id = i.id) ';
+			
+			// Check the specified ticket status
+			if (strtolower($status) == 'resolved' OR strtolower($status) == 'unresolved')
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) ';
+				$sql .= (strtolower($status) == 'resolved')
+					? 'WHERE it.report_status_id = 2 '
+					: 'WHERE it.report_status_id = 1 ';
+			}
+			else
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) '
+					. 'WHERE 1=1 ';
+			}
+					
+			$sql .= 'AND c.category_visible = 1 '
+				. 'AND i.incident_active = 1 '
+				. 'AND ic.category_id = %d '
+				. 'GROUP BY i.id '
+				. 'ORDER BY i.incident_date DESC';
+			
+			Kohana::log('debug', sprintf($sql, $category_id));
+			
+			// Return
+			return $db->query(sprintf($sql, $category_id));
+		}
+	}
 }

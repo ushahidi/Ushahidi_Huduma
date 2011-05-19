@@ -154,7 +154,7 @@ class Entities_Controller extends Frontend_Controller {
 		// Show the reports
 		$reports = Static_Entity_Model::get_reports($entity_id);
 
-		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'entities/reports/'.$entity_id.'/');
+		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'reports/view/');
 
 		//Javascript Header
 		$this->themes->map_enabled = TRUE;
@@ -386,115 +386,6 @@ class Entities_Controller extends Frontend_Controller {
 			print json_encode(array('success' => FALSE));
 		}
 	}
-	
-	/**
-	 * Loads the report view for an entity
-	 */
-	public function reports($entity_id =  FALSE, $incident_id =  FALSE)
-	{
-		// Validate entity and incident 
-		if (Static_Entity_Model::is_valid_static_entity($entity_id) AND Incident_Model::is_valid_incident($incident_id))
-		{
-			$this->template->content = new View('frontend/single_report_view');
-			// Setup forms
-			$form = array(
-				'comment_author' => '',
-				'comment_email' => '',
-				'comment_description' => '',
-			);
-			$errors = $form;
-			$form_error = FALSE;
-			$form_saved = FALSE;
-		
-			// Get the ticket for the incident
-			$ticket = Incident_Ticket_Model::get_incident_ticket($incident_id);
-			
-			// Has the form been submitted
-			if ($_POST)
-			{
-				// Manually extract the data to be passed on for validation and subsequent saving
-				$data = arr::extract($_POST, 'incident_id', 'comment_description');
 
-				// Check if dashboard user is logged in
-				if ($this->is_dashboard_user)
-				{
-					// Dashboard user is logged in, fetch name and email from ORM
-					$data = array_merge($data, array(
-						'comment_author' => $current_user->name,
-						'comment_email' => $current_user->email,
-						'dashboard_user_id' => $current_user->id,
-					));
-				}
-				else
-				{
-					// User not logged in, fetch author and email address from input
-					$data = array_merge($data, arr::extract($_POST, 'comment_author', 'comment_email'));
-				}
-
-				// Add the the static entity id and comment date to the data array
-				$data = array_merge($data, array('static_entity_id' => $entity_id));
-
-				// Validate the captcha
-				$valid_captcha = Captcha::valid($_POST['captcha']);
-
-				// Static Entity Comment instance
-				$comment_model = new Comment_Model();
-				
-				if ($comment_model->validate($data) AND $valid_captcha)
-				{
-					// Success save
-					$comment_model->comment_date = date('Y-m-d H:i:s');
-					$comment_model->save();
-					$form_saved = TRUE;
-					array_fill_keys($form, '');
-				}
-				else
-				{
-					// Check if the captcha was valid
-					if ( ! $valid_captcha)
-					{
-						$data->add_error('captcha', Kohana::lang('ui_main.invalid_security_code'));
-					}
-					
-					// Turn on form error
-					$form_error = TRUE;
-					
-					// Overwrite form and error array key values
-					$form = arr::overwrite($form, $data->as_array());
-					$errors = arr::overwrite($errors, $data->errors('comment'));
-				}
-			}
-		
-			// Load the comments form
-			$comments_form = new View('frontend/report_comments_form');
-			$comments_form->incident_id = $incident_id;
-			$comments_form->is_dashboard_user = $this->is_dashboard_user;
-			
-			// Set the form content
-			$comments_form->captcha = Captcha::factory();
-			$comments_form->form = $form;
-			$comments_form->errors = $errors;
-			$comments_form->form_error = $form_error;
-			$comments_form->form_saved = $form_saved;
-			
-			$this->template->content->show_dashboard_panel = FALSE;
-			$this->template->content->form = $form;
-			$this->template->content->dashboard_panel = "";
-			$this->template->content->comments_form = $comments_form;
-			$this->template->content->incident = new Incident_Model($incident_id);
-			$this->template->content->ticket = $ticket;
-			$this->template->header->header_block = $this->themes->header_block();
-		}
-		elseif (Static_Entity_Model::is_valid_static_entity($entity_id))
-		{
-			// Entity id is valid, redirect to entity view page
-			url::redirect('entities/view/'.$entity_id);
-		}
-		else
-		{
-			// Invalid parameters, redirect to entities listing
-			url::redirect('entities');
-		}
-	}
 }
 ?>

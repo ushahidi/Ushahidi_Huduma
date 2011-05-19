@@ -17,6 +17,9 @@
 				$unresolved = ($unresolved > 0)? round(($unresolved/$total_reports) * 100,2) : 0;
 				$resolved = ($resolved > 0)? round(($resolved/$total_reports)*100,2) : 0;
 				
+				// Dashboard Acess URL
+				$dashboard_url = url::site().'dashboards/?action=list&type=category&id=%d';
+				
 				// Get the color gradient
 				$gradient_map = navigator::get_color_gradient_map($category->category_color);
 			?>
@@ -46,7 +49,7 @@
 							</dl>
 						</div>
 					</div>
-					<a href="#">
+					<a href="<?php echo sprintf($dashboard_url, $category->id); ?>">
 					<?php echo Kohana::lang('ui_huduma.click_to_view_reports').' '.strtolower($category->category_title); ?>
 					</a>
 				</div>

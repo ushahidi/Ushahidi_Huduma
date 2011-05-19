@@ -42,6 +42,9 @@ class Frontend_Controller extends Template_Controller {
 
 	// Use default header view
 	protected $use_default_header;
+	
+	// Whether a dashboard user can close an issue
+	protected $can_close_issue = FALSE;
 
 	protected $db;
 
@@ -126,6 +129,8 @@ class Frontend_Controller extends Template_Controller {
 
 				// Load the privileges for the current role
 				$dashboard_role = $logged_in_user->dashboard_role;
+				
+				$this->can_close_issue = (bool) $dashboard_role->can_close_issue;
 
 				// Role associated with agency
 				if ( ! empty($dashboard_role->static_entity_id))

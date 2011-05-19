@@ -40,7 +40,7 @@
 			map.addLayers(<?php echo map::layers_array(FALSE); ?>);
 	
 			map.addControl(new OpenLayers.Control.Navigation());
-			map.addControl(new OpenLayers.Control.PanZoomBar());
+			map.addControl(new OpenLayers.Control.PanZoom());
 			map.addControl(new OpenLayers.Control.MousePosition(
 					{ div: 	document.getElementById('mapMousePosition'), numdigits: 5 
 				}));    

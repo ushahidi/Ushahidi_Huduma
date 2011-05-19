@@ -226,13 +226,21 @@ class Boundary_Model extends ORM {
 				. 'LEFT JOIN '.$table_prefix.'boundary b ON (i.boundary_id = b.id) '
 				. 'LEFT JOIN '.$table_prefix.'static_entity se ON (i.static_entity_id = se.id) ';
 				
-			// Add join depending on the value of @param $status
-			$sql .= (strtolower($status) == 'all')? 'LEFT JOIN incident_ticket it ON (it.incident_id = i.id) ': '';
-			$sql .- (strtolower($status) == 'resolved' OR $status = 'unresolved')
-					? 'INNER JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) ' 
-					: '';
+			// Check the specified ticket status
+			if (strtolower($status) == 'resolved' OR strtolower($status) == 'unresolved')
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) ';
+				$sql .= (strtolower($status) == 'resolved')
+					? 'WHERE it.report_status_id = 2 '
+					: 'WHERE it.report_status_id = 1 ';
+			}
+			else
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) '
+					. 'WHERE 1=1 ';
+			}
 			
-			$sql .= 'WHERE c.category_visible = 1 '
+			$sql .= 'AND c.category_visible = 1 '
 				. 'AND i.incident_active = 1 '
 				. 'AND se.boundary_id = b.id '
 				. 'AND i.boundary_id = %d ';

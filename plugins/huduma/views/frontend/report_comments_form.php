@@ -80,7 +80,7 @@
             			</li>
             			<li>
 							<?php 
-								if ($is_dashboard_user)
+								if ($is_dashboard_user AND $can_close_issue)
 								{
 									print form::input(array('type'=>'submit', 'name'=>'comment_close', 'class'=>'huduma_button'),
 										Kohana::lang('ui_huduma.comment_close'));
