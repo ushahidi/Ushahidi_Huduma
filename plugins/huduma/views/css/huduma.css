@@ -226,7 +226,14 @@ div.ticket-box { border: 1px solid #E5E5E5; margin: 15px 0 0 0; padding: 15px 5p
 .ticket-box h4 { padding: 10px 0 0 0; font-size: 13px; color: blue;}
 div.ticket-notes { margin: 3px 0; padding: 15px 0 0 0;}
 div.report_item_media { float: left; overflow: hidden; width: 34px; padding: 0; margin:0;}
-div.report_item_content { float: left; overflow: hidden; padding: 5px 0 0 10px; /*width: 522px;*/}
+.report-item-content { float: left; overflow: hidden; padding: 5px 0 0 10px; margin: 0; }
+.report-item-content h1 { font-size: 12px; font-weight: normal; margin: 0; padding: 0; }
+.report-item-content p { margin: 0; padding: 2px 0; border: medium none; }
+.report-item-content a { color: #00ADE3; font-size: 13px; text-decoration: none; font-weight: bold; }
+ul.report-item-actions { float: left; padding: 0; margin: 0; }
+ul.report-item-actions li { float: left; border-right: 1px solid #CCC; padding-right:8px;}
+ul.report-item-actions li:last-child { padding-left: 8px; border: none;; }
+ul.report-item-actions li a { text-decoration: none; color: #999; font-size: 12px; font-weight: normal; margin: 0; padding: 0; }
 div.report_item_date { margin-top: 5px; }
 div.report-header { float: left; }
 .report-header h3 { color: #00ADE3; padding:5px 0; font-size: 18px; margin: 0;}
@@ -246,6 +253,7 @@ div.report-ticket-info { float: right; margin: -10px 35px 0 0; }
 .report-ticket-info .state-open { background-color: #6CC644; }
 .report-ticket-info .state-closed { background-color: #FF0000; }
 .report-ticket-info p { margin: 10px 0; color: #888;}
+
 
 .dashboard-map {
 	width: 645px;
@@ -378,3 +386,10 @@ div.dash-snapshots { margin-top: -130px; }
 	padding:5px 3px;
 }
 .report-additional-reports h4 { text-align: right; color: #666666; }
+.main-reports-pager { float: right; right: 10px; background-color: #FFFFFF; margin: 5px 10px 0 0; padding-bottom: 10px; font-size: 11px; }
+.pagination { color: #7AD1EC; padding:3px 5px; font-weight: bold;}
+.pagination span { border-right: 1px solid #7AD1EC; padding: 2px 5px; }
+.pagination span:first-child { border-left: 1px solid #7AD1EC; }
+.pagination span.current { color: #016DB9; font-weight: bold; }
+.pagination span a, .pagination a { color: #7AD1EC; }
+.pagination a { text-decoration: none; }

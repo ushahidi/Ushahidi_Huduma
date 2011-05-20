@@ -22,16 +22,16 @@
 		$(".report-filter-tabs a").removeClass("active");
 		$("#"+itemId).addClass("active");
 		
-		$("ul.reports-list").html("");
-		$("ul.reports-list").fadeOut('slow');
+		$("div.reports-list-holder").html("");
+		$("div.reports-list-holder").fadeOut('slow');
 		
 		// Get the reports
 		$.get(fetchURL + '&filter=' + filter, function(data){
 			if (data != "" && data != null && data.length > 0)
 			{
 				setTimeout(function(){
-					$("ul.reports-list").fadeIn('fast');
-					$("ul.reports-list").html(data);
+					$("div.reports-list-holder").fadeIn('fast');
+					$("div.reports-list-holder").html(data);
 				}, 500);
 			}
 			else

@@ -14,6 +14,9 @@
  */
 class Dashboards_Controller extends Frontend_Controller {
 	
+	// No. of report items to be displayed in each of the stacked views
+	private $report_items_per_view = 3;
+	
 	public function index()
 	{
 		// Prevent invalid access
@@ -23,7 +26,7 @@ class Dashboards_Controller extends Frontend_Controller {
 			url::redirect('main');
 		}
 		
-		if ($_GET['action'] == 'list')
+		if ($_GET['action'] == 'list' OR ($_GET['action'] == 'filter' AND ! empty($_GET['page'])))
 		{
 			// Get the dashboard type
 			$dashboard_type = $_GET['type'];
@@ -43,34 +46,43 @@ class Dashboards_Controller extends Frontend_Controller {
 			$this->template = "";
 			$this->auto_render = FALSE;
 			
+			// Fetch the category ID
 			$category_id  = $_GET['id'];
+			
+			// Set up pagination
+			$pagination = $this->_get_report_paginator($category_id, $_GET['filter']);
+			
+			// To hold the reports view
+			$reports = "";
+			
+			// Determine filter to use
 			switch($_GET['filter'])
 			{
 				case 'all':
-					$reports = Category_Model::get_category_reports($category_id);
-					print $this->_get_report_items($reports);
+					$reports = Category_Model::get_category_reports($category_id, 'all', $pagination->sql_offset, 
+						$this->report_items_per_view);
 				break;
 				
 				case 'resolved':
-					$reports = Category_Model::get_category_reports($category_id, 'resolved');
-					print $this->_get_report_items($reports);
+					$reports = Category_Model::get_category_reports($category_id, 'resolved', $pagination->sql_offset, 
+						$this->report_items_per_view);
 				break;
 				
 				case 'unresolved':
-					$reports = Category_Model::get_category_reports($category_id, 'unresolved');
-					print $this->_get_report_items($reports);
+					$reports = Category_Model::get_category_reports($category_id, 'unresolved', $pagination->sql_offset, 
+						$this->report_items_per_view);
 				break;
 				
 				default:
 					// Invalid filter -  show all
-					print $this->_get_report_items(Category_Model::get_category_reports($category_id));
+					$reports = Category_Model::get_category_reports($category_id, 'all', $pagination->sql_offset, 
+						$this->report_items_per_view);
 			}
+			// Print the returned content
+			print ($reports->count() > 0)
+				? navigator::get_reports_view($reports, 'reports/view/', $pagination) 
+				: "";
 		}
-	}
-	
-	public function filtered()
-	{
-		
 	}
 	
 	/**
@@ -119,10 +131,11 @@ class Dashboards_Controller extends Frontend_Controller {
 			);
 			
 			$this->template->content->category_stats = $stats;
+			$pagination = $this->_get_report_paginator($category_id);
 			$this->template->content->category = ORM::factory('category', $category_id);
 			// Get the reports for the category
-			$reports = Category_Model::get_category_reports($category_id);
-			$this->template->content->category_reports_view = navigator::get_reports_view($reports, 'reports/view/');
+			$reports = Category_Model::get_category_reports($category_id, 'all', $pagination->sql_offset, $this->report_items_per_view);
+			$this->template->content->category_reports_view = navigator::get_reports_view($reports, 'reports/view/', $pagination);
 			
 			// Javascript
 			$this->themes->js = new View('js/category_dashboard_js');
@@ -132,12 +145,43 @@ class Dashboards_Controller extends Frontend_Controller {
 		}
 	}
 	
-	// Generates the inline reports view
-	private function _get_report_items($reports)
+	// Gets the paginator for the incidents
+	private function _get_report_paginator($category_id, $status_filter = FALSE)
 	{
-		$view = View::factory('frontend/dashboard_report_items');
-		$view->reports = $reports;
-		$view->report_view_controller = 'reports/view/';
-		return trim($view);
+		// Ticket status values
+		$report_filters = array('unresolved' => 1, 'resolved' => 2);
+		
+		if ($status_filter AND array_key_exists($status_filter, $report_filters))
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $this->report_items_per_view,
+				'total_items' => $this->db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->join('incident_ticket', 'incident.id', 'incident_ticket.incident_id')
+									->where(array(
+										'incident.incident_active' => 1, 
+										'incident_category.category_id' => $category_id,
+										'incident_ticket.report_status_id' => $report_filters[$status_filter]))
+									->get()
+									->count()
+			));
+		}
+		else
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $this->report_items_per_view,
+				'total_items' => $this->db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->where(array('incident.incident_active' => 1, 'incident_category.category_id' => $category_id))
+									->get()
+									->count()
+			));
+		}
+		
 	}
+	
 }

@@ -91,6 +91,10 @@
 				<div id="emptyFilterResults" style="display:none">
 					<p><?php echo Kohana::lang('ui_huduma.no_reports_found'); ?></p>
 				</div>
+				
+				<div class="reports-list-holder">
 				<?php echo $category_reports_view; ?>
+				</div>
+				
 			</div>
 		</div>

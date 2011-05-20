@@ -288,20 +288,17 @@ class navigator_Core {
 	 * @param array $reports List of reports to be displayed in the view
 	 * @param string $controller Relative path of the controller to be used to view individual reports
 	 */
-	public static function get_reports_view($reports, $controller)
+	public static function get_reports_view($reports, $controller, $pagination)
 	{
 		// Get the parent view
 		$reports_view = View::factory('frontend/entity_reports_view');
 		
-		// Get the child view and set the content to be rendered
-		$report_list_items = View::factory('frontend/dashboard_report_items');
-		$report_list_items->reports = $reports;
-		$report_list_items->report_view_controller = $controller;
-		
-		$reports_view->report_list_items = $report_list_items;
+		$reports_view->reports = $reports;
+		$reports_view->pagination = $pagination;
+		$reports_view->report_view_controller = $controller;
 		
 		// Return
-		return $reports_view;
+		return trim($reports_view);
 	}
 	
 	/**
@@ -351,9 +348,6 @@ class navigator_Core {
 		$start_color = hexdec($start_color);
 		$end_color = hexdec($end_color);
 		
-		// Log
-		Kohana::log('info', sprintf('Color gradient starts at: 0x%06X and ends at: 0x%06X', $start_color, $end_color));
-		
 		// Extract the RGB components for the start and end colors
 		$start_red = ($start_color & 0xff0000) >> 16;
 		$start_green = ($start_color & 0x00ff00) >> 8;
@@ -386,6 +380,69 @@ class navigator_Core {
 		return ($p_begin < $p_end)
 			? (($p_end  - $p_begin) * ($p_step / $p_max)) + $p_begin
 			: (($p_begin - $p_end) * (1- ($p_step / $p_max))) + $p_end;
+	}
+	
+	/**
+	 * Gets the age of an incident
+	 *
+	 * @param string $incident_date Date when the incident was reported
+	 * @return string
+	 */
+	public static function get_incident_age($incident_date)
+	{
+		// Convert the incident date to string
+		$date_string = strtotime($incident_date);
+		
+		// Calculate difference between years
+		$years = date('Y') - date('Y', $date_string);
+		$months = ($years == 0)
+			? date('n') - date('n', $date_string)
+			: date('n') + (12 - date('n', $date_string));
+		
+		// Check if the difference in months is more than a year
+		if ($months >= 12 )
+		{
+			$years++;
+			$months -= 12;
+		}
+		
+		// Compute difference in days
+		$days = ($months == 0 AND $years == 0)? date('j') - date('j', $date_string) : 0;
+		
+		// Time difference computation
+		$hours = ($days == 0 AND $months == 0 AND $years == 0)? date('G') - date('G', $date_string): 0;
+		$minutes = ($days == 0)? date('i') - date('i', $date_string) : 0;
+		$seconds = ($minutes == 9)? date('s') - date('s', $date_string) : 0;
+		
+		// Log
+		Kohana::log('info', sprintf('Incident age is: %d Years, %d Months, %d, Days, %d Hours, %d Minutes, %d Seconds', 
+			$years, $months, $days, $hours, $minutes, $seconds));
+			
+		// Return
+		if ($years > 0)
+		{
+			return sprintf('%d year%s ago', $years, (($years > 1)? 's' : ''));
+		}
+		elseif ($months > 0)
+		{
+			return sprintf('%d month%s ago', $months, (($months > 1)? 's' : ''));
+		}
+		elseif ($days > 0)
+		{
+			return sprintf('%d day%s ago', $days, (($days > 1)? 's' : ''));
+		}
+		elseif ($hours > 0)
+		{
+			return sprintf('%d hour%s ago', $hours, (($hours > 1)? 's' : ''));
+		}
+		elseif ($minutes > 0)
+		{
+			return sprintf('%d minute%s ago', $minutes, (($minutes > 1)? 's' : ''));
+		}
+		elseif ($seconds > 0)
+		{
+			return sprintf('%d second%s ago', $seconds, (($seconds > 1)? 's' : ''));
+		}
 	}
 }
 ?>

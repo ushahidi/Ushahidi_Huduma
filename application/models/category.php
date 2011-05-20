@@ -79,7 +79,7 @@ class Category_Model extends ORM_Tree
 	 * @param int $category_id Database ID of the category
 	 * @return Result
 	 */
-	public static function get_category_reports($category_id, $status = 'all')
+	public static function get_category_reports($category_id, $status = 'all', $offset = 0, $limit)
 	{
 		if ( ! self::is_valid_category($category_id))
 		{
@@ -119,12 +119,11 @@ class Category_Model extends ORM_Tree
 				. 'AND i.incident_active = 1 '
 				. 'AND ic.category_id = %d '
 				. 'GROUP BY i.id '
-				. 'ORDER BY i.incident_date DESC';
-			
-			Kohana::log('debug', sprintf($sql, $category_id));
+				. 'ORDER BY i.incident_date DESC '
+				. 'LIMIT %d, %d';
 			
 			// Return
-			return $db->query(sprintf($sql, $category_id));
+			return $db->query(sprintf($sql, $category_id, $offset, $limit));
 		}
 	}
 }
