@@ -130,13 +130,13 @@
 				if (!$(this).hasClass('active') && $('.single-entity-map').is(":visible"))
 				{
 					// Show the additional info
-					$('.single-entity-map').hide('fast');
+					$('.single-entity-map').hide();
 					$('.entity-additional-info').css('display', 'block');
 				}
 				else if (!$(this).hasClass('active') && !$('.single-entity-map').is(":visible"))
 				{
 					// Show the map
-					$('.single-entity-map').show('fast');
+					$('.single-entity-map').show();
 					$('.entity-additional-info').css('display', 'none');
 				}
 				
