@@ -30,27 +30,32 @@
 						<div class="report_item_media">
 						<?php 
 							$image_url = "";
+							$mode_name = 'Web';
 							if ($incident->incident_mode == 1) // Web
 							{
 								$image_url = url::base().'plugins/huduma/views/images/msDash.png';
+								$mode_name = 'Web';
 							}
 							elseif ($incident->incident_mode == 2) // SMS
 							{
 								$image_url = url::base().'plugins/huduma/views/images/sms.png';
+								$mode_name = Kohana::lang('ui_main.sms');
 							}
 							elseif ($incident->incident_mode == 3) // Twitter
 							{
 								$image_url = url::base().'plugins/huduma/views/images/twDash.png';
+								$mode_name = Kohana::lang('ui_main.twitter');
 							}
 
 							if ( ! empty($image_url))
 							{
 								print html::image(array('src'=>$image_url, 'border'=>'0'));
 							}
+							$mode_name = strtolower($mode_name);
 						?>
 						</div>
 						<div class="report-item-content">
-							<h1><?php echo navigator::get_incident_age($incident->incident_date); ?></h1>
+							<h1><?php echo navigator::get_incident_age($incident->incident_date).' '.Kohana::lang('ui_main.via').' '.$mode_name; ?></h1>
 							<p>
 								<a href="<?php echo url::site().$report_view_controller.$incident->id; ?>"><?php echo $incident->incident_title; ?></a>
 							</p>
