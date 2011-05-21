@@ -304,7 +304,12 @@ div.dash-snapshots { margin-top: -130px; }
 
 .stat-overview-right { float: right; margin: 0; padding: 0; width: 114px; }
 
-.total-reports { float: right; margin-top: 120px; width: 114px; }
+.response-rate { float: right; width: 114px; padding-top: 15px;}
+.response-rate p { font-size: 30px; color: #CC0033; float: left; font-weight: bold; margin: 0; padding: 0 1px 0 2px; width: 85px; }
+.response-rate span { color: #CC0033; float: right; font-size: 17px; margin: 0; padding: 10px 0 0 6px; text-align: right; }
+.response-rate h3 { padding:0 0 0 5px; margin: 0; position: relative; top: 15px; color: #999999; font-family: "Trebuchet MS"; font-size: 16px; }
+
+.total-reports { float: right; padding-top: 53px; width: 114px; }
 .total-reports p { color: #00ADE7; font-size: 24px; margin: 0; padding-left: 21px; text-align: left; }
 
 #unresolvedStats, #resolvedStats { float: left; width: 145px;}

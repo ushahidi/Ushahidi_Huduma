@@ -416,11 +416,16 @@ class huduma
 			$stats['resolved'] += $category->resolved;
 			$stats['unresolved'] += $category->unresolved;
 		}
+		
+		$stats = array_merge($stats, array(
+			'unassigned' => $stats['total_reports'] - ($stats['unresolved'] + $stats['resolved']))
+		);
+		
 		$chart_colors = array_reverse(array("'#640235'", "'#CA669A'", "'#CC0033'"));
 		$stats_data = array(
 			$stats['resolved'], 
 			$stats['unresolved'], 
-			$stats['total_reports'] - ($stats['unresolved'] + $stats['resolved'])
+			$stats['unassigned']
 		);
 		
 		// Generate the Raphael JS
@@ -438,6 +443,11 @@ class huduma
 		if ($stats['unresolved'] > 0)
 		{
 			$stats['unresolved'] = round(($stats['unresolved']/$stats['total_reports']) * 100, 2);
+		}
+		
+		if ($stats['unassigned'] > 0)
+		{
+			$stats['unassigned'] = round(($stats['unassigned']/$stats['total_reports']) * 100, 2);
 		}
 		
 		// TODO: Compute issue resolution rate

@@ -16,7 +16,10 @@
 			<div id="pieChartHolder">
 				<div class="stat-overview-right">
 					<div class="response-rate">
-						<p></p>
+						<p><?php echo $stats['unassigned']; ?></p>
+						<span>%</span>
+						<div style="clear: both;"></div>
+						<h3><?php echo strtoupper(Kohana::lang('ui_huduma.unassigned_reports')); ?></h3>
 					</div>
 					<div class="total-reports">
 						<p><?php echo $stats['total_reports']; ?></p>
