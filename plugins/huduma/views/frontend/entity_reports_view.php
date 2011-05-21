@@ -16,9 +16,11 @@
 		<div id="entity_view_column">
 			<div class="dash-page-header">
 				<h3><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?></h3>
+				<?php if ($pagination->total_pages > 1): ?>
 				<div class="main-reports-pager">
 					<?php echo $pagination; ?>
 				</div>
+				<?php endif; ?>
 			</div>
 			<ul class="reports-list">
 			<?php if ($reports): ?>
@@ -53,7 +55,7 @@
 								<a href="<?php echo url::site().$report_view_controller.$incident->id; ?>"><?php echo $incident->incident_title; ?></a>
 							</p>
 							<ul class="report-item-actions">
-								<li><a href="#"><?php echo Kohana::lang('ui_main.comment').'('.$incident->comment_count.')'; ?></a></li>
+								<li><a href="#"><?php echo Kohana::lang('ui_main.comments').' ('.$incident->comment_count.')'; ?></a></li>
 								<li><a href="#"><?php echo Kohana::lang('ui_main.share')?></a></li>
 							</span>
 							<?php

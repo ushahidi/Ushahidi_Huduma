@@ -149,12 +149,41 @@ class Entities_Controller extends Frontend_Controller {
 		$this->template->content->latitude = $entity->latitude;
 		$this->template->content->longitude = $entity->longitude;		
 		$this->template->content->show_dashboard_panel = FALSE;
-		$this->template->content->show_metadata = $show_metadata;
+		
+		// Setup metadata pagiantion
+		$metadata_pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => 5,
+			'total_items' => $entity->static_entity_metadata->count(),
+			// 'style' => 'huduma',
+		));
+		
+		$metadata = ORM::factory('static_entity_metadata')
+			->where('static_entity_id', $entity_id)
+			->find_all(5, $metadata_pagination->sql_offset);
+			
+		$metadata_view = new View('frontend/entity_metadata_view');
+		$metadata_view->metadata = $metadata;
+		$metadata_view->entity = $entity;
+		$metadata_view->metadata_pagination = $metadata_pagination;
+		
+		$this->template->content->entity_metadata_view = $metadata_view;
 
+
+		$pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => 10,
+			'total_items' => ORM::factory('incident')
+							->where(array('incident_active' => 1, 'static_entity_id' => $entity_id))
+							->find_all()
+							->count(),
+			'style' => 'huduma'
+		));
+		
 		// Show the reports
 		$reports = Static_Entity_Model::get_reports($entity_id);
-
-		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'reports/view/');
+		
+		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'reports/view/', $pagination);
 
 		//Javascript Header
 		$this->themes->map_enabled = TRUE;
@@ -385,6 +414,47 @@ class Entities_Controller extends Frontend_Controller {
 			// Invalid REQUEST method
 			print json_encode(array('success' => FALSE));
 		}
+	}
+	
+	// Returns the HTML for the metadata view
+	public function get_metadata_view()
+	{
+		$this->template = "";
+		$this->auto_render = FALSE;
+		
+		// Validation
+		if ( ! Static_Entity_Model::is_valid_static_entity($_GET['entity_id']))
+		{
+			print "";
+		}
+		else
+		{
+			// Get the entity id
+			$entity  = ORM::factory('static_entity', $_GET['entity_id']);
+			
+			// Set up pagination
+			$metadata_pagination = new Pagination(array(
+				'query_string' => 'page',
+				'items_per_page' => 5,
+				'total_items' => $entity->static_entity_metadata->count(),
+			));
+			
+			// Get the metadata
+			$metadata = ORM::factory('static_entity_metadata')
+				->where('static_entity_id', $entity->id)
+				->find_all(5, $metadata_pagination->sql_offset);
+			
+			// Load the metadata view and set the content
+			$view = new View('frontend/entity_metadata_view');
+			$view->metadata = $metadata;
+			$view->entity = $entity;
+			$view->metadata_pagination = $metadata_pagination;
+			
+			// Output
+			print $view;
+			
+		}
+		
 	}
 
 }

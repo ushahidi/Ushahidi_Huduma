@@ -43,15 +43,48 @@ class Home_Controller extends Dashboard_Template_Controller {
 			
 			// Set the entity name
 			$this->template->content->entity_name = $entity_name;
+			$this->template->content->entity = $entity;
 			
 			// Disable "view metadata" link
 			$this->template->content->show_metadata = FALSE;
 			$this->template->content->show_dashboard_panel = TRUE;
 			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 			
-			// Get the comments for the static entity
+			// Metadata viewer
+			$metadata_pagination = new Pagination(array(
+				'query_string' => 'page',
+				'items_per_page' => 5,
+				'total_items' => $entity->static_entity_metadata->count(),
+				// 'style' => 'huduma',
+			));
+
+			$metadata = ORM::factory('static_entity_metadata')
+				->where('static_entity_id', $this->static_entity_id)
+				->find_all(5, $metadata_pagination->sql_offset);
+
+
+			$metadata_view = new View('frontend/entity_metadata_view');
+			$metadata_view->metadata = $metadata;
+			$metadata_view->entity = $entity;
+			$metadata_view->metadata_pagination = $metadata_pagination;
+
+			$this->template->content->entity_metadata_view = $metadata_view;
+			
+			
+			// Setup pagination for the entity's reports
+			$pagination = new Pagination(array(
+				'query_string' => 'page',
+				'items_per_page' => 10,
+				'total_items' => ORM::factory('incident')
+								->where(array('incident_active' => 1, 'static_entity_id' => $this->static_entity_id))
+								->find_all()
+								->count(),
+				'style' => 'huduma'
+			));
+			
+			// Get the reports for the entity
 			$reports = Static_Entity_Model::get_reports($this->static_entity_id);
-			$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/');
+			$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/', $pagination);
 			
 			$this->template->content->entity_id = $this->static_entity_id;
 			
@@ -189,7 +222,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 
 		// Dashboard panel
 		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-		$dashboard_panel->static_entity_panel = TRUE;
+		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
+		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
 
 		$this->template->content->dashboard_panel = $dashboard_panel;
 
@@ -335,6 +369,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	    
 		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
 		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
+		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
 
 		// Set content data
 		$this->template->content->dashboard_panel = $dashboard_panel;

@@ -14,11 +14,13 @@
  */
 class Static_Entity_Model extends ORM {
     
-    // Database table name
-    protected $table_name = 'static_entity';
+	// Database table name
+	protected $table_name = 'static_entity';
 
-    // Relationships
-    protected $belongs_to = array('static_entity_type');
+	// Relationships
+	protected $belongs_to = array('static_entity_type');
+	
+	protected $has_many = array('static_entity_metadata');
 
     /**
      * Validates the static entity data against the specific set of rules

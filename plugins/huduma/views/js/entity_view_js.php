@@ -116,14 +116,71 @@
 			map.addControl(highlightCtrl);
 			selectCtrl.activate();
 
-            // create a lat/lon object
-            myPoint = new OpenLayers.LonLat(<?php echo $longitude; ?>, <?php echo $latitude; ?>);
-            myPoint.transform(proj_4326, map.getProjectionObject());
+			// create a lat/lon object
+			myPoint = new OpenLayers.LonLat(<?php echo $longitude; ?>, <?php echo $latitude; ?>);
+			myPoint.transform(proj_4326, map.getProjectionObject());
 
-            // display the map centered on a latitude and longitude (Google zoom levels)
-            map.setCenter(myPoint, <?php echo ($default_zoom) ? $default_zoom : 10; ?>);
+			// display the map centered on a latitude and longitude (Google zoom levels)
+			map.setCenter(myPoint, <?php echo ($default_zoom) ? $default_zoom : 10; ?>);
+			
+			// Event handlers for the content filters
+			$(".top-content-filters li a").click(function(){
+				
+				// Toggle the display of the additional info and the map
+				if (!$(this).hasClass('active') && $('.single-entity-map').is(":visible"))
+				{
+					// Show the additional info
+					$('.single-entity-map').hide('fast');
+					$('.entity-additional-info').css('display', 'block');
+				}
+				else if (!$(this).hasClass('active') && !$('.single-entity-map').is(":visible"))
+				{
+					// Show the map
+					$('.single-entity-map').show('fast');
+					$('.entity-additional-info').css('display', 'none');
+				}
+				
+				$(".top-content-filters li a").removeClass("active");
+				$(this).addClass("active");
+				
+			});
+			
+			attachPagingEvents();
         });
-        
+
+		// Styles the metadata table rows and attaches the events to the paging links
+		function attachPagingEvents()
+		{
+			// Styling of the metadata table rows
+			$('tr.metadata-item:odd').css('background-color', '#F5F5F5');
+			
+			// Remove page links for the metadata pager
+			$(".metadata-pager a").attr("href", "#");
+			
+			$(".metadata-pager a").click(function() {
+				
+				$("#metadataPageContent").html("");
+				$("#metadataPageContent").fadeOut('slow');
+				
+				// Get the content for the new page
+				$.get('<?php echo url::site().'entities/get_metadata_view'?>',
+					{ entity_id: $("#entity_id").val(), page: $(this).html() },
+					function(data) {
+						if (data != null && data != "" && data.length > 0) {
+							
+							// Animation delay
+							setTimeout(function(){
+								$("#metadataPageContent").fadeIn('slow');
+								$("#metadataPageContent").html(data);
+							
+								attachPagingEvents();
+							}, 500);
+						}
+					}
+				);
+			});
+		}
+		
 		function onPopupClose(evt) {
             selectCtrl.unselect(selectedFeature);
         }
@@ -257,3 +314,4 @@
 		        );
 		    });
 		}
+		

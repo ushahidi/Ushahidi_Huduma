@@ -7,15 +7,7 @@ ul.boundary-list li a { padding-left: 5px; text-decoration: none; }
 .infowindow_list h5 { font-size: 90%; }
 .popup-table { font:11px Arial,Helvetica,sans-serif; }
 
-.entity_map {
-	clear:both;
-	width:645px;
-	height:150px;
-	border: 1px solid #C0C2B8;
-	border-bottom:2px solid #C0C2B8;
-}
-
-.entity-name { position: absolute; margin: -20px 320px; }
+.single-entity-map { margin: 10px 0 10px 0; display:block; }
 
 div.comment-col {
     margin: 0 0 0 40px;
@@ -357,7 +349,7 @@ div.dash-snapshots { margin-top: -130px; }
 .report-filter-tabs { margin: 10px 0; padding-bottom: 20px; }
 .report-filter-tabs ul { float: left; margin: 0; padding: 0; border-bottom:1px solid #CCCCCC; width:100%;}
 .report-filter-tabs li { float: left; list-style: none; margin-left:2px;}
-.report-filter-tabs li a {
+.report-filter-tabs li a, .top-content-filters ul li a {
 	font-weight: bold;
 	text-decoration: none;
 	padding: 8px 10px;
@@ -373,7 +365,7 @@ div.dash-snapshots { margin-top: -130px; }
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 }
-.report-filter-tabs li a.active { background-color: #FFFFFF; }
+.report-filter-tabs li a.active, .top-content-filters ul li a.active { background-color: #FFFFFF; }
 
 #emptyFilterResults { width: 96%; padding: 30px 15px; border-bottom: 1px solid #F3F3F3; text-align:center; }
 
@@ -393,3 +385,13 @@ div.dash-snapshots { margin-top: -130px; }
 .pagination span.current { color: #016DB9; font-weight: bold; }
 .pagination span a, .pagination a { color: #7AD1EC; }
 .pagination a { text-decoration: none; }
+
+.top-content-filters { float: right; padding: 0; margin-top: -20px;}
+.top-content-filters ul { float: left; margin: 0; }
+.top-content-filters ul li { list-style: none; float: left; margin-right: 2px;}
+.top-content-filters ul li a { padding: 3px 5px; font-weight: normal; font-size: 80%; }
+
+.entity-additional-info table { border-collapse: collapse; margin-bottom: 10px; width: 100%; }
+.entity-additional-info table th, .entity-additional-info table td { padding: 4px 7px !important; text-align: left; vertical-align: top; }
+.entity-additional-info table th { color: #FFFFFF; }
+.entity-additional-info h6{ padding: 0; margin: 0;}
