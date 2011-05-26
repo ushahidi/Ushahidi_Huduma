@@ -11,7 +11,8 @@
 					$(".r_details:odd").css('background-color', '#E5F7FC');
 				});
 			</script>
-
+			
+			<div id="pageColRight">
 			<div class="reports-box">
 				<?php
 				foreach ($entities as $entity)
@@ -64,8 +65,6 @@
 							<?php //endif; ?>
                             <!-- /Metadata -->
                             <p class="r_location">
-                                <a href="#"><?php echo Kohana::lang('ui_main.comment'); ?></a>
-                                <a href="#"><?php echo Kohana::lang('ui_main.share'); ?></a>
                             </p>
 							<p class="r_date r-3 bottom-cap"><?php //echo $incident_date; ?></p>
 							<div class="r_description"> <?php //echo $incident_description; ?> </div>
@@ -75,6 +74,7 @@
 				<?php } ?>
 			</div>
 			<?php echo $pagination; ?>
+			</div>
 		</div>
 		<!-- end reports block -->
 	</div>

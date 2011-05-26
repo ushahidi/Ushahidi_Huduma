@@ -14,8 +14,7 @@
 
 		<!-- panel items for static entity role only -->
 		<?php if ($static_entity_panel): ?>
-		<li><a href="<?php echo url::site().'dashboards/home/moderate_comments'; ?>"><?php echo Kohana::lang('ui_huduma.moderate_comments'); ?></a></li>
-		<li><a href="<?php echo url::site().'dashboards/home/entity_profile'; ?>"><?php echo Kohana::lang('ui_huduma.entity_profile'); ?></a></li>
+		<li><a href="<?php //echo url::site().'dashboards/home/entity_profile'; ?>"><?php echo Kohana::lang('ui_huduma.entity_profile'); ?></a></li>
 		<?php endif; ?>
 		
 		<!-- menu items for boundary level role -->

@@ -12,7 +12,7 @@
 
 <body id="page">
     <!-- header wrapper -->
-    <div id="header-wrapper">
+    <div id="mainpage-header">
     	<!-- header -->
     	<div id="header">
     	    <!--header-left -->
@@ -23,11 +23,7 @@
         		<!-- / logo -->
 
     			<!-- category filters -->
-    			<div class="cat-filters clearingfix">
-    			    <!--
-    				<strong><?php echo strtolower(Kohana::lang('ui_main.category_filter'));?> <span>[<a href="javascript:toggleLayer('category_switch_link', 'category_switch')" id="category_switch_link"><?php echo Kohana::lang('ui_main.hide'); ?></a>]</span></strong>
-    				-->
-    			</div>
+    			<div class="cat-filters"></div>
 
     			<ul id="category_switch" class="category-filters">
     				<li><a class="active" id="cat_0" href="#"><span class="swatch" style="background-color:<?php echo "#".$default_map_all;?>"></span><span class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></span></a></li>
@@ -83,9 +79,8 @@
             <div id="header-right">
 				
 				<div id="loginsection">
-					<?php print form::input(array('type'=>'button', 'name'=>'d_login_button', 'id'=>'d_login_button', 'class'=>'huduma_button'), Kohana::lang('ui_main.login')); ?>
 					<!-- login -->
-					<div class="login" style="display:none; ">
+					<div class="login">
 						<?php if ($is_logged_in): ?>
 							<?php print form::open(url::site().'dashboards/logout'); ?>
 							<div class="row">
@@ -94,7 +89,7 @@
 							</div>
 
 							<div class="row login_panel_button">
-								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'huduma_button login_panel_button'), Kohana::lang('ui_admin.logout')); ?>
+								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'submit'), Kohana::lang('ui_admin.logout')); ?>
 							</div>
 							<?php print form::close(); ?>
 						<?php else: ?>
@@ -108,18 +103,15 @@
 									<h5><?php echo Kohana::lang('ui_main.password'); ?></h5>
 									<?php print form::password(array('name' => 'dashboard_password', 'class'=>'field', 'placeholder' => Kohana::lang('ui_huduma.password_placeholder')), ''); ?>
 								</div>
-
-								<div class="row login_panel_button">
-									<?php print form::input(array('type' => 'submit', 'name'=>'submit', 'class'=>'huduma_button'), Kohana::lang('ui_huduma.sign_in')); ?>
-									<?php print form::input(array('type'=>'checkbox', 'name'=>'dashboard_login_remember', 'id'=>'dashboard_remember'), ''); ?>
-									<label for="dashboard_login_remember"><?php echo Kohana::lang('ui_huduma.remember_me'); ?></label>
+								<div>
+									<?php print form::input(array('type'=>'submit', 'name'=>'login', 'class'=>'submit'), Kohana::lang('ui_main.reports_btn_submit'));?>
 								</div>
 							<?php print form::close(); ?>
 						<?php endif; ?>
 					</div>
 					<!-- /login -->
 				</div>
-			
+				<div style="clear:both;"></div>
                 <!-- mainmenu -->
         		<div id="mainmenu" class="clearingfix">
         			<ul>
@@ -127,95 +119,75 @@
         			</ul>
         		</div>
                 <!-- /mainmenu -->
-
-        		<!-- content column -->
-        		<div id="content" class="clearingfix">
-        			<div class="floatbox">
-        				<!-- filters -->
-        				<div class="filters clearingfix">
-                            <?php
-                            /*
-        					<div style="float:left; width: 100%">
-        						<strong><?php echo Kohana::lang('ui_main.filters'); ?></strong>
-        						<ul>
-        							<li><a id="media_0" class="active" href="#"><span><?php echo Kohana::lang('ui_main.reports'); ?></span></a></li>
-        							<li><a id="media_4" href="#"><span><?php echo Kohana::lang('ui_main.news'); ?></span></a></li>
-        							<li><a id="media_1" href="#"><span><?php echo Kohana::lang('ui_main.pictures'); ?></span></a></li>
-        							<li><a id="media_2" href="#"><span><?php echo Kohana::lang('ui_main.video'); ?></span></a></li>
-        							<li><a id="media_3" href="#"><span><?php echo Kohana::lang('ui_main.all'); ?></span></a></li>
-        						</ul>
-        					</div>
-                            */
-                            ?>
-        					<?php
-        					// Action::main_filters - Add items to the main_filters
-        					Event::run('ushahidi_action.map_main_filters');
-        					?>
-        				</div>
-        				<!-- / filters -->
-
-        				<?php
-        				// Map Blocks
-        				echo $div_map;
-        				?>
-
-                        <!-- how to report -->
-                        <?php
-                        if (Kohana::config('settings.allow_reports')): ?>
-                        <!-- additional content -->
-                        <div class="additional-content">
-
-                            <h5><?php echo Kohana::lang('ui_main.how_to_report'); ?></h5>
-                            <div style="float: left; margin-left: 100px; margin-top: -23px;">
-                            <ol>
-        					<?php if (!empty($phone_array)): ?>
-                                <li><?php echo Kohana::lang('ui_main.sms').": "; ?>
-                                <?php
-                                foreach ($phone_array as $phone)
-                                {
-                                    echo "<strong>". $phone ."</strong>";
-                                    if ($phone != end($phone_array)) echo " or ";
-                                }
-                                ?>
-                                </li>
-                            <?php endif; ?>
-
-                            <?php if (!empty($report_email)): ?>
-        					<li><?php echo Kohana::lang('ui_main.email').": "; ?> <a href="mailto:<?php echo $report_email?>"><?php echo $report_email?></a></li>
-                            <?php endif; ?>
-        					
-                            <?php if (!empty($twitter_hashtag_array)): ?>
-                            <li>
-                            <?php echo Kohana::lang('ui_main.twitter').": "; ?>
-                            <?php
-                                foreach ($twitter_hashtag_array as $twitter_hashtag)
-                                {
-                                    echo "<strong>". $twitter_hashtag ."</strong>";
-                                    if ($twitter_hashtag != end($twitter_hashtag_array)) {
-                                        echo " or ";
-                                    }
-                                }
-                            ?>
-                            </li>
-                            <?php endif; ?>
-
-                            <li><a href="<?php echo url::site() . 'reports/submit/'; ?>"><?php echo Kohana::lang('ui_main.report_option_4'); ?></a></li>
-        				</ol>
-                            </div>
-
-                    </div>
-                    <!-- /additional content -->
-                    
-                    <?php endif; ?>
-                    <!-- /how to report -->
-
-        			</div>
-        		</div>
-        		<!-- / content column -->
-
-                <div id="clearingfix"></div>
             </div>
             <!-- /right header -->
+			
+			
+    		<!-- content column -->
+    		<div id="mainpageContent">
+    			<div class="floatbox">
+    				<!-- filters -->
+    				<div class="filters clearingfix">
+    					<?php
+    					// Action::main_filters - Add items to the main_filters
+    					Event::run('ushahidi_action.map_main_filters');
+    					?>
+    				</div>
+    				<!-- / filters -->
+
+    				<?php
+    				// Map Blocks
+    				echo $div_map;
+    				?>
+
+                    <!-- how to report -->
+                    <?php
+                    if (Kohana::config('settings.allow_reports')): ?>
+                    <!-- additional content -->
+                    <div class="additional-content">
+
+                        <strong><?php echo Kohana::lang('ui_main.how_to_report'); ?></strong>
+    					<?php if (!empty($phone_array)): ?>
+                            <span><?php echo Kohana::lang('ui_main.sms').": "; ?>
+                            <?php
+                            foreach ($phone_array as $phone)
+                            {
+                                echo "<strong>". $phone ."</strong>";
+                                if ($phone != end($phone_array)) echo " or ";
+                            }
+                            ?>
+                            </span>
+                        <?php endif; ?>
+
+                        <?php if (!empty($report_email)): ?>
+    					<span><?php echo Kohana::lang('ui_main.email').": "; ?> <a href="mailto:<?php echo $report_email?>"><?php echo $report_email?></a></span>
+                        <?php endif; ?>
+    					
+                        <?php if (!empty($twitter_hashtag_array)): ?>
+                        <span>
+                        <?php echo Kohana::lang('ui_main.twitter').": "; ?>
+                        <?php
+                            foreach ($twitter_hashtag_array as $twitter_hashtag)
+                            {
+                                echo "<strong>". $twitter_hashtag ."</strong>";
+                                if ($twitter_hashtag != end($twitter_hashtag_array)) {
+                                    echo " or ";
+                                }
+                            }
+                        ?>
+                        </span>
+                        <?php endif; ?>
+
+                        <span><a href="<?php echo url::site() . 'reports/submit/'; ?>"><?php echo Kohana::lang('ui_main.report_option_4'); ?></a></span>
+					</div>
+                <!-- /additional content -->
+                
+                <?php endif; ?>
+                <!-- /how to report -->
+
+    			</div>
+    		</div>
+    		<!-- / content column -->
 
     	</div>
     	<!-- / header -->

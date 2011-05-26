@@ -45,7 +45,7 @@ class huduma
 		
 		// Queue events
 		Event::add('ushahidi_action.nav_main_right_tabs', array($this, 'add_huduma_tab'));
-		Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
+		// Event::add('ushahidi_action.header_scripts', array($this, 'modify_header_scripts'));
 		Event::add('ushahidi_action.orm_validate_comment', array($this, 'orm_validate_comment'));
 
 		if (Router::$controller == 'main')
@@ -121,18 +121,6 @@ class huduma
     }
 
 
-	/**
-	 * Renders the javascript for d
-	 */
-	public function modify_header_scripts()
-	{
-		// $no_conflict = View::factory('js/no_conflict_js');
-		// $no_conflict->render(TRUE);
-		
-		$toggle_button_js = new View('js/toggle_login_button_js');
-		$toggle_button_js->render(TRUE);
-	}
-	
     /**
      * Renders the javascript to render the static entities overlay
      */

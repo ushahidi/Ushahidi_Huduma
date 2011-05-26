@@ -576,47 +576,6 @@ CREATE TABLE IF NOT EXISTS `media` (                                            
 -- Dumping data for table `media`
 
 
-
-/**
-* Table structure for table `organization`
-* 
-*/
-
-CREATE TABLE IF NOT EXISTS `organization` (                                         -- table description
-    `id` bigint(20) unsigned NOT NULL auto_increment,                               -- field description
-    `organization_name` varchar(255) default NULL,                                  -- field description
-    `organization_description` longtext default NULL,                               -- field description
-    `organization_website` varchar(255) default NULL,                               -- field description
-    `organization_email` varchar(120) default NULL,                                 -- field description
-    `organization_phone1` varchar(50) default NULL,                                 -- field description
-    `organization_phone2` varchar(50) default NULL,                                 -- field description
-    `organization_address` varchar(255) default NULL,                               -- field description
-    `organization_country` varchar(100) default NULL,                               -- field description
-    `organization_active` tinyint(4) NOT NULL default '1',                          -- field description
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
-
--- Dumping data for table `organization`
-
-
-
-/**
-* Table structure for table `organization_incident`
-* 
-*/
-
-CREATE TABLE IF NOT EXISTS `organization_incident` (                                -- table description
-    `organization_id` bigint(20) default NULL,                                      -- field description
-    `incident_id` bigint(20) default NULL                                           -- field description
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
-
--- Dumping data for table `organization_incident`
-
-
 /**
 * Table structure for table `feed`
 * 

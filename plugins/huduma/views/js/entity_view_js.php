@@ -174,7 +174,7 @@
 								$("#metadataPageContent").html(data);
 							
 								attachPagingEvents();
-							}, 500);
+							}, 400);
 						}
 					}
 				);

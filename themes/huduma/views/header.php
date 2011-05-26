@@ -19,10 +19,6 @@
             <div id="header-left">
         		<!-- logo -->
         		<div id="logo">
-        		    <!--
-        			<h1><?php //echo $site_name; ?></h1>
-        			<span><?php //echo $site_tagline; ?></span>
-        			-->
         		</div>
         		<!-- / logo -->
         		<div class="clearingfix"></div>
@@ -33,9 +29,8 @@
             <div id="header-right">
 				
 				<div id="loginsection">
-					<?php print form::input(array('type'=>'button', 'name'=>'d_login_button', 'id'=>'d_login_button', 'class'=>'huduma_button'), Kohana::lang('ui_main.login')); ?>
 					<!-- login -->
-					<div class="login" style="display: none;">
+					<div class="login" >
 						<?php if ($is_logged_in): ?>
 							<?php print form::open(url::site().'dashboards/logout'); ?>
 							<div class="row">
@@ -44,7 +39,7 @@
 							</div>
 
 							<div class="row login_panel_button">
-								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'huduma_button login_panel_button'), Kohana::lang('ui_admin.logout')); ?>
+								<?php print form::input(array('type'=>'submit', 'name'=> 'dashboard_logout', 'class'=>'submit'), Kohana::lang('ui_admin.logout')); ?>
 							</div>
 							<?php print form::close(); ?>
 						<?php else: ?>
@@ -58,11 +53,8 @@
 									<h5><?php echo Kohana::lang('ui_main.password'); ?></h5>
 									<?php print form::password(array('name' => 'dashboard_password', 'class'=>'field', 'placeholder' => Kohana::lang('ui_huduma.password_placeholder')), ''); ?>
 								</div>
-
-								<div class="row login_panel_button">
-									<?php print form::input(array('type' => 'submit', 'name'=>'submit', 'class'=>'huduma_button'), Kohana::lang('ui_huduma.sign_in')); ?>
-									<?php print form::input(array('type'=>'checkbox', 'name'=>'dashboard_login_remember', 'id'=>'dashboard_remember'), ''); ?>
-									<label for="dashboard_login_remember"><?php echo Kohana::lang('ui_huduma.remember_me'); ?></label>
+								<div>
+									<?php print form::input(array('type' => 'submit', 'name'=> 'login'), Kohana::lang('ui_main.reports_btn_submit'), ' class="submit"');?>
 								</div>
 							<?php print form::close(); ?>
 						<?php endif; ?>
@@ -70,7 +62,7 @@
 					</div>
 					<!-- /login -->
 				</div>
-
+				<div style="clear: both"></div>
                 <!-- mainmenu -->
         		<div id="mainmenu" class="clearingfix">
         			<ul>
@@ -82,15 +74,16 @@
             </div>
             <!-- /right header -->
 
+			<div id="content-mainbar"></div>
     	</div>
     	<!-- / header -->
+		
 	</div>
 	<!-- /header wrapper-->
 
 	<!-- wrapper -->
 	<div class="rapidxwpr floatholder">
-
-		<div id="content-mainbar"></div>
+		
 		<!-- main body -->
 		<div id="middle">
 			<div class="background layoutleft">

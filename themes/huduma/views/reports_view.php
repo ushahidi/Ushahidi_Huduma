@@ -1,6 +1,12 @@
 <div class="bg">
 	
-	<div id="content-section-left">
+	<div class="dashboard-title">
+		<h1>
+			<?php echo Kohana::lang('ui_huduma.report_details'); ?>
+		</h1>
+	</div>
+	<div style="clear: both;"></div>
+	<div id="pageColLeft">
 		<div id="sidebar-left-content">
 			<!-- dashboard menu -->
 			<!-- /dashboard menu -->
@@ -18,15 +24,10 @@
 		</div>
 	</div>
 	
-	<div class="dashboard-title">
-		<h1>
-			<?php echo Kohana::lang('ui_huduma.report_details'); ?>
-		</h1>
-	</div>
-	
+	<div id="pageColRight">
 	<div class="dashboard_container">
 		<div id="report-map" style="margin: 10px 0 30px 0;">
-			<div id="map" style="width:655px; height: 250px;"></div>
+			<div id="map" style="width:575px; height: 250px;"></div>
 			<div style="clear:both"></div>
 		</div>
 		
@@ -65,6 +66,7 @@
 			Event::run('ushahidi_action.report_extra', $incident_id);
 		 ?>
 		
+	</div>
 	</div>
 	
 </div>

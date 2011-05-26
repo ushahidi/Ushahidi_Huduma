@@ -121,6 +121,8 @@
 	'all_reports' => 'All Reports',
 	'no_reports_found' => 'No reports matched your chosen filters.',
 	'report_details' => 'Report Details',
+	'select_county' => 'Select County',
+	'select_constituency' => 'Select Constituency',
 
 	// Error Messages
 	'error'	=> array(
