@@ -204,7 +204,7 @@ class Boundary_Model extends ORM {
 	 * @param string $status Status filter for the reports to be fetched
 	 * @return array
 	 */
-	public static function get_boundary_reports($boundary_id, $status = 'all', $category_id = FALSE)
+	public static function get_boundary_reports($boundary_id, $status = 'all', $category_id = FALSE, $offest = 0, $limit = 0)
 	{
 		if ( ! Boundary_Model::is_valid_boundary($boundary_id))
 		{
@@ -294,6 +294,14 @@ class Boundary_Model extends ORM {
 			
 			// Order the incidents by date in descending order
 			$sql .= 'ORDER BY i.incident_date DESC';
+			
+			// Check if the offset and limit are non-zero
+			// @todo Sanitization of values
+			if ($limit > 0 AND $offset > 0)
+			{
+				$sql .= ' LIMIT %d, %d';
+				$sql = sprintf($sql, $offset, $limit);
+			}
 			
 			Kohana::log('debug', sprintf('Query for fetching the data: %s', $sql));
 			

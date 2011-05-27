@@ -248,7 +248,7 @@ div.report-ticket-info { float: right; margin: -10px 35px 0 0; }
 
 
 .dashboard-map {
-	width: 645px;
+	width: 575px;
 	height: 300px;
 }
 div#dashboardContentFilters { float: right; margin: 0!important; position: relative; top: -20px;}

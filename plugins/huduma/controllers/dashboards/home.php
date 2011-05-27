@@ -84,7 +84,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			
 			// Get the reports for the entity
 			$reports = Static_Entity_Model::get_reports($this->static_entity_id);
-			$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/', $pagination);
+			$this->template->content->entity_reports_view = navigator::get_reports_view($reports, '/reports/view/', $pagination);
 			
 			$this->template->content->entity_id = $this->static_entity_id;
 			
@@ -144,10 +144,18 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content->categories = !empty($this->boundary_role)
 													? Category_Model::get_dropdown_categories()
 													: NULL;
+			
 			$this->template->content->total_reports = $total_reports;
 			$this->template->content->total_resolved = $total_resolved;
 			$this->template->content->total_unresolved = $total_unresolved;
-			$this->template->content->boundary_reports_view = navigator::get_reports_view($reports, 'dashboards/home/reports/');
+			
+			$pagination = new Pagination(array(
+				'items_per_page' => 10,
+				'query_string' => 'page',
+				'total_items' => $total_reports
+			));
+			
+			$this->template->content->boundary_reports_view = navigator::get_reports_view($reports, '/reports/view/', $pagination);
 			
 			$marker_radius = Kohana::config('map.marker_radius');
 			$marker_opacity = Kohana::config('map.marker_opacity');
@@ -367,12 +375,8 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$form['email'] = $this->user->email;
 		}
 	    
-		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
-		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
-		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
-
 		// Set content data
-		$this->template->content->dashboard_panel = $dashboard_panel;
+		$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 		$this->template->content->form = $form;
 		$this->template->content->errors = $errors;
 		$this->template->content->form_error = $form_error;

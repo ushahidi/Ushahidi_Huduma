@@ -25,48 +25,48 @@
 	</div>
 	
 	<div id="pageColRight">
-	<div class="dashboard_container">
-		<div id="report-map" style="margin: 10px 0 30px 0;">
-			<div id="map" style="width:575px; height: 250px;"></div>
-			<div style="clear:both"></div>
-		</div>
-		
-		<div class="report-header">
-			<div class="report-item-date">
-				<span class="comment_date_time"><?php echo Kohana::lang('ui_huduma.submitted_on'); ?></span>
-				<span class="comment_date_time">
-					<?php echo date('g:m a', strtotime($incident_date)); ?>
-				</span>
-				<span class="comment_date_time">
-					<?php echo date('F j, Y', strtotime($incident_date)); ?>
-				</span>
+		<div class="dashboard_container">
+			<div id="report-map" style="margin: 10px 0 30px 0;">
+				<div id="map" style="width:575px; height: 250px;"></div>
+				<div style="clear:both"></div>
 			</div>
-			<div class="row" style="margin:5px 0;">
-				<span class="comment_date_time"><?php echo Kohana::lang('ui_main.location').': '.$incident_location; ?></span>
+		
+			<div class="report-header">
+				<div class="report-item-date">
+					<span class="comment_date_time"><?php echo Kohana::lang('ui_huduma.submitted_on'); ?></span>
+					<span class="comment_date_time">
+						<?php echo date('g:m a', strtotime($incident_date)); ?>
+					</span>
+					<span class="comment_date_time">
+						<?php echo date('F j, Y', strtotime($incident_date)); ?>
+					</span>
+				</div>
+				<div class="row" style="margin:5px 0;">
+					<span class="comment_date_time"><?php echo Kohana::lang('ui_main.location').': '.$incident_location; ?></span>
+				</div>
+				<div class="row">
+					<h3><?php echo $incident_title; ?></h3>
+				</div>
 			</div>
-			<div class="row">
-				<h3><?php echo $incident_title; ?></h3>
+		
+			<?php 
+				//TODO: Run event here to show the ticket status info
+				Event::run('ushahidi_action.report_meta', $incident_id);
+			?>
+		
+			<div style="clear:both;"></div>
+		
+			<div class="description">
+				<?php echo $incident_description; ?>
 			</div>
+		
+			<?php echo navigator::inline_comments($incident_id); ?>
+		
+			<?php
+				Event::run('ushahidi_action.report_extra', $incident_id);
+			 ?>
+		
 		</div>
-		
-		<?php 
-			//TODO: Run event here to show the ticket status info
-			Event::run('ushahidi_action.report_meta', $incident_id);
-		?>
-		
-		<div style="clear:both;"></div>
-		
-		<div class="description">
-			<?php echo $incident_description; ?>
-		</div>
-		
-		<?php echo navigator::inline_comments($incident_id); ?>
-		
-		<?php
-			Event::run('ushahidi_action.report_extra', $incident_id);
-		 ?>
-		
-	</div>
 	</div>
 	
 </div>

@@ -14,17 +14,9 @@
  */
 ?>
 		<div class="bg">
-			<div id="content-section-left">
-				<div id="sidebar-left-content">
-					<?php echo $dashboard_panel; ?>
-				</div>
-			</div>
-        
-			<div class="report-form" style="border-bottom: 1px solid #F5F5F5;">
-				<div class="entity-name">
-					<div class="row"><h3><?php echo $boundary_name; ?></h3></div>
-				</div>
-				<div id="dashboardContentFilters">
+			<div class="dashboard-title">
+				<h1><?php echo $boundary_name; ?></h1>
+				<div class="top-content-filters">
 					<ul>
 						<li>
 							<a href="javascript:toggleItemDisplay('dashboard-map', 'dash-category-panel')">
@@ -39,37 +31,48 @@
 					</ul>
 				</div>
 			</div>
-	
-			<div class="dashboard_container">
-				<div class="dash-category-panel" style="display:none;">
-					<!-- category filters -->
-					<?php if ($categories): ?>
-					<ul class="dash-cat-filter">
-						<?php foreach ($categories as $key => $value): ?>
-						<li><a href="#" id="category_<?php echo $key; ?>"><?php echo $value; ?></a></li>
-						<?php endforeach; ?>
-					</ul>
-					<?php endif; ?>
-					<!-- /category filters -->
-					<table width="100%" cellpadding="0" cellspacing="0" border="0">
-						<tr>
-							<th>
-								<?php echo $total_reports; ?>
-								<div><span><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?><span></div>
-							</th>
-							<td>
-								<dl class="dash_bar_graphs">
-									<dt>% <?php echo Kohana::lang('ui_huduma.unresolved'); ?></dt><dd><?php echo $total_unresolved; ?></dd>
-									<dt>% <?php echo Kohana::lang('ui_huduma.resolved'); ?></dt><dd><?php echo $total_resolved; ?></dd>
-								</dl>
-							</td>
-					</table>
+			<div style="clear: both"></div>
+
+			<div id="pageColLeft">
+				<div id="content-section-left">
+					<div id="sidebar-left-content">
+						<?php echo $dashboard_panel; ?>
+					</div>
 				</div>
-				<div id="divMap" class="dashboard-map"></div>
-				<div style="clear: both;"></div>
+			</div>
+
+			<div id="pageColRight">
+				<div class="dashboard_container">
+					<div class="dash-category-panel" style="display:none;">
+						<!-- category filters -->
+						<?php if ($categories): ?>
+						<ul class="dash-cat-filter">
+							<?php foreach ($categories as $key => $value): ?>
+							<li><a href="#" id="category_<?php echo $key; ?>"><?php echo $value; ?></a></li>
+							<?php endforeach; ?>
+						</ul>
+						<?php endif; ?>
+						<!-- /category filters -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<th>
+									<?php echo $total_reports; ?>
+									<div><span><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?><span></div>
+								</th>
+								<td>
+									<dl class="dash_bar_graphs">
+										<dt>% <?php echo Kohana::lang('ui_huduma.unresolved'); ?></dt><dd><?php echo $total_unresolved; ?></dd>
+										<dt>% <?php echo Kohana::lang('ui_huduma.resolved'); ?></dt><dd><?php echo $total_resolved; ?></dd>
+									</dl>
+								</td>
+						</table>
+					</div>
+					<div id="divMap" class="dashboard-map"></div>
+					<div style="clear: both;"></div>
 				
-				<div class="row">
-					<?php echo $boundary_reports_view; ?>
+					<div class="row">
+						<?php echo $boundary_reports_view; ?>
+					</div>
 				</div>
 			</div>
 			

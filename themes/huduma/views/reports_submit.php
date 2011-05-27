@@ -27,7 +27,7 @@
 				}
 			?>
 			
-			<div id="reportColLeft">
+			<div id="pageColLeft">
 			<div class="report_left">
 				<div class="report_row">
 					<h4><?php echo Kohana::lang('ui_main.reports_title'); ?></h4>
@@ -35,7 +35,7 @@
 				</div>
 				<div class="report_row">
 					<h4><?php echo Kohana::lang('ui_main.reports_description'); ?></h4>
-					<?php print form::textarea('incident_description', $form['incident_description'], ' rows="10" class="textarea long" ') ?>
+					<?php print form::textarea('incident_description', $form['incident_description'], ' rows="18" class="textarea long" ') ?>
 				</div>
 				<div class="report_row" id="datetime_default">
 					<h4><a href="#" id="date_toggle" class="show-more"><?php echo Kohana::lang('ui_main.modify_date'); ?></a><?php echo Kohana::lang('ui_main.date_time'); ?>: 
@@ -146,11 +146,13 @@
 					?>
                             </div>
 
+				<div class="report_row">
+					<h4><?php echo Kohana::lang('ui_main.reports_optional'); ?></h4>
+				</div>			
 				<div class="report_optional">
-					<h3><?php echo Kohana::lang('ui_main.reports_optional'); ?></h3>
 					<div class="report_row">
-							 <h4><?php echo Kohana::lang('ui_main.reports_first'); ?></h4>
-							 <?php print form::input('person_first', $form['person_first'], ' class="text long"'); ?>
+						 <h4><?php echo Kohana::lang('ui_main.reports_first'); ?></h4>
+						 <?php print form::input('person_first', $form['person_first'], ' class="text long"'); ?>
 					</div>
 					<div class="report_row">
 						<h4><?php echo Kohana::lang('ui_main.reports_last'); ?></h4>
@@ -173,18 +175,18 @@
 				<?php if ( ! $multi_country): ?>
 				<div class="report_row">
 					<div style="float: left;">
-						<h4><?php echo Kohana::lang('ui_huduma.select_county'); ?></h4>
-						<?php print form::dropdown('county_id', $counties, $form['county_id'], ' class="select" '); ?>
+						<p><strong><?php echo Kohana::lang('ui_huduma.select_county'); ?></strong></p>
+						<?php print form::dropdown('county_id', $counties, $form['county_id'], ' class="select"'); ?>
 					</div>
-					<div id="constituency_selector" style="float: float; position: relative; left: 40px">
-						<h4><?php echo Kohana::lang('ui_huduma.select_constituency'); ?></h4>
-						<?php print form::dropdown('constituency_id','',$form['constituency_id'],' class="select" '); ?>
+					<div id="constituency_selector" style="float: left; position: relative; left: 40px">
+						<p><strong><?php echo Kohana::lang('ui_huduma.select_constituency'); ?></strong></p>
+						<?php print form::dropdown('constituency_id','',$form['constituency_id'],' class="select"'); ?>
 					</div>
 				</div>
 				<div style="clear: both;">
 				<?php endif; ?>
-				
-				<div class="clearingfix">
+				<br>
+				<div class="report_row">
 					<div id="divMap" class="report_map"></div>
 					<div class="report-find-location">
 						<?php print form::input('location_find', '', ' title="'.Kohana::lang('ui_main.location_example').'" class="findtext"'); ?>
