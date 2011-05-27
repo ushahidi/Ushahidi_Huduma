@@ -144,7 +144,7 @@ class Agencies_Controller extends Admin_Controller {
 				array_fill_keys($form, '');
 
 				// SAVE & CLOSE
-				if ($_POST['save']' == 1)   // Save but don't close
+				if ($_POST['save'] == 1)   // Save but don't close
 				{
 					// Redirect to the index page of this controller
 					url::redirect('/admin/agencies/edit/'.$agency->id.'/saved');
