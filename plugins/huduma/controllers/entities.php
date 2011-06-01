@@ -100,7 +100,7 @@ class Entities_Controller extends Frontend_Controller {
 				'longitude <=' => $lon_max
 			));
 		}
-        
+		
 		// Pagination
 		$pagination = new Pagination(array(
 			'query_string' => 'page',
@@ -115,6 +115,7 @@ class Entities_Controller extends Frontend_Controller {
 		$entities = ORM::factory('static_entity')
 					->where($where_entity_type_id)
 					->where($where_latlon)
+					->where($where_clause)
 					->find_all((int) Kohana::config('settings.items_per_page'), $pagination->sql_offset);
 
 		// Extract URL variables

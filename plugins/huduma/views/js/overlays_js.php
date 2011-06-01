@@ -20,7 +20,7 @@
      */
     function overlayMainMap() {
         // URL containing the JSON data
-        var overlayURL = "<?php echo url::base().$overlay_json_url; ?>/";
+        var overlayURL = "<?php echo url::site().$overlay_json_url; ?>/";
 
         // Name of the layer for overlaying data on the main map
         var o_layerName = "<?php echo $overlay_layer_name; ?>";
