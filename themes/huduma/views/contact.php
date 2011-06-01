@@ -1,17 +1,15 @@
 <div id="content">
 	<div class="content-bg">
+		<div class="page-title"><h1><?php echo Kohana::lang('ui_main.contact'); ?></h1></div>
+		<div style="clear:both;"></div>
+		
 		<!-- start contacts block -->
 		<div class="big-block">
-			<h1><?php echo Kohana::lang('ui_main.contact'); ?></h1>
-			
 			<div id="pageColLeft"></div>
 			
 			<div id="pageColRight">
-			<div id="contact_us" class="contact">
-				<?php
-				if ($form_error)
-				{
-					?>
+				<div id="contact_us" class="contact">
+				<?php if ($form_error): ?>
 					<!-- red-box -->
 					<div class="red-box">
 						<h3>Error!</h3>
@@ -24,19 +22,13 @@
 							?>
 						</ul>
 					</div>
-					<?php
-				}
-
-				if ($form_sent)
-				{
-					?>
+				<?php endif; ?>
+				<?php if ($form_sent): ?>
 					<!-- green-box -->
 					<div class="green-box">
 						<h3><?php echo Kohana::lang('ui_main.contact_message_has_send'); ?></h3>
 					</div>
-					<?php
-				}
-				?>
+				<?php endif; ?>
 				<?php print form::open(NULL, array('id' => 'contactForm', 'name' => 'contactForm')); ?>
 				<div class="report_row">
 					<strong><?php echo Kohana::lang('ui_main.contact_name'); ?>:</strong><br />

@@ -232,7 +232,7 @@ class Overlays_Controller extends Template_Controller {
             // Calculate the cluster center
             $bounds = cluster::calculate_cluster_center($cluster);
             $cluster_center = $bounds['center'];
-
+			Kohana::log('info', sprintf('Cluster center: %s -- %d', $cluster_center, count($cluster)));
             // Number of items in cluster
             $cluster_count = count($cluster);
             $cluster_info = cluster::get_entity_cluster_info($cluster, $bounds);

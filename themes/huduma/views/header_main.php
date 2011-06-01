@@ -195,7 +195,7 @@
 	<!-- /header wrapper-->
 
 	<!-- wrapper -->
-	<div class="rapidxwpr floatholder">
+	<div class="rapidxwpr-main floatholder">
 
 		<!-- main body -->
 		<div id="middle">

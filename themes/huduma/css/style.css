@@ -90,10 +90,10 @@ body#page{
 }
 
 /* wrapper setup */
-div.rapidxwpr{
-    margin: 0 auto 0 0;
-    width: 100%;
+div.rapidxwpr, div.rapidxwpr-main{
+    margin: 0 auto;
     padding: 0;
+    width: 1100px;
 }
 
 /* header wrapper */
@@ -110,7 +110,7 @@ div#header{
 	/*position: relative;*/
 	margin: 0 auto;
 	/*width: 940px;*/
-	width: 909px;
+	width: 1110px;
     /*height: auto;*/
     overflow: hidden;
     /*padding: 0 40px 0 20px;*/
@@ -119,7 +119,9 @@ div#header{
 div#header-left {
 	float: left;
 	padding: 44px 0 12px 0;
-	width: 300px;
+	width: 400px;
+	position: relative;
+	right: 40px;
 }
 
 div#header-right {
@@ -127,8 +129,10 @@ div#header-right {
 	width:586px;
 	margin: 0;
 	padding: 0;
+	position: relative;
+	left: -140px;
 }
-div#mainpageContent { float: right; margin: 0; padding: 0; width: 586px; }
+div#mainpageContent { float: right; margin: 0; padding: 0; width: 586px; position: relative; left: -140px;}
 
 /* logo */
 div#logo{
@@ -192,9 +196,11 @@ div#middle .layoutright div#left{
     background: url(../images/content-mainbar-bg.png);
     float: right;
     height: 37px;
-    margin-right: -5px;
+    /*margin-right: -5px;*/
     margin-top: 5px;
     width: 595px;
+    position: relative;
+    left: -145px;
 }
 
 /* right column */
@@ -1300,17 +1306,15 @@ label.error {
 	font-size:16px;
 }
 .report_left{
-	float: right;
-	width: 400px;
-	/*margin:20px 0 0;*/
-	padding:15px 0 10px;
+	float: left;
+	width: 370px;
+	margin: 0;
+	padding: 0;
 }
-.report_left table {
-	width: 100%;
-}
-.report_left table tr th {
-	text-align: left;
-}
+
+.report_left table { width: 100%; }
+.report_left table tr th { text-align: left; }
+
 .report_right{
 	overflow:hidden;
 	width: 570px;
@@ -1505,7 +1509,7 @@ a.rem { background:url(../images/icon-minus.gif) no-repeat;}
 	font-size:14px;
 	font-weight:bold;
 	color:#666;
-	width:250px;
+	width:62.5%;
 	border:1px #ccc solid;
 }
 .report-find-loading{
@@ -1535,7 +1539,7 @@ a.show-more {
 	min-height:400px;
 }
 
-.big-block h1 {position: absolute; top: 190px; margin-left: 42%; padding: 0 0 4px 0; font-size: 120%; }
+.big-block h1 {position: relative;  margin-left: 42%; padding: 0 0 4px 0; font-size: 120%; }
 
 /* Min-Height for IE */
 * html .big-block {
@@ -1670,16 +1674,19 @@ a.show-more {
 
 /*---alerts-block---*/
 .step-1 {
-	float: right;
-	width: 420px;
-	margin: 11px 0 0 0;
+	/*float: right;*/
+	width: 370px;
 	padding: 0;
+	margin: 0;
+	/*position: relative;*/
+	/*right: 80px;*/
 }
-.step-1 h2 {
+.step-1 h2, .step-2 h2 {
     text-align: right;
 	margin:0;
 	padding:0 0 0 10px;
 }
+.step-2 h2 { text-align: left !important; }
 .step-1 .location {
 	overflow:hidden;
 	width:388px;
@@ -1693,7 +1700,7 @@ a.show-more {
 }
 .step-1 .map {
 	overflow:hidden;
-	width: auto;
+	width: 350px;
 	padding: 10px;
 	margin: 20px 0 0 0;
 	height: 366px;
@@ -1706,7 +1713,7 @@ a.show-more {
 }
 .step-1 .map .map-holder {
 	overflow:hidden;
-	width:387px;
+	width:350px;
 	height:325px;
 }
 .step-1 .alert_slider{
@@ -1719,23 +1726,22 @@ a.show-more {
 }
 .step-2-holder {
 	float: left;
-	display: inline;
-	overflow: hidden;
-	/*width:450px;*/
+  display: inline;
+    overflow: hidden;
 }
-.step-2,
-.step-3 {
+
+.step-2, .step-3 {
 	overflow:hidden;
 	width:430px;
-	margin:10px 0 0;
+	margin:0 0 10px 0;
 	padding:0 0 10px;
 }
 .feed {
-	overflow:hidden;
-	width:400px;
-	margin:50px 0 0;
+	overflow: hidden;
+	width: 400px;
+	margin: 0;
 	padding: 15px;
-  border: 1px solid #c2c2c2;
+	border: 1px solid #c2c2c2;
 }
 
 .feed .holder .box {
@@ -2120,11 +2126,17 @@ div.green-box ul, div.red-box ul{
     padding: 5px 10px 0 0;
 }
 
-div#pageColLeft{ float: left; width: 38%; margin: 0; padding: 0; }
-div#pageColRight { float:right; width: 59.1%; }
-.mainpage-left { float: right; width: 300px; padding: 0px; }
+div#pageColLeft{ float: left; /*position: relative !important;*/ /*right: 40px;*/ width: 400px; margin: 0 0; padding: 0 80px 12px 0; }
+div#pageColRight { float: right; width: 586px; padding: 0; margin: 0; position: relative; left: -140px; }
+
+.mainpage-left { float: right; width: 310px; padding: 0 30px 0 0; position: relative; right: 20px; }
 .mainpage-middle { float: left; width: 587px; }
+
 .report_left .report_row h4 { text-align: right; font-size: 110%; padding-right: 23px; }
-div.contact { width: 535px; margin: 20px 0; background-color: #fff; border: none; }
+
+div.contact { width: 535px; margin: 0; padding: 0 15px; background-color: #fff; border: none; }
 div.contact input { width: 300px; height: 20px; }
 div.contact input.btn_submit { width: auto; height: auto; }
+
+.page-title { position: relative; float: right; top: -22px; width: 587px; left: -140px; padding: 0; margin: 0;}
+.page-title h1 { font-size: 130%; padding: 0 15px; margin: 0; }

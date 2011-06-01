@@ -1,15 +1,14 @@
 <div id="content">
-	<div class="bg">
+	<div class="content-bg">
+		<div class="page-title"><h1><?php echo Kohana::lang('ui_main.reports_submit_new'); ?></h1></div>
+		<div style="clear:both;"></div>
 		<!-- start report form block -->
 		<?php print form::open(NULL, array('enctype' => 'multipart/form-data', 'id' => 'reportForm', 'name' => 'reportForm', 'class' => 'gen_forms')); ?>
 		<input type="hidden" name="latitude" id="latitude" value="<?php echo $form['latitude']; ?>">
 		<input type="hidden" name="longitude" id="longitude" value="<?php echo $form['longitude']; ?>">
 		<input type="hidden" name="form_id" id="form_id" value="<?php echo $id?>">
 		<div class="big-block">
-			<h1><?php echo Kohana::lang('ui_main.reports_submit_new'); ?></h1>
-			<?php
-				if ($form_error) {
-			?>
+			<?php if ($form_error): ?>
 			<!-- red-box -->
 			<div class="red-box">
 				<h3>Error!</h3>
@@ -23,9 +22,7 @@
 					?>
 				</ul>
 			</div>
-			<?php
-				}
-			?>
+			<?php endif; ?>
 			
 			<div id="pageColLeft">
 			<div class="report_left">
@@ -324,4 +321,5 @@
 		<?php print form::close(); ?>
 		<!-- end report form block -->
 	</div>
+</div>
 </div>

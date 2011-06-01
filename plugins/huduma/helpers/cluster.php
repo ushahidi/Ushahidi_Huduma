@@ -94,6 +94,7 @@ class cluster_Core {
 			// Calculate the cluster center
 			$bounds = self::calculate_cluster_center($cluster);
 			$cluster_center = $bounds['center'];
+			Kohana::log('info', sprintf('Cluster center: %s', $cluster_center));
 
 			// Number of items in cluster
 			$cluster_count = count($cluster);

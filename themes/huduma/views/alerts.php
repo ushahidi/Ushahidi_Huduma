@@ -1,11 +1,10 @@
 <div id="content">
 	<div class="content-bg">
+		<div class="page-title"><h1><?php echo Kohana::lang('ui_main.alerts_get'); ?></h1></div>
+		<div style="clear:both;"></div>
 		<!-- start block -->
 		<div class="big-block">
-			<h1><?php echo Kohana::lang('ui_main.alerts_get'); ?></h1>
-			<?php
-			if ($form_error) {
-			?>
+			<?php if ($form_error): ?>
 			<!-- red-box -->
 			<div class="red-box">
 				<h3>Error!</h3>
@@ -19,9 +18,7 @@
 					?>
 				</ul>
 			</div>
-			<?php
-			}
-			?>
+			<?php endif; ?>
 			<?php print form::open() ?>
 				<input type="hidden" id="alert_lat" name="alert_lat" value="<?php echo $form['alert_lat']; ?>">
 				<input type="hidden" id="alert_lon" name="alert_lon" value="<?php echo $form['alert_lon']; ?>">
@@ -101,9 +98,15 @@
 						        </div>
 					        </div>
 					</div>
-					<input id="btn-send-alerts" class="btn_submit" type="submit" value="<?php echo Kohana::lang('ui_main.alerts_btn_send'); ?>" />
-					<BR /><BR />
-					<a href="<?php echo url::site()."alerts/confirm";?>"><?php echo Kohana::lang('ui_main.alert_confirm_previous'); ?></a>
+					<div class="step-3">
+						<div class="holder">
+							<div class="box">
+								<input id="btn-send-alerts" class="btn_submit" type="submit" value="<?php echo Kohana::lang('ui_main.alerts_btn_send'); ?>" />
+								<BR /><BR />
+								<a href="<?php echo url::site()."alerts/confirm";?>"><?php echo Kohana::lang('ui_main.alert_confirm_previous'); ?></a>
+							</div>
+						</div>
+					</div>
 				</div>
 				
 				<?php if ($allow_feed == 1 ): ?>
