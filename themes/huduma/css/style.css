@@ -2121,7 +2121,7 @@ div.green-box ul, div.red-box ul{
 #content-section-left-wrap{ position: relative; z-index: 290; width: 25%; clear: both; float: left;}
 
 #sidebar-left-content{ 
-    float: right;
+    /*float: right;*/
     width: 300px;
     padding: 5px 10px 0 0;
 }
