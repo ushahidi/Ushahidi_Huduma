@@ -90,7 +90,7 @@ body#page{
 }
 
 /* wrapper setup */
-div.rapidxwpr, div.rapidxwpr-main{
+div.rapidxwpr {
     margin: 0 auto;
     padding: 0;
     width: 1100px;
@@ -1674,12 +1674,10 @@ a.show-more {
 
 /*---alerts-block---*/
 .step-1 {
-	/*float: right;*/
+	float: left;
 	width: 370px;
 	padding: 0;
 	margin: 0;
-	/*position: relative;*/
-	/*right: 80px;*/
 }
 .step-1 h2, .step-2 h2 {
     text-align: right;
@@ -2121,12 +2119,11 @@ div.green-box ul, div.red-box ul{
 #content-section-left-wrap{ position: relative; z-index: 290; width: 25%; clear: both; float: left;}
 
 #sidebar-left-content{ 
-    /*float: right;*/
     width: 300px;
     padding: 5px 10px 0 0;
 }
 
-div#pageColLeft{ float: left; /*position: relative !important;*/ /*right: 40px;*/ width: 400px; margin: 0 0; padding: 0 80px 12px 0; }
+div#pageColLeft{ float: left; width: 400px; margin: 0 0; padding: 0 80px 12px 0; }
 div#pageColRight { float: right; width: 586px; padding: 0; margin: 0; position: relative; left: -140px; }
 
 .mainpage-left { float: right; width: 310px; padding: 0 30px 0 0; position: relative; right: 20px; }
