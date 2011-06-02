@@ -1,9 +1,10 @@
 <div id="content">
 	<div class="content-bg">
+		<div class="page-title"><h1><?php echo Kohana::lang('ui_huduma.entities').": ";?> </h1></div>
+		<div style="clear:both;"></div>
+		
 		<!-- start reports block -->
 		<div class="big-block">
-			<h1><?php echo Kohana::lang('ui_huduma.entities').": ";?> </h1>
-			<div style="clear:both;"></div>
 			<div class="r_cat_tooltip"> <a href="#" class="r-3"></a> </div>
 
 			<script type="text/javascript">

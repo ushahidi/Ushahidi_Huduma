@@ -172,11 +172,11 @@
 				<?php if ( ! $multi_country): ?>
 				<div class="report_row">
 					<div style="float: left;">
-						<p><strong><?php echo Kohana::lang('ui_huduma.select_county'); ?></strong></p>
+						<h4><?php echo Kohana::lang('ui_huduma.select_county'); ?></h4>
 						<?php print form::dropdown('county_id', $counties, $form['county_id'], ' class="select"'); ?>
 					</div>
 					<div id="constituency_selector" style="float: left; position: relative; left: 40px">
-						<p><strong><?php echo Kohana::lang('ui_huduma.select_constituency'); ?></strong></p>
+						<h4><?php echo Kohana::lang('ui_huduma.select_constituency'); ?></h4>
 						<?php print form::dropdown('constituency_id','',$form['constituency_id'],' class="select"'); ?>
 					</div>
 				</div>

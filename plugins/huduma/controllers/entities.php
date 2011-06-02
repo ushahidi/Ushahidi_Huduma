@@ -108,6 +108,7 @@ class Entities_Controller extends Frontend_Controller {
 			'total_items' => ORM::factory('static_entity')
 							->where($where_entity_type_id)
 							->where($where_latlon)
+							->where($where_clause)
 							->count_all()
 		));
 
