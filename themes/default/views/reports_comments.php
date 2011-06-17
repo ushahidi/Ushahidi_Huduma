@@ -4,7 +4,7 @@
 					
 	<h5><?php echo Kohana::lang('ui_main.comments'); ?></h5>
 
-	<?php foreach($incident_comments as $comment) { ?>
+	<?php foreach($incident_comments as $comment): ?>
 		<div class="report-comment-box">
 	
 			<div>
@@ -26,7 +26,7 @@
 	  </div>
 	
 		</div>
-	<?php } ?>
+	<?php endif; ?>
 	
 </div>
 

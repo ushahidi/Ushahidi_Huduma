@@ -2,11 +2,11 @@
 <div id="main" class="clearingfix">
 	<div id="mainmiddle" class="floatbox withright">
 
-	<?php if($site_message != '') { ?>
+	<?php if($site_message != ''): ?>
 		<div class="green-box">
 			<h3><?php echo $site_message; ?></h3>
 		</div>
-	<?php } ?>
+	<?php endif; ?>
 
 		<!-- right column -->
 		<div id="right" class="clearingfix">
@@ -61,10 +61,7 @@
 			</ul>
 			<!-- / category filters -->
 			
-			<?php
-			if ($layers)
-			{
-				?>
+			<?php if ($layers): ?>
 				<!-- Layers (KML/KMZ) -->
 				<div class="cat-filters clearingfix" style="margin-top:20px;">
 					<strong><?php echo Kohana::lang('ui_main.layers_filter');?> <span>[<a href="javascript:toggleLayer('kml_switch_link', 'kml_switch')" id="kml_switch_link"><?php echo Kohana::lang('ui_main.hide'); ?></a>]</span></strong>
@@ -87,15 +84,10 @@
 					?>
 				</ul>
 				<!-- /Layers -->
-				<?php
-			}
-			?>
+			<?php endif; ?>
 			
 			
-			<?php
-			if ($shares)
-			{
-				?>
+			<?php if ($shares): ?>
 				<!-- Layers (Other Ushahidi Layers) -->
 				<div class="cat-filters clearingfix" style="margin-top:20px;">
 					<strong><?php echo Kohana::lang('ui_main.other_ushahidi_instances');?> <span>[<a href="javascript:toggleLayer('sharing_switch_link', 'sharing_switch')" id="sharing_switch_link"><?php echo Kohana::lang('ui_main.hide'); ?></a>]</span></strong>
@@ -112,18 +104,13 @@
 					?>
 				</ul>
 				<!-- /Layers -->
-				<?php
-			}
-			?>
+			<?php endif; ?>
 			
 			
 			<br />
 		
 			<!-- additional content -->
-			<?php
-			if (Kohana::config('settings.allow_reports'))
-			{
-				?>
+			<?php if (Kohana::config('settings.allow_reports')): ?>
 				<div class="additional-content">
 					<h5><?php echo Kohana::lang('ui_main.how_to_report'); ?></h5>
 					<ol>
@@ -147,7 +134,7 @@
 					</ol>
 
 				</div>
-			<?php } ?>
+			<?php endif; ?>
 			<!-- / additional content -->
 			
 			<?php
@@ -212,14 +199,10 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php
-						if ($total_items == 0)
-					{
-					?>
+				<?php if ($total_items == 0): ?>
 					<tr><td colspan="3"><?php echo Kohana::lang('ui_main.no_reports'); ?></td></tr>
-
-					<?php
-					}
+				<?php endif; ?>
+				<?php
 					foreach ($incidents as $incident)
 					{
 						$incident_id = $incident->id;
@@ -227,15 +210,15 @@
 						$incident_date = $incident->incident_date;
 						$incident_date = date('M j Y', strtotime($incident->incident_date));
 						$incident_location = $incident->location->location_name;
-					?>
+				?>
 					<tr>
 						<td><a href="<?php echo url::site() . 'reports/view/' . $incident_id; ?>"> <?php echo $incident_title ?></a></td>
 						<td><?php echo $incident_location ?></td>
 						<td><?php echo $incident_date; ?></td>
 					</tr>
-					<?php
+				<?php
 					}
-					?>
+				?>
 
 				</tbody>
 			</table>

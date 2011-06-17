@@ -2,9 +2,7 @@
 <div class="comment-block">
 	
 	<h5><?php echo Kohana::lang('ui_main.leave_a_comment');?></h5>
-	<?php
-		if ($form_error) {
-	?>
+	<?php if ($form_error): ?>
 	<!-- red-box -->
 	<div class="red-box">
 		<h3><?php echo Kohana::lang('ui_main.error');?></h3>
@@ -17,9 +15,7 @@
 			?>
 		</ul>
 	</div>
-	<?php
-	}
-	?>
+	<?php endif; ?>
 	<?php print form::open(NULL, array('id' => 'commentForm', 'name' => 'commentForm')); ?>
 	<div class="report_row">
 		<strong><?php echo Kohana::lang('ui_main.name');?>:</strong><br />

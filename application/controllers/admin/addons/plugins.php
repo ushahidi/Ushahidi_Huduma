@@ -140,11 +140,12 @@ class Plugins_Controller extends Admin_Controller {
 							$path = $this->_find_install($plugin->plugin_name);
 							if ($path)
 							{
-								include $path;
+								require_once $path;
 
 								// Run the installer
 								$install = new $class;
 								$install->run_install();
+								
 							}
 							
 							// Mark as Active and Mark as Installed
