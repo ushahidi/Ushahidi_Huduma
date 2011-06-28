@@ -43,7 +43,7 @@ class Entities_Controller extends Frontend_Controller {
 		$this->is_cachable = TRUE;
 
 		$this->template->header->this_page = 'entities';
-		$this->template->content = new View('frontend/entities');
+		$this->template->content = new View('huduma/entities');
 
 		// Get entity type ids if we're allowed to filter by category
 		$entity_type_ids = array();
@@ -135,7 +135,7 @@ class Entities_Controller extends Frontend_Controller {
 			url::redirect('entities');
 		}
 
-		$this->template->content = new View("frontend/entity_view");
+		$this->template->content = new View("huduma/entity_view");
 
 		// Get the entity
 		$entity = ORM::factory('static_entity', $entity_id);
@@ -164,7 +164,7 @@ class Entities_Controller extends Frontend_Controller {
 			->where('static_entity_id', $entity_id)
 			->find_all(5, $metadata_pagination->sql_offset);
 			
-		$metadata_view = new View('frontend/entity_metadata_view');
+		$metadata_view = new View('huduma/entity_metadata_view');
 		$metadata_view->metadata = $metadata;
 		$metadata_view->entity = $entity;
 		$metadata_view->metadata_pagination = $metadata_pagination;
@@ -274,7 +274,7 @@ class Entities_Controller extends Frontend_Controller {
      */
     public function report($entity_id)
     {
-        $this->template = new View('frontend/entity_report_submit');
+        $this->template = new View('huduma/entity_report_submit');
         
         // Setup form fields
 		$form = array
@@ -447,7 +447,7 @@ class Entities_Controller extends Frontend_Controller {
 				->find_all(5, $metadata_pagination->sql_offset);
 			
 			// Load the metadata view and set the content
-			$view = new View('frontend/entity_metadata_view');
+			$view = new View('huduma/entity_metadata_view');
 			$view->metadata = $metadata;
 			$view->entity = $entity;
 			$view->metadata_pagination = $metadata_pagination;

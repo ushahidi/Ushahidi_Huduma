@@ -105,6 +105,7 @@
 								</div>
 								<div>
 									<?php print form::input(array('type'=>'submit', 'name'=>'login', 'class'=>'submit'), Kohana::lang('ui_main.reports_btn_submit'));?>
+									<?php print form::input(array('type'=>'button', 'name'=>'register', 'class'=>'submit', 'onclick'=>'showRegistrationForm()'), Kohana::lang('ui_huduma.register'));?>
 								</div>
 							<?php print form::close(); ?>
 						<?php endif; ?>
@@ -196,6 +197,14 @@
 
 	<!-- wrapper -->
 	<div class="rapidxwpr floatholder">
+		<div id="facebox" style="display: none;">
+			<div class="popup">
+				<div class="content"></div>
+				<a href="#" class="close">
+					<?php print html::image(array('src' => 'plugins/huduma/views/images/closelabel.png', 'class'=> 'close_image')); ?>
+				</a>
+			</div>
+		</div>
 
 		<!-- main body -->
 		<div id="middle">

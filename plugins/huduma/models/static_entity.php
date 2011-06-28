@@ -64,17 +64,49 @@ class Static_Entity_Model extends ORM {
         return parent::validate($array, $save);
     }
     
-    /**
-     * Gets the list of static entities for the entity type specified in @param $type_id
+	/**
+	 * Gets the list of static entities for the specific entity type
 	 * 
-     * @param int $type_id
-     */
-    public static function get_entities_by_type($type_id)
-    {
-        return ORM::factory('static_entity')
-                        ->where('static_entity_type_id', $type_id);
-//                        ->find_all();
-    }
+	 * @param int $type_id Database ID of the static entity type
+	 * @return array List of a static entities
+	 */
+	public static function get_entities_by_type($type_id, $boundary_id = FALSE)
+	{
+		
+		// Check if the boundary id has been specified
+		if (Boundary_Model::is_valid_boundary($boundary_id))
+		{
+			// Fetch the database IDs for all boundaries with $boundary_id as parent
+			$table_prefix = Kohana::config('database.table_prefix');
+			$db = new Database();
+			$query = 'SELECT id FROM '.$table_prefix.'boundary WHERE id = %d OR parent_id = %d';
+			$result = $db->query(sprintf($query, $boundary_id, $boundary_id));
+			unset($db);
+			
+			$boundary_ids = array();
+			foreach ($result as $item)
+			{
+				$boundary_ids[] = $item->id;
+			}
+			
+			return (Static_Entity_Type_Model::is_valid_static_entity_type($type_id))
+				? ORM::factory('static_entity')
+						->where('static_entity_type_id', $type_id)
+						->in('id', $boundary_ids)
+						->select_list('id', 'entity_name')
+				: FALSE;
+			
+		}
+		else
+		{
+			return (Static_Entity_Type_Model::is_valid_static_entity_type($type_id))
+				? ORM::factory('static_entity')
+						->where('static_entity_type_id', $type_id)
+						->select_list('id', 'entity_name')
+				: FALSE;
+		}
+		
+	}
 
 	/**
 	 * Gets the list of static entities within the administrative boundary in @param $boundary_id
@@ -88,7 +120,6 @@ class Static_Entity_Model extends ORM {
 			? ORM::factory('static_entity')
 				->where('boundary_id', $boundary_id)
 				->find_all()
-
 			: array();
 	}
 

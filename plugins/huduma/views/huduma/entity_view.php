@@ -54,6 +54,11 @@
 							<?php print form::input(array('type'=>'hidden', 'name'=>'entity_id', 'id'=>'entity_id'), $entity_id); ?>
                     
 							<div class="single-entity-map">
+								<div style="float: right; margin: -15px 10px 5px 0;">
+									<input type="button" class="btn_submit btn_submit2" value="<?php echo Kohana::lang('ui_main.submit'); ?>" 
+										onclick="loadEntityReportForm('<?php echo urlencode($entity_id); ?>')">
+								</div>
+								<div style="clear: both;"></div>
 								<div id="map" style="width: 575px; height: 205px;"></div>
 							</div>
 							<div style="clear:both"></div>
@@ -66,13 +71,6 @@
 							</div>
 							<!-- /static entity metadata -->
 						
-							<?php
-							/*
-							<div class="row">
-								<a href="javascript:loadEntityReportForm('<?php echo urlencode($entity_id); ?>')"><?php echo Kohana::lang('ui_main.submit'); ?></a>
-							</div>
-							*/
-							?>
 							<?php echo $entity_reports_view; ?>
 							
 						<?php print form::close(); ?>

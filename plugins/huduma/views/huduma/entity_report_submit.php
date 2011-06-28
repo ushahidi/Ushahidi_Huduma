@@ -115,7 +115,7 @@
 			</div>
         	
         	<div class="row">
-        	    <input name="submit" id="report_submit" type="button" value="<?php echo Kohana::lang('ui_main.reports_btn_submit'); ?>" class="huduma_button" /> 
+        	    <input name="submit" class="btn_submit" id="report_submit" type="button" value="<?php echo Kohana::lang('ui_main.reports_btn_submit'); ?>" class="huduma_button" /> 
         	</div>
         <?php print form::close(); ?>
     </div>

@@ -33,7 +33,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		if ($this->static_entity_role)
 		{
 			// Load the static entity view
-			$this->template->content = new View('frontend/entity_view');
+			$this->template->content = new View('huduma/entity_view');
 			
 			// Load the static entity
 			$entity = ORM::factory('static_entity', $this->static_entity_id);
@@ -63,7 +63,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 				->find_all(5, $metadata_pagination->sql_offset);
 
 
-			$metadata_view = new View('frontend/entity_metadata_view');
+			$metadata_view = new View('huduma/entity_metadata_view');
 			$metadata_view->metadata = $metadata;
 			$metadata_view->entity = $entity;
 			$metadata_view->metadata_pagination = $metadata_pagination;
@@ -117,7 +117,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		elseif ($this->boundary_role)
 		{
 			// Role for specific admin boundary
-			$this->template->content = new View('frontend/dashboards/boundary_dashboard');
+			$this->template->content = new View('huduma/dashboards/boundary_dashboard');
 			
 			// Load the boundary from the database
 			$boundary = ORM::factory('boundary', $this->boundary_id);
@@ -209,7 +209,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		}
 
 		// Load the entity view page with edit options
-		$this->template->content = new View('frontend/dashboards/entity_profile');
+		$this->template->content = new View('huduma/dashboards/entity_profile');
 
 		// Setup forms
 		$form = array(
@@ -229,7 +229,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		$form_saved = FALSE;
 
 		// Dashboard panel
-		$dashboard_panel = new View('frontend/dashboards/dashboard_panel');
+		$dashboard_panel = new View('huduma/dashboards/dashboard_panel');
 		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
 		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
 
@@ -287,7 +287,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			);
 		}
 	    
-		$entity_metadata = new View('frontend/dashboards/entity_metadata_view');
+		$entity_metadata = new View('huduma/dashboards/entity_metadata_view');
 		$entity_metadata->static_entity_id = $this->static_entity_id;
 		$entity_metadata->metadata_items = Static_Entity_Model::get_metadata($this->static_entity_id);
 
@@ -323,7 +323,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	public function change_password()
 	{
 		// Load the content view
-		$this->template->content = new View('frontend/dashboards/change_password');
+		$this->template->content = new View('huduma/dashboards/change_password');
 
 		// Set up form fields
 		$form = array(
@@ -395,7 +395,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	 public function moderate_comments()
 	 {
 		// Load template
-		$this->template->content = new View('frontend/dashboards/moderate_comments');
+		$this->template->content = new View('huduma/dashboards/moderate_comments');
 
 		// Get the no. of items per page
 		$items_per_page = (int)Kohana::config('settings.items_per_page_admin');
@@ -577,7 +577,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 		// Validate incident id
 		if (Incident_Model::is_valid_incident($incident_id))
 		{
-			$this->template->content = new View('frontend/single_report_view');
+			$this->template->content = new View('huduma/single_report_view');
 			// Setup forms
 			$form = array(
 				'comment_author' => '',
@@ -659,7 +659,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			}
 		
 			// Load the comments form
-			$comments_form = new View('frontend/report_comments_form');
+			$comments_form = new View('huduma/report_comments_form');
 			$comments_form->incident_id = $incident_id;
 			$comments_form->is_dashboard_user =TRUE;
 			$comments_form->can_close_issue = $this->can_close_issue;
@@ -693,7 +693,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 	private function __get_dashboard_panel()
 	{
 		// Load the dashboard panel view
-		$dashboard_panel = View::factory('frontend/dashboards/dashboard_panel');
+		$dashboard_panel = View::factory('huduma/dashboards/dashboard_panel');
 		$dashboard_panel->static_entity_panel = ! empty($this->static_entity_id);
 		$dashboard_panel->boundary_panel = ! empty($this->boundary_id);
 		if ( ! empty($this->boundary_id))
@@ -755,7 +755,7 @@ class Home_Controller extends Dashboard_Template_Controller {
 			// Success
 			
 			// Get the reports for the specified category in the current boundary
-			$report_html = View::factory('frontend/dashboard_report_items');
+			$report_html = View::factory('huduma/dashboard_report_items');
 			$reports = Boundary_Model::get_boundary_reports($this->boundary_id, 'all', $category_id);
 			$report_html->reports = $reports;
 			$report_html->report_view_controller = 'dashboards/home/reports/';

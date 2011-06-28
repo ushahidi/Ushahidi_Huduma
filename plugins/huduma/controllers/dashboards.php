@@ -118,7 +118,7 @@ class Dashboards_Controller extends Frontend_Controller {
 		}
 		else
 		{
-			$this->template->content = new View('frontend/category_dashboard');
+			$this->template->content = new View('huduma/category_dashboard');
 			
 			// Get the category stats
 			$category_stats = navigator::get_category_stats($category_id);

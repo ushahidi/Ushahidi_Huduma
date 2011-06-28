@@ -309,3 +309,127 @@
 	jQuery(document).ready(function(){
 		jQuery(".cat-stats-graph").horizontalBarGraph({interval: 0.55});
 	});
+	
+	/**
+	 * Loads the registration form
+	 */
+	function showRegistrationForm()
+	{
+		// Tracks the selected boundary
+		var boundary_id = 0;
+		
+		// Display the dialog
+		$("#facebox .content").attr("class", "content body");
+		$("#facebox").css("display", "block");
+		$("#facebox .content").css("width", "620px");
+        
+	    $.facebox(function(){
+	        jQuery.get('<?php echo url::site().'registration_form'?>',
+	            function(data) {
+					jQuery.facebox(data);
+
+					//*
+					//* EVENT HANDLERS
+					//*
+					
+					// Close form
+					$("#close_registration_form").click(function(){
+						$.facebox.close();
+					})
+					
+        			// Form submission handler
+        			$("#register_user").click(function(){
+        			    // Fetch the submitted information
+        			    var postData = {
+        			        first_name : $("#first_name").val(),
+        			        last_name : $("#last_name").val(),
+        			        phone_number : $("#phone_number").val(),
+        			        email : $("#email").val(),
+        			        category_id : $("#category_id").val()
+        			    };
+        			    
+        			    // Post the provided information
+        			    $.post('<?php echo url::site().'registration_form'; ?>', 
+        			        postData,
+        			        function(response) {
+        			            if (response.success) {
+        			                // Show message 
+        			                $("#submitStatus").css("display", "block");
+                    			    // Close the dialog
+                    			    setTimeout(function(){ $.facebox.close(); }, 600);
+        			            } else {
+        			                // Show message
+        			                // TODO Figure out how to display the error messages
+        			            }
+        			        }
+						);
+					}); // END form submission
+					
+					// Category change - Loads the facility types
+					$("#category_id").change(function(){
+						$("#facility_id").html("<option value=\"0\">--<?php echo Kohana::lang('ui_huduma.select_facility')?>---</option>");
+						$.get('<?php echo url::site().'registration_form/get_facility_types/'?>'+$(this).val(),
+							function(data)
+							{
+								if (data != null && data != "")
+								{
+									$("#facility_type_id").html(data);
+								}
+							}
+						);
+					});
+					
+					// County selection change
+					$("#county_id").change(function(){
+						boundary_id = $(this).val();
+						$.get('<?php echo url::site().'registration_form/get_constituencies/'?>'+boundary_id,
+							function(data)
+							{
+								if (data != null && data != "")
+								{
+									$("#constituency_id").html(data);
+								}
+							}
+						);
+					});
+					
+					// Constituency selection change
+					$("#constituency_id").change(function(){
+						if ($(this).val() != "" && $(this).val() != null)
+						{
+							// Update boundary id
+							boundary_id = $(this).val();
+						}
+						else
+						{
+							boundary_id = $("#county_id").val();
+						}
+					});
+					
+					// Facility Type change - Loads the facilities
+					$("#facility_type_id").change(function(){
+						$("#facility_id").html("<option value=\"0\">---<?php echo Kohana::lang('ui_huduma.select_facility'); ?>--</option>");
+						$.get('<?php echo url::site().'registration_form/get_facilities/'?>'+$(this).val()+'/'+boundary_id,
+							function(data)
+							{
+								if (data != null && data != "")
+								{
+									$("#facility_id").html(data);
+								}
+							}
+						);
+					});
+					
+					// Facility selection change
+					$("#facility_id").change(function(){
+						if ($(this).val() != "" && $(this).val() > 0)
+						{
+							$("#in_charge").attr("enabled");
+						}
+					});
+					
+	            }
+	        );
+		});
+		
+	}

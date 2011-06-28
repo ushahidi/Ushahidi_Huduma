@@ -291,7 +291,7 @@ class navigator_Core {
 	public static function get_reports_view($reports, $controller, $pagination)
 	{
 		// Get the parent view
-		$reports_view = View::factory('frontend/entity_reports_view');
+		$reports_view = View::factory('huduma/entity_reports_view');
 		
 		$reports_view->reports = $reports;
 		$reports_view->pagination = $pagination;

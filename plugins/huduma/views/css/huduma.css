@@ -80,7 +80,7 @@ div.login {
 .login .dashboard_role_detail { font-style: italic; font-size: 1.3em; }
 .login #dashboard_remember { margin: 0 3px 0 10px; }
 .login label {font-size: 120%; }
-.login .submit { border: medium none; font-weight: bold; color: #C7F91A; background-color: #0E7596; padding: 3px 7px 8px; cursor: pointer;}
+.login .submit { border: medium none; font-weight: bold; color: #C7F91A; background-color: #0E7596; padding: 2px 7px 8px; cursor: pointer;}
 
 .huduma_button {
 	-webkit-border-radius: 4px;
@@ -125,7 +125,7 @@ div.report_comments_area {
 	float: left;
 	min-height: 40em; 
 	width: 586px;
-	font: 12px Arial,Helvetica,sans-serif
+	font: 12px Arial,Helvetica,sans-serif;
 }
 .dash-page-header { background-color: #7AD1EC; margin: 20px 0 0 5px; height:27px;}
 .dash-page-header h3 { color: #333333; float: left; padding: 5px 0 0 10px; width: 20%; font-size: 14px;}
@@ -399,3 +399,10 @@ div.dash-snapshots { margin-top: -130px; }
 .entity-additional-info h6{ padding: 0; margin: 0;}
 
 #ui-datepicker-div { display: none !important; }
+
+.registration_form { font-family: "Trebuchet MS", Verdana, Arial, sans-serif !important; font-size: 100%; }
+.registration_form h1 { color: #00ADE4 !important; }
+.registration_form td { padding: 3px; margin: 3px 0;}
+.registration_form select { border: 1px solid #CCCCCC; height: 25px; padding: 0 !important; margin: 0 !important;}
+td.label { text-align: right; }
+.registration_form .cancel { color: #FF0000; text-decoration: underline !important; }

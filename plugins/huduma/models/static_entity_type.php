@@ -62,9 +62,11 @@ class Static_Entity_Type_Model extends ORM {
 	 *
 	 * @return  array
 	 */
-	public static function get_entity_types_dropdown()
+	public static function get_entity_types_dropdown($category_id = NULL)
 	{
-	    return self::factory('static_entity_type')->select_list('id', 'type_name');
+	    return (Category_Model::is_valid_category($category_id))
+			? self::factory('static_entity_type')->where('category_id', $category_id)->select_list('id', 'type_name')
+			: self::factory('static_entity_type')->select_list('id', 'type_name');
 	}
 
 }

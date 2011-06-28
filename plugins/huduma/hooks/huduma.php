@@ -101,6 +101,10 @@ class huduma
 				
 			}
 		}
+		elseif (Router::$controller == 'opendata')
+		{
+			plugin::add_stylesheet('huduma/views/css/opendata');
+		}
 	}
 
     /**
@@ -361,6 +365,10 @@ class huduma
 		
 		// Set the boundary id
 		$incident->boundary_id = $this->boundary_id;
+		
+		// Auto approve report
+		$incident->incident_active = 1;
+				
 		$incident->save();
 		
 		// Clear the property
@@ -375,7 +383,7 @@ class huduma
 	 */
 	public function add_dashboard_snapshots()
 	{
-		$view = View::factory('frontend/dashboard_snapshots');
+		$view = View::factory('huduma/dashboard_snapshots');
 		$view->category_snapshots = navigator::get_category_stats();
 		$view->render(TRUE);
 	}
@@ -441,7 +449,7 @@ class huduma
 		// TODO: Compute issue resolution rate
 		
 		// Load the view
-		$view = View::factory('frontend/main_page_sidebar');
+		$view = View::factory('huduma/main_page_sidebar');
 		$view->stats = $stats;
 		$view->main_sidebar_js = $raphael_js;
 		$view->render(TRUE);
@@ -477,7 +485,7 @@ class huduma
 		}
 								
 		// Load and display the view
-		$comments_form = View::factory('frontend/report_comments_form');
+		$comments_form = View::factory('huduma/report_comments_form');
 		$comments_form->incident_id = $incident_id;
 		$comments_form->form = $form;
 		$comments_form->form_error = FALSE;
