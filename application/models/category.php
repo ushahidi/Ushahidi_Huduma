@@ -66,10 +66,10 @@ class Category_Model extends ORM_Tree
 	{
 		return ($parent_only)
 			? self::factory('category')
-				->where(array('parent_id' => 0, 'category_visible' => 1))
+				->where(array('parent_id' => 0, 'category_visible' => 1, 'category_title !=' => 'Trusted Reports'))
 				->select_list('id', 'category_title')
 			: self::factory('category')
-				->where('category_visible', 1)
+				->where(array('category_visible' => 1, 'category_title !=' => 'Trusted Reports'))
 				->select_list('id', 'category_title');
 	}
 	

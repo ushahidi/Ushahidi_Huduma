@@ -337,30 +337,39 @@
 						$.facebox.close();
 					})
 					
-        			// Form submission handler
-        			$("#register_user").click(function(){
-        			    // Fetch the submitted information
-        			    var postData = {
-        			        first_name : $("#first_name").val(),
-        			        last_name : $("#last_name").val(),
-        			        phone_number : $("#phone_number").val(),
-        			        email : $("#email").val(),
-        			        category_id : $("#category_id").val()
-        			    };
+					// Form submission handler
+					$("#register_user").click(function(){
+						// Fetch the submitted information
+						var postData = {
+							name : $("#first_name").val() + " " + $("#last_name").val(),
+							phone_number : $("#phone_number").val(),
+							email : $("#email").val(),
+							category_id : $("#category_id").val(),
+							boundary_id : boundary_id,
+							static_entity_id: $("#facility_id").val(),
+							in_charge : (! $("#in_charge").attr("disabled") && $("#in_charge").attr("checked"))? 1 : 0
+						};
         			    
         			    // Post the provided information
-        			    $.post('<?php echo url::site().'registration_form'; ?>', 
+        			    $.post('<?php echo url::site().'registration_form/register'; ?>', 
         			        postData,
         			        function(response) {
-        			            if (response.success) {
-        			                // Show message 
-        			                $("#submitStatus").css("display", "block");
-                    			    // Close the dialog
-                    			    setTimeout(function(){ $.facebox.close(); }, 600);
-        			            } else {
-        			                // Show message
-        			                // TODO Figure out how to display the error messages
-        			            }
+								if (response.success) {
+									// Show message 
+									$("#submitStatus").css("display", "block");
+									$("#submitStatus").html("<h3><div class=\"green-box\">"+response.message+"</div></h3>");
+									setTimeout(function(){ $.facebox.close(); }, 600);
+								} else {
+									// Generate the error message
+									var html_str = "<ul>";
+									$.each(response.message, function(key, value){
+										html_str += "<li>"+key+": "+value+"</li>";
+									});
+									html_str += "</ul>";
+									
+									$("#submitStatus").css("display", "block");
+									$("#submitStatus").html("<h3><div class=\"red-box\">"+html_str+"</div></h3>");
+								}
         			        }
 						);
 					}); // END form submission
@@ -424,7 +433,7 @@
 					$("#facility_id").change(function(){
 						if ($(this).val() != "" && $(this).val() > 0)
 						{
-							$("#in_charge").attr("enabled");
+							$("#in_charge").removeAttr("disabled");
 						}
 					});
 					

@@ -54,6 +54,13 @@ class Dashboard_User_Model extends ORM {
 			// Password validation rule
 			$array->add_rules('password', 'required', 'alpha_numeric', 'matches[confirm_password]');
 		}
+		
+		// Check if the phone number has been specified
+		if ( ! empty($array->phone_number))
+		{
+			// Phone number validation rules - Digits only
+			$array->add_rules('phone_number', 'digit');
+		}
 
 		// Validation for the dashboard role
 		if (empty($array->dashboard_role_id) OR $array->dashboard_role_id == '0')

@@ -43,7 +43,7 @@ class Dashboard_Role_Model extends ORM {
 		}
 		
 		// Check if role is associated with a service agency
-		if ($array->agency_id == 0 AND $array->category_id == 0 AND $array->boundary_id == 0 AND $array->static_entity_id = 0)
+		if ( $array->agency_id == 0 AND $array->category_id == 0 AND $array->boundary_id == 0 AND $array->static_entity_id = 0)
 		{
 			// Role not associated with agency, category, boundary or entity
 			Kohana::log('error', 'No privileges defined');
@@ -54,39 +54,44 @@ class Dashboard_Role_Model extends ORM {
 			$array->add_error('boundary_id', 'privileges');
 			$array->add_error('static_entity_id', 'privileges');
 		}
-		
-		// Category validation
-		if ( ! empty($array->category_id)  AND $array->category_id != 0)
+		else
 		{
-			$array->add_rules('category_id', array('Category_Model', 'is_valid_category'));
-			$array->agency_id = NULL;
-		}
-
-		// Administrative boundary validation
-		if ( ! empty($array->boundary_id) AND $array->boundary_id != 0)
-		{
-			$array->add_rules('boundary_id', array('Boundary_Model', 'is_valid_boundary'));
-		}
-
-		// Either category or boundary specified, entity level access is irrelevant
-		if ( ! empty($array->category_id) AND ! empty($array->boundary_id))
-		{
-			if ($array->category_id != 0 AND $array->boundary_id != 0)
+			// Static entity
+			if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
 			{
-				$array->static_entity_id = NULL;
-				$array->agency_id = NULL;
-			}
-		}
-		
-		// Static entity
-		if ( ! empty($array->static_entity_id) AND $array->static_entity_id != 0)
-		{
-			// Add validation rule for static entity
-			$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
+				// Add validation rule for static entity
+				$array->add_rules('static_entity_id', array('Static_Entity_Model', 'is_valid_static_entity'));
 
-			// Set
-			$array->category_id = NULL;
-			$array->boundary_id = NULL;
+				// Set
+				$array->category_id = NULL;
+				$array->boundary_id = NULL;
+			}
+			else
+			{
+				// Category validation
+				if ( ! empty($array->category_id)  AND $array->category_id != 0)
+				{
+					$array->add_rules('category_id', array('Category_Model', 'is_valid_category'));
+					$array->agency_id = NULL;
+				}
+				
+				// Administrative boundary validation
+				if ( ! empty($array->boundary_id) AND $array->boundary_id != 0)
+				{
+					$array->add_rules('boundary_id', array('Boundary_Model', 'is_valid_boundary'));
+				}
+				
+				// Either category or boundary specified, entity level access is irrelevant
+				if ( ! empty($array->category_id) AND ! empty($array->boundary_id))
+				{
+					if ($array->category_id != 0 AND $array->boundary_id != 0)
+					{
+						$array->static_entity_id = NULL;
+						$array->agency_id = NULL;
+					}
+				}
+			}
+			
 		}
 
 		return parent::validate($array, $save);
@@ -323,6 +328,23 @@ class Dashboard_Role_Model extends ORM {
 			$role_items = $roles->as_array();
 			return $role_items[0];
 		}
+	}
+	
+	/**
+	 * Checks if a role with the specified privilges exists
+	 *
+	 * @param array $privileges key,value array of the privileges to check
+	 * @return mixed Returns FALSE if no match is found, Dashboard_Role_Model is a match is found
+	 */
+	public static function role_exists($privileges)
+	{
+		// Privilege combinations should be unique
+		$result = ORM::factory('dashboard_role')
+					->where($privileges)
+					->find();
+		
+		// Return
+		return ($result->loaded) ? $result : FALSE;
 	}
 }
 ?>

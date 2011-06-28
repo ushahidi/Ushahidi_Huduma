@@ -8,6 +8,9 @@
 			<div class="row">
 				<h1><?php echo strtoupper(Kohana::lang('ui_huduma.registration_form')); ?></h1>
 			</div>
+			
+			<div id="submitStatus" style="display:none;"></div>
+			
 			<div class="row">
 				<span>*<?php echo Kohana::lang('ui_huduma.required_field'); ?></span>
 			</div>

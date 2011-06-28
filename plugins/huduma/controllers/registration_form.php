@@ -43,30 +43,117 @@ class Registration_Form_Controller extends Frontend_Controller {
 	{
 		$this->template = '';
 		$this->auto_render = FALSE;
+		header("Content-type: application/json; charset=utf-8");
 		
 		if ($_POST)
 		{
-			// Form error tracking
-			$form_error = FALSE;
-			
-			// @todo - This make use of the role based system code
-			// Automatically create a role and assign it to the user
 			// Manually extract the data to be validated
-			$data = arr::extract($_POST, 'first_name', 'last_name');
+			$username_data = arr::extract($_POST, 'name', 'email', 'phone_number');
 			
-			// Verify that either a constituency or county has been specified
-			if ( ! empty($_POST['constituency_id']))
+			// Exrtact the data for the role
+			$role_data = arr::extract($_POST, 'category_id', 'boundary_id', 'static_entity_id');
+			
+			// Check if the role exists
+			$role = Dashboard_Role_Model::role_exists($role_data);
+			if ($role == FALSE)
 			{
-				$data = array_merge($data, array('boundary_id' => $_POST['constituency_id']));
+				// To store the role name
+				$role_name = 'Role';
+				
+				// Set the role name and description
+				if ( ! empty($role_data['category_id']))
+				{
+					$role_name .= '_'.ORM::factory('category', $role_data['category_id'])->category_title;
+				}
+				
+				if ( ! empty($role_data['boundary_id']))
+				{
+					$role_name .= '_'.ORM::factory('boundary', $role_data['boundary_id'])->boundary_name;
+				}
+				
+				if ( ! empty($role_data['static_entity_id']))
+				{
+					$role_name = 'Role_'.ORM::factory('static_entity', $role_data['static_entity_id'])->entity_name;
+				}
+				
+				// Trim the role name to 35 characters
+				$role_name = substr($role_name, 0, 35);
+				
+				// Set the role name and description
+				// Disable closing of issues for the role
+				$role_data = array_merge($role_data, array(
+					'name' => $role_name, 
+					'description' => $role_name, 
+					'agency_id' => 0, 
+					'can_close_issue' => 0,
+					'in_charge' => $_POST['in_charge']
+				));
+				
+				// Debug
+				// Kohana::log('debug', Kohana::debug($role_data));
+				
+				// Create a new role
+				$role = new Dashboard_Role_Model();
+				if ($role->validate($role_data))
+				{
+					// Save the role
+					$role->save();
+				}
+				else
+				{
+					print json_encode(array(
+						'success' => FALSE,
+						'message' => $role_data->errors()
+					));
+					
+					exit(1);
+				}
 			}
-			elseif ( empty($_POST['constituency_id']) AND ! empty($_POST['county_id']))
+			
+			// Add the role id to the username data and also set the username to inactive
+			$user_password = text::random('alnum');
+			$extra_properties = array(
+				'username' => $username_data['email'],
+				'password' => $user_password,
+				'confirm_password' => $user_password,
+				'dashboard_role_id' => $role->id, 
+				'is_active' => 0,
+			);
+			
+			// Add the extra properties to the username
+			$username_data = array_merge($username_data, $extra_properties);
+			
+			// Validate and save the user
+			$dashboard_user = new Dashboard_User_Model();
+			if ($dashboard_user->validate($username_data))
 			{
-				$data = array_merge($data, array('boundary_id' => $_POST['county_id']));
+				// Success! Save
+				$dashboard_user->save();
+				
+				// Send information confirmation via SMS/email
+				
+				// Return success message
+				print json_encode(array(
+					'success' => TRUE,
+					'message' => Kohana::lang('ui_huduma.registration_successful')
+				));
 			}
 			else
 			{
-				$form_error = TRUE;
+				// Delete the role
+				$role->delete();
+				
+				// Show error message
+				print json_encode(array(
+					'success' => FALSE,
+					'message' => $username_data->errors()
+				));
 			}
+			
+		}
+		else
+		{
+			print json_encode(array('success' => FALSE));
 		}
 	}
 	

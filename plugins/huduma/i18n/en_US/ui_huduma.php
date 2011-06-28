@@ -75,6 +75,7 @@
 	'password_placeholder' => 'Password...',
 	'phone_no' => 'Phone Number',
 	'phone_placeholder' => 'including country code e.g. 2546720123456',
+	'registration_successful' => 'Your registration was successful',
 	'remember_me' => 'Remember me',
 	'required_field' => 'Required Field',
 	'role_privileges' => 'Role Privileges',

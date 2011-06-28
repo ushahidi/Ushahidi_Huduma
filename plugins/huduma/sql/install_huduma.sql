@@ -197,13 +197,35 @@ CREATE TABLE IF NOT EXISTS `incident_ticket_history` (
 ) COMMENT = 'Update log of incident reports that have been flagged as tickets';
 
 --
+-- Table boundary_metadata
+--
+CREATE TABLE IF NOT EXISTS `boundary_metadata` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`metadata_title` VARCHAR(255),
+	`metadata_columns` TEXT,
+	PRIMARY KEY (`id`)
+);
+
+--
+-- Table boundary_metadata
+--
+CREATE TABLE IF NOT EXISTS `boundary_metadata_items` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`boundary_metadata_id` INT NOT NULL,
+	`boundary_id` INT NOT NULL,
+	`data_items` TEXT,
+	PRIMARY KEY(`id`)
+);
+
+--
 -- Add extra columns to the comment and incident tables
 --
 ALTER TABLE `comment` ADD COLUMN `static_entity_id` INT;
 ALTER TABLE `comment` ADD COLUMN `dashboard_user_id` INT;
 ALTER TABLE `incident` ADD COLUMN `boundary_id` INT NOT NULL;
 ALTER TABLE `incident` ADD COLUMN `static_entity_id` INT;
-
+ALTER TABLE `dashboard_user` ADD COLUMN `phone_number` VARCHAR(25);
+ALTER TABLE `dashboard_role` ADD COLUMN `in_charge` TINYINT;
 --
 -- Drop stale schema objects (just incase they exist in the current schema)
 --
