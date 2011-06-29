@@ -197,10 +197,11 @@ class Static_Entity_Model extends ORM {
 	/**
 	 * Gets the reports for a specific static entity
 	 *
-	 * @param   int   $entity_id
+	 * @param int $entity_id
+	 * @param string $status Status of the reports to fetch
 	 * @return  ORM_Iterator
 	 */
-	public static function get_reports($entity_id)
+	public static function get_reports($entity_id, $status = 'all', $offset = FALSE, $limit = FALSE)
 	{
 	    if ( ! self::is_valid_static_entity($entity_id))
 	    {
@@ -210,16 +211,38 @@ class Static_Entity_Model extends ORM {
 	    {
 			// Database instance
 			$db = new Database();
+			$table_prefix = Kohana::config('database.table_prefix');
 			
 			// Query to be executed
 			$sql = 'SELECT i.id, i.incident_title, i.incident_description, i.incident_date, i.incident_mode, '
 				. 'COUNT(co.id) AS comment_count '
-				. 'FROM incident i '
-				. 'LEFT JOIN comment co ON (co.incident_id = i.id) '
-				. 'WHERE i.static_entity_id = %d '
+				. 'FROM '.$table_prefix.'incident i '
+				. 'LEFT JOIN '.$table_prefix.'comment co ON (co.incident_id = i.id) ';
+			
+			// Check if the status has been specified
+			if ($status == 'resolved' OR $status == 'unresolved')
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) ';
+				$sql .= (strtolower($status) == 'resolved')
+					? 'WHERE it.report_status_id = 2 '
+					: 'WHERE it.report_status_id = 1 ';
+			}
+			else
+			{
+				$sql .= 'LEFT JOIN '.$table_prefix.'incident_ticket it ON (it.incident_id = i.id) '
+					. 'WHERE 1=1 ';
+			}
+			
+			$sql .= 'AND i.static_entity_id = %d '
 				. 'AND i.incident_active = 1 '
 				. 'GROUP BY i.id '
-				. 'ORDER BY i.incident_date DESC';
+				. 'ORDER BY i.incident_date DESC ';
+			
+			// Check if the limit and offset have been specified and are scalar values
+			if ( is_int($offset) AND (int)$offset >= 0 AND is_int($limit) AND (int)$limit >= 1)
+			{
+				$sql .= 'LIMIT '.$offset.', '.$limit;
+			}
 				
 	        // Return list of reports
 	        return $db->query(sprintf($sql, $entity_id));
@@ -307,5 +330,46 @@ class Static_Entity_Model extends ORM {
 	        // Return
 	        return ($location->validate($data))? $location : FALSE;
 	    }
+	}
+	
+	/**
+	 * Gets the list of facilities neighbouring the specified facility. These facilities
+	 * may not be of the same category as the specified facility
+	 *
+	 * @param int $entity_id Database ID for which to get neighbouring facilities
+	 * @param int $count No. of neighbouring facilities to fetch
+	 * @return mixed Returns Result when successful, FALSE on failure
+	 */
+	public static function get_neighbour_entities($entity_id, $count = 5)
+	{
+		// Validation
+		if (self::is_valid_static_entity($entity_id))
+		{
+			// Get the table prefix
+			$table_prefix = Kohana::config('database.table_prefix');
+			
+			// Load the static entity
+			$entity = ORM::factory('static_entity', $entity_id);
+			
+			// SQL
+			$query = "SELECT DISTINCT se.id, se.entity_name, t.type_name, "
+					. "((ACOS(SIN(%s * PI() / 180) * SIN(se.`latitude` * PI() / 180) + COS(%s * PI() / 180) * COS(se.`latitude` * PI() / 180) "
+					. "* COS((%s - se.`longitude`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance "
+					. "FROM `".$table_prefix."static_entity` AS se "
+					. "INNER JOIN `".$table_prefix."static_entity_type` t ON (se.static_entity_type_id = t.id) "
+					. "WHERE se.id != ".$entity_id." "
+					. "ORDER BY distance ASC LIMIT %d";
+			
+			// Format the query
+			$query = sprintf($query, $entity->latitude, $entity->latitude, $entity->longitude, $count);
+			
+			// Execute query
+			$db = new Database();
+			return $db->query($query);
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 }

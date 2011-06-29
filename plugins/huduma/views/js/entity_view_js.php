@@ -15,6 +15,8 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 ?>
+		<?php require_once(PLUGINPATH.'huduma/views/js/dashboard_common_js.php'); ?>
+		
 		var map;
 		var myPoint;
 		var commentForm;

@@ -13,6 +13,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 ?>
+		<?php if ($reports->count() > 0): ?>
 		<div id="entity_view_column">
 			<div class="dash-page-header">
 				<h3><?php echo strtoupper(Kohana::lang('ui_main.reports')); ?></h3>
@@ -23,7 +24,6 @@
 				<?php endif; ?>
 			</div>
 			<ul class="reports-list">
-			<?php if ($reports): ?>
 				<?php foreach ($reports as $incident): ?>
 				<li class="report_box">
 					<div class="dashboard_report_item">
@@ -88,6 +88,11 @@
 
 				</li>
 				<?php endforeach; ?>
-			<?php endif; ?>
 			</ul>
 		</div>
+		<?php else: ?>
+		<div style="padding: 30px 15px; text-align: center;">
+			<p><?php echo Kohana::lang('ui_huduma.no_facility_reports')?></p>
+		</div>
+		<?php endif; ?>
+		

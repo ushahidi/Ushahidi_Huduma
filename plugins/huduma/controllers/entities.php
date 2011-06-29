@@ -17,14 +17,22 @@ class Entities_Controller extends Frontend_Controller {
 	var $logged_in;
 	
 	/**
-	 * @param boolean Whether the current user has access to the dashboards
+	 * Whether the current user has access to the dashboards
+	 * @var boolean
 	 */
 	private $is_dashboard_user;
 	
 	/**
-	 * @param object ORM reference to the currently logged in user
+	 * ORM reference to the currently logged in user
+	 * @var ORM
 	 */
 	private $current_user = "";
+	
+	/**
+	 * No. of report items to show per view
+	 * @var int
+	 */
+	private $report_items_per_view = 3;
 	
 	
 	public function __construct()
@@ -144,6 +152,9 @@ class Entities_Controller extends Frontend_Controller {
 
 		// ucfirst() conversion each word in the string
 		$entity_name = preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name));
+		
+		// Get the neighbouring entities
+		$neighbours = Static_Entity_Model::get_neighbour_entities($entity_id);
 
 		$this->template->content->entity_id = $entity->id;
 		$this->template->content->entity_name = $entity_name;
@@ -151,6 +162,12 @@ class Entities_Controller extends Frontend_Controller {
 		$this->template->content->latitude = $entity->latitude;
 		$this->template->content->longitude = $entity->longitude;		
 		$this->template->content->show_dashboard_panel = FALSE;
+		
+		// Set the neighbouring facilities
+		$this->template->content->neighbour_facilities = $neighbours;
+		
+		// Set the URL to be used by the report filter
+		$this->template->content->fetch_url = url::site().'entities/get_reports/?id='.$entity_id;
 		
 		// Setup metadata pagiantion
 		$metadata_pagination = new Pagination(array(
@@ -183,7 +200,7 @@ class Entities_Controller extends Frontend_Controller {
 		));
 		
 		// Show the reports
-		$reports = Static_Entity_Model::get_reports($entity_id);
+		$reports = Static_Entity_Model::get_reports($entity_id, NULL, 0, $pagination->items_per_page);
 		
 		$this->template->content->entity_reports_view = navigator::get_reports_view($reports, 'reports/view/', $pagination);
 
@@ -458,6 +475,92 @@ class Entities_Controller extends Frontend_Controller {
 		}
 		
 	}
-
+	
+	/**
+	 * Filters the reports for a given static entity
+	 */
+	public function get_reports()
+	{
+		// Blank out the template and disable auto rendering of the view content
+		$this->template = '';
+		$this->auto_render = FALSE;
+		
+		// Grab the URL parameters
+		$entity_id = $_GET['id'];
+		if (Static_Entity_Model::is_valid_static_entity($entity_id))
+		{
+			// Get the status
+			$filter = $_GET['filter'];
+			
+			// Fetch the reports
+			$reports = Static_Entity_Model::get_reports($entity_id, $filter);
+			
+			// Check if any records have been returned
+			if ($reports->count() > 0)
+			{
+				// Report content paginator
+				$pagination = $this->_get_report_paginator($entity_id, $filter);
+				
+				// Generate the reports view
+				$reports_view = navigator::get_reports_view($reports, 'reports/view/', $pagination);
+				
+				print $reports_view;
+			}
+			else
+			{
+				// No results found
+				print "";
+			}
+		}
+		else
+		{
+			print "";
+		}
+	}
+	
+	/**
+	 * Gets the paginator for entity reports
+	 * 
+	 * @param int $entity_id Database id of the static entity/facility
+	 * @param int $status filter
+	 * @return Pagination Pagination object
+	 */
+	private function _get_report_paginator($entity_id, $status_filter = FALSE)
+	{
+		// Ticket status values
+		$report_filters = array('unresolved' => 1, 'resolved' => 2);
+		
+		if ($status_filter AND array_key_exists($status_filter, $report_filters))
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $this->report_items_per_view,
+				'total_items' => $this->db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->join('incident_ticket', 'incident.id', 'incident_ticket.incident_id')
+									->where(array(
+										'incident.incident_active' => 1, 
+										'incident.static_entity_id' => $entity_id,
+										'incident_ticket.report_status_id' => $report_filters[$status_filter]))
+									->get()
+									->count()
+			));
+		}
+		else
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $this->report_items_per_view,
+				'total_items' => $this->db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->where(array('incident.incident_active' => 1, 'incident.static_entity_id' => $entity_id))
+									->get()
+									->count()
+			));
+		}
+		
+	}
 }
 ?>

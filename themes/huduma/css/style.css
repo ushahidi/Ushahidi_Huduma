@@ -871,7 +871,7 @@ div.report-additional-reports h4 {
 	text-transform: capitalize;
 }
 
-div.report-additional-reports h5 { font-size:95%; margin:4px 120px 2px 0; }
+div.report-additional-reports h5 { font-size:102%; margin:4px 120px 2px 0; }
 div.report-additional-reports .r_date { font-size:10px; background:#f2f2f2 url(../images/icon_sprite.png) 0px -133px no-repeat; }
 div.report-additional-reports .r_location { font-size:10px; padding:3px 0 3px 18px; color:#828784; }
 
