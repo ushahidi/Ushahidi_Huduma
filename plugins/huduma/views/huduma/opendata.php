@@ -16,17 +16,22 @@
 								<div>
 									<table>
 										<tr>
-											<td><?php echo Kohana::lang('opendata.category_sector'); ?></td>
+											<td class="label"><?php echo Kohana::lang('opendata.category_sector'); ?>:</td>
 											<td><?php print form::dropdown(array('name' => 'category_id', 'id' => 'category_id', 'style' => 'width: 150px;'), $categories); ?></td>
 										</tr>
 										<tr>
-											<td><?php echo Kohana::lang('opendata.select_facility'); ?></td>
+											<td class="label"><?php echo Kohana::lang('opendata.select_facility'); ?>:</td>
 											<td><?php print form::dropdown(array('name' => 'facility_type', 'id' => 'facility_type', 'style' => 'width: 250px;'), NULL); ?></td>
 										</tr>
 										<tr>
-											<td colspan="2"><input type="button" name="apply" id="apply_overlay" value="Apply"></td>
+											<th colspan="2" align="left"><?php echo Kohana::lang('opendata.select_overlay_option'); ?></td>
+										</tr>
+										<tr>
+											<td><input type="radio" name="overlay_option" id="heatmap_overlay"><span class="overlay_option">Heatmap</span></td>
+											<td><input type="radio" name="overlay_option" id="cluster_overlay" checked="true"><span class="overlay_option">Clusters</span></td>
 										</tr>
 									</table>
+									<div style="padding-bottom: 20px;"><input type="button" name="apply" id="apply_overlay" class="btn_submit" value="Apply"></div>
 								</div>
 							</li>
 							<li>

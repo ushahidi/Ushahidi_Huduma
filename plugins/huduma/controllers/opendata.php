@@ -84,7 +84,11 @@ class Opendata_Controller extends Frontend_Controller {
 		$interval = (int) $total/(count($choropleth_data) * 60);
 		
 		// Display the data
-		$this->template->content->categories = Category_Model::get_dropdown_categories();
+		$categories = Category_Model::get_dropdown_categories();
+		$categories[0] = "---".Kohana::lang('ui_huduma.select_category')."---";
+		ksort($categories);
+		
+		$this->template->content->categories = $categories;
 		$this->template->content->total  =$total;
 		$this->template->content->breakdown_data = $breakdown_data;
 		
@@ -179,6 +183,38 @@ class Opendata_Controller extends Frontend_Controller {
 			
 			print $html_str;
 		}
+	}
+	
+	/**
+	 * Gets the data points to be used for generating a heatmap and echoes
+	 * a JSON string
+	 */
+	public function get_heatmap_data()
+	{
+		$this->template = '';
+		$this->auto_render = FALSE;
+		
+		header("Content-type: application/json; charset=utf-8");
+		
+		// Get the parameters
+		$category_id = $_GET['category'];
+		$facility_type = $_GET['facility_type'];
+		
+		// Fetch the entities
+		$entities = (Static_Entity_Type_Model::is_valid_static_entity_type($facility_type))
+				? ORM::factory('static_entity')->where('static_entity_type_id', $facility_type)->find_all()
+				: Static_Entity_Model::get_entities_by_category($category_id);
+				
+		$points = array();
+		foreach ($entities as $entity)
+		{
+			$points[] = array('id' => $entity->id, 'latitude' => $entity->latitude, 'longitude' => $entity->longitude);
+		}
+		
+		print json_encode(array(
+			'success' => TRUE,
+			'points' => $points
+		));
 	}
 }
 ?>

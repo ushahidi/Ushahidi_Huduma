@@ -372,4 +372,30 @@ class Static_Entity_Model extends ORM {
 			return FALSE;
 		}
 	}
+	
+	/**
+	 * Gets the list of static entities by category
+	 * 
+	 * @param int $category_id Database ID of the category to be used for filtering out the entities
+	 * @return mixed ORM_Iterator if the category id is valid, FALSE if the category id is invalid
+	 */
+	public static function get_entities_by_category($category_id)
+	{
+		if (Category_Model::is_valid_category($category_id))
+		{
+			// Get the entity types
+			$types = ORM::factory('static_entity_type')->where('category_id', $category_id)->find_all();
+			$type_ids = array();
+			foreach ($types as $type)
+			{
+				$type_ids[] = $type->id;
+			}
+			
+			return ORM::factory('static_entity')->in('static_entity_type_id', $type_ids)->find_all();
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
 }
