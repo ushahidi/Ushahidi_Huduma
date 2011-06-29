@@ -1,0 +1,36 @@
+.opendata-analytics {
+    font-family: "Trebuchet MS", Verdana, Arial, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.opendata-analytics table {
+    width: 100%;
+    border-left: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    border-collapse: collapse;
+}
+
+.opendata-analytics table td {
+    padding: 5px 3px;
+    border-bottom: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-collapse: collapse;
+}
+
+.opendata-analytics td.header {
+    background-color: #F5F5F5 !important;
+}
+
+.opendata-analytics .breakdown-stats dt {
+    font-weight: normal !important;
+}
+
+.opendata-analytics .breakdown-stats dd {
+/*    color: #CCCCCC !important;*/
+}
+
+ul.analytics-menu { list-style: none;  padding: 0; margin: 0;}
+
+ul.analytics-menu li { margin: 3px 0;}
+ul.analytics-menu li a { padding: 5px 4px; display: block; width: 100%; background-color: #F5F5F5;}
