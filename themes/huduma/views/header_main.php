@@ -41,31 +41,11 @@
     								));
     							$color_css = '';
     						}
-    						echo '<li><a href="#" id="cat_'. $category .'"><span class="category-title">'.$category_title.'</span><span '.$color_css.'>'.$category_image.'</span></a>';
-    						// Get Children
-    						echo '<div class="hide" id="child_'. $category .'">';
-                            if( sizeof($category_info[3]) != 0)
-                            {
-                                echo '<ul>';
-                                foreach ($category_info[3] as $child => $child_info)
-                                {
-                                    $child_title = $child_info[0];
-                                    $child_color = $child_info[1];
-                                    $child_image = '';
-                                    $color_css = 'class="swatch" style="background-color:#'.$child_color.'"';
-                                    if($child_info[2] != NULL && file_exists(Kohana::config('upload.relative_directory').'/'.$child_info[2]))
-                                    {
-                                        $child_image = html::image(array(
-                                                'src'=>Kohana::config('upload.relative_directory').'/'.$child_info[2],
-                                                'style'=>'float:right; padding-right:5px;'
-                                                ));
-                                        $color_css = '';
-                                    }
-                                    echo '<li style="padding-left:20px;"><a href="#" id="cat_'. $child .'"><span '.$color_css.'>'.$child_image.'</span><span class="category-title">'.$child_title.'</span></a></li>';
-                                }
-                                echo '</ul>';
-                            }
-						echo '</div></li>';
+    						echo '<li><a href="#" id="cat_'. $category .'">'
+								. '<span class="category-title">'.$category_title.'</span>'
+								. '<span '.$color_css.'>'.$category_image.'</span>'
+								. '</a>'
+								. '</li>';
     					}
     				?>
     			</ul>

@@ -522,8 +522,6 @@
 				$("a[id^='cat_']").removeClass("active"); // Remove All active
 				$("[id^='child_']").hide(); // Hide All Children DIV
 				$("#cat_" + catID).addClass("active"); // Add Highlight
-				$("#child_" + catID).show(); // Show children DIV
-				$(this).parents("div").show();
 				
 				currentCat = catID;
 				$("#currentCat").val(catID);
