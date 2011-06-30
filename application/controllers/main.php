@@ -225,11 +225,11 @@ class Main_Controller extends Frontend_Controller {
 		$this->template->content->default_map_all = Kohana::config('settings.default_map_all');
 
 		// Get Twitter Hashtags
-		$this->template->header->twitter_hashtag_array = array_filter(array_map('trim',
+		$this->template->content->twitter_hashtag_array = array_filter(array_map('trim',
 			explode(',', Kohana::config('settings.twitter_hashtags'))));
 
 		// Get Report-To-Email
-		$this->template->header->report_email = Kohana::config('settings.site_email');
+		$this->template->content->report_email = Kohana::config('settings.site_email');
 
 		// Get SMS Numbers
 		$phone_array = array();
@@ -245,7 +245,7 @@ class Main_Controller extends Frontend_Controller {
 		if (!empty($sms_no3)) {
 			$phone_array[] = $sms_no3;
 		}
-		$this->template->header->phone_array = $phone_array;
+		$this->template->content->phone_array = $phone_array;
 
 		// Get RSS News Feeds
 		$this->template->content->feeds = ORM::factory('feed_item')

@@ -17,6 +17,12 @@
     	<div id="header">
     	    <!--header-left -->
             <div id="header-left">
+				<div class="row" style="float: right; margin-bottom: 10px; ">
+					<?php print form::open(url::site().'search', array('name' => 'mainpage-search'))?>
+					<?php print form::input('search_main', '', ' class="mainpage_search text" placeholder="'.Kohana::lang('ui_huduma.search_huduma').'"'); ?>
+					<?php print form::close(); ?>
+				</div>
+				<div style="clear: both;"></div>
         		<!-- logo -->
         		<div id="logo">
         		</div>
@@ -122,49 +128,7 @@
     				?>
 
                     <!-- how to report -->
-                    <?php
-                    if (Kohana::config('settings.allow_reports')): ?>
-                    <!-- additional content -->
-                    <div class="additional-content">
-
-                        <strong><?php echo Kohana::lang('ui_main.how_to_report'); ?></strong>
-    					<?php if (!empty($phone_array)): ?>
-                            <span><?php echo Kohana::lang('ui_main.sms').": "; ?>
-                            <?php
-                            foreach ($phone_array as $phone)
-                            {
-                                echo "<strong>". $phone ."</strong>";
-                                if ($phone != end($phone_array)) echo " or ";
-                            }
-                            ?>
-                            </span>
-                        <?php endif; ?>
-
-                        <?php if (!empty($report_email)): ?>
-    					<span><?php echo Kohana::lang('ui_main.email').": "; ?> <a href="mailto:<?php echo $report_email?>"><?php echo $report_email?></a></span>
-                        <?php endif; ?>
-    					
-                        <?php if (!empty($twitter_hashtag_array)): ?>
-                        <span>
-                        <?php echo Kohana::lang('ui_main.twitter').": "; ?>
-                        <?php
-                            foreach ($twitter_hashtag_array as $twitter_hashtag)
-                            {
-                                echo "<strong>". $twitter_hashtag ."</strong>";
-                                if ($twitter_hashtag != end($twitter_hashtag_array)) {
-                                    echo " or ";
-                                }
-                            }
-                        ?>
-                        </span>
-                        <?php endif; ?>
-
-                        <span><a href="<?php echo url::site() . 'reports/submit/'; ?>"><?php echo Kohana::lang('ui_main.report_option_4'); ?></a></span>
-					</div>
-                <!-- /additional content -->
-                
-                <?php endif; ?>
-                <!-- /how to report -->
+					<!-- /how to report -->
 
     			</div>
     		</div>

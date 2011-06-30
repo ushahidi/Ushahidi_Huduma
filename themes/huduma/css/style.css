@@ -513,14 +513,14 @@ div.map {
 
 
 div.graph-holder {
-    height:150px;
+    height:1px;
     overflow:hidden;
     width:573px;
 }
 
 div.slider-holder {
     font-size:70%;
-    height:70px;
+    /*height:70px;*/
     margin-top:15px;
     width:554px;
     padding-left: 11px;
@@ -589,16 +589,16 @@ ul.category-filters li.child{
 
 /* additional content */
 div.additional-content{
+    font-family: "Trebuchet MS", Verdana,Arial,sans-serif;
     margin: 0;
     padding: 0 0 10px 0;
-    background: #00ade3;
-    color: #fff;
-    font-size: 8pt;
+    color: #00ADE3;
+    font-size: 130%;
+    margin-top: 10px;
+    border-bottom: 1px dotted #999999;
 }
 
-div.additional-content a, div.additional-content h5 {
-    color: #fff;
-}
+div.additional-content a, div.additional-content h5 { color: #00ADE3; }
 
 /* content blocks */
 div.content-container{

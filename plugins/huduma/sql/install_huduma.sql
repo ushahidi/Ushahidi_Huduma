@@ -218,6 +218,16 @@ CREATE TABLE IF NOT EXISTS `boundary_metadata_items` (
 );
 
 --
+-- Table agency_type
+--
+CREATE TABLE IF NOT EXISTS `agency_type` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`type_name` VARCHAR(150) NOT NULL,
+	`short_name` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+--
 -- Add extra columns to the comment and incident tables
 --
 ALTER TABLE `comment` ADD COLUMN `static_entity_id` INT;
@@ -226,6 +236,7 @@ ALTER TABLE `incident` ADD COLUMN `boundary_id` INT NOT NULL;
 ALTER TABLE `incident` ADD COLUMN `static_entity_id` INT;
 ALTER TABLE `dashboard_user` ADD COLUMN `phone_number` VARCHAR(25);
 ALTER TABLE `dashboard_role` ADD COLUMN `in_charge` TINYINT;
+ALTER TABLE `agency` ADD COLUMN `agency_type_id` INT;
 --
 -- Drop stale schema objects (just incase they exist in the current schema)
 --

@@ -279,7 +279,7 @@ ul.dash-cat-filter { padding-bottom: 50px; }
 .hbg-label { margin: 3px 0 5px 0; font-weight: bold; font-size: 105%; width: 100px; }
 
 .slider-holder { display: none; }
-div.dash-snapshots { margin-top: -130px; }
+div.dash-snapshots { margin-top: -10px; }
 
 .snapshot-item { border-bottom: 1px dotted #999999; float: left; width: 100%; margin-top: 20px; padding-bottom: 5px;}
 .snapshot-item h1 { text-align: left; font-size: 22px; color: #858585; font-family: Verdana,Arial,Helvetica,sans-serif; font-weight: normal;}
@@ -406,3 +406,14 @@ div.dash-snapshots { margin-top: -130px; }
 .registration_form select { border: 1px solid #CCCCCC; height: 25px; padding: 0 !important; margin: 0 !important;}
 td.label { text-align: right; }
 .registration_form .cancel { color: #FF0000; text-decoration: underline !important; }
+
+input.mainpage_search { 
+    border: 1px solid #CCCCCC; 
+    height: 20px; 
+    width: 190px !important;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    font-size: 95%;
+    font-style: italic;
+}

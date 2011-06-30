@@ -81,6 +81,7 @@
 	'remember_me' => 'Remember me',
 	'required_field' => 'Required Field',
 	'role_privileges' => 'Role Privileges',
+	'search_huduma' => 'Search Huduma...',
 	'select_agency'	=> 'Select Agency',
 	'select_category' => 'Select Category',
 	'select_entity'	=> 'Select Entity',

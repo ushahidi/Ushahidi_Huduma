@@ -4,6 +4,7 @@
  */
 ?>
 		<div class="dash-snapshots">
+		
 		<?php $base_image_url = url::base().'plugins/huduma/views/images/'; ?>
 		<?php foreach ($category_snapshots as $category): ?>
 			<?php
