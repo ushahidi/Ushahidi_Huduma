@@ -415,5 +415,64 @@ class Main_Controller extends Frontend_Controller {
         // Rebuild Header Block
         $this->template->header->header_block = $this->themes->header_block();
 	}
+	
+	/**
+	 * Performs a live search against the static entities table
+	 * and returns a listing of the results
+	 */
+	public function live_search()
+	{
+		$this->template = '';
+		$this->auto_render = FALSE;
+		
+		header("Content-type: application/json; charset=utf-8");
+		
+		// Check if a search term has been specified
+		$keyword = (isset($_GET['search']))? preg_replace('/[^\w+]\w*/', '', $_GET['search']) : "";
+		$keyword = strip_tags($keyword);
+		
+		if ( ! empty($keyword))
+		{
+			// SQL query to perform the search
+			$sql = "SELECT id, entity_name FROM ".$this->table_prefix."static_entity "
+				. "WHERE LOWER(entity_name) LIKE '%".$keyword."' "
+				. "OR LOWER(entity_name) LIKE '%".$keyword."' "
+				. "OR LOWER(entity_name) LIKE '%".$keyword."%'";
+			
+			// Exectute the query
+			$results = $this->db->query($sql);
+			
+			// Check if any records have been returned
+			if ($results->count() > 0)
+			{
+				$html_str = "<ul class=\"live_search_results\">";
+				foreach ($results as $entity)
+				{
+					$html_str .= "<li>"
+							. "<a href=\"".url::site().'entities/view/'.$entity->id."\">"
+							. preg_replace('/\b(\w)/e', 'ucfirst("$1")', strtolower($entity->entity_name))."</a>"
+							. "</li>";
+				}
+				$html_str .= "</ul>";
+				
+				print json_encode(array(
+					'success' => TRUE,
+					'results' => $html_str
+				));
+			}
+			else
+			{
+				print json_encode(array(
+					'success' => FALSE
+				));
+			}
+		}
+		else
+		{
+			print json_encode(array(
+				'success' => FALSE
+			));
+		}
+	}
 
 } // End Main

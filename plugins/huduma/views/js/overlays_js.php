@@ -308,6 +308,31 @@
 
 	jQuery(document).ready(function(){
 		jQuery(".cat-stats-graph").horizontalBarGraph({interval: 0.55});
+		
+		// Event handler for the live search
+		$("#livesearch_bar").keyup(function(){
+			var search_value = $(this).val();
+			if (search_value != null && search_value != '' && search_value.length > 0)
+			{
+				$.get('<?php echo url::site().'main/live_search/?search='?>'+search_value, 
+				function(response){
+					if (response.success)
+					{
+						$("#livesearch_results").css("display", "block");
+						$("#livesearch_results").html(response.results);
+					}
+					else
+					{
+						$("#livesearch_results").css("display", "none");
+					}
+				}
+				);
+			}
+			else
+			{
+				$("#livesearch_results").css("display", "none");
+			}
+		});
 	});
 	
 	/**

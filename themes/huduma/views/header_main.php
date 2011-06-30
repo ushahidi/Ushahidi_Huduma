@@ -18,9 +18,8 @@
     	    <!--header-left -->
             <div id="header-left">
 				<div class="row" style="float: right; margin-bottom: 10px; ">
-					<?php print form::open(url::site().'search', array('name' => 'mainpage-search'))?>
-					<?php print form::input('search_main', '', ' class="mainpage_search text" placeholder="'.Kohana::lang('ui_huduma.search_huduma').'"'); ?>
-					<?php print form::close(); ?>
+					<?php print form::input('livesearch_bar', '', ' class="mainpage_search text" placeholder="'.Kohana::lang('ui_huduma.search_huduma').'"'); ?>
+					<div id="livesearch_results" style="display:none;"></div>
 				</div>
 				<div style="clear: both;"></div>
         		<!-- logo -->

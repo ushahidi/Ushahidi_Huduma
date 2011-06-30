@@ -73,6 +73,7 @@
 	'metadata_item_saved' => 'Static Entity Type Metadata Item successfully saved',
 	'neighbour_facilities' => 'Neighbouring Facilities',
 	'no_facility_reports' => 'There are no reports for this facility',
+	'no_suggestions' => 'No Suggestions',
 	'parent_boundary_type'	=> 'Parent Boundary Type',
 	'password_placeholder' => 'Password...',
 	'phone_no' => 'Phone Number',

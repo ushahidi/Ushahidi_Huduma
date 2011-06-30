@@ -417,3 +417,20 @@ input.mainpage_search {
     font-size: 95%;
     font-style: italic;
 }
+
+div#livesearch_results { 
+    position: absolute;
+    margin-top: 5px;
+    right: 0px;
+    background-color: #F3F3F3 !important; 
+    width: 250px !important; 
+    z-index: 1000;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+#livesearch_results ul { list-style: none; padding:0 10px;}
+#livesearch_results li a { font-size: 95% !important; padding: 5px 3px; display: block; }
