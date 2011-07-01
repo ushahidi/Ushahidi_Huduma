@@ -1,4 +1,12 @@
 <?php
+/**
+ * Opendata controller
+ *
+ * @author Ushahidi Dev Team - http://ushahidi.com
+ * @package Huduma- http://github.com/ushahidi/Ushahidi_Huduma
+ * @copyright Ushahidi Inc - http://ushahidi.com
+ * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
+ */
 class Opendata_Controller extends Frontend_Controller {
 	
 	public function index()
@@ -88,6 +96,7 @@ class Opendata_Controller extends Frontend_Controller {
 		$categories[0] = "---".Kohana::lang('ui_huduma.select_category')."---";
 		ksort($categories);
 		
+		$this->template->content->basemap_title = Kohana::lang('opendata.basemap').": ".Kohana::lang('opendata.basemap_options.1');
 		$this->template->content->categories = $categories;
 		$this->template->content->total  =$total;
 		$this->template->content->breakdown_data = $breakdown_data;
@@ -110,12 +119,16 @@ class Opendata_Controller extends Frontend_Controller {
 		$this->template = '';
 		$this->auto_render = FALSE;
 		
+		// Set the content type
+		header("Content-type: application/json; charst=utf-8");
+		
 		// Get the county id for the selected feature
 		$data = ORM::factory('boundary')->where(array('unique_id' => $feature_id, 'boundary_type' => 1))->find_all();
 		$data = $data->as_array();
 		if (count($data) == 0 OR count($data) > 1)
 		{
-			print "No data found";
+			print json_encode(array("success" => FALSE));
+			exit(1);
 		}
 		else
 		{
@@ -151,19 +164,43 @@ class Opendata_Controller extends Frontend_Controller {
 				}
 			}
 			
-			$content_view = new View('huduma/opendata_feature_content');
-			$content_view->boundary_name = $data[0]->boundary_name.' '.$data[0]->get_boundary_type_name();
-			$content_view->data_title = $metadata_defs->metadata_title;
-			$content_view->feature_data = $boundary_data;
+			// Build the boundary name
+			$boundary_name = $data[0]->boundary_name.' '.$data[0]->get_boundary_type_name();
+			
+			// HTML string to return via JSON
+			$html_str = "<div class=\"opendata-analytics\">"
+						. "<h4>".$metadata_defs->metadata_title.": ".$boundary_name."</h4>"
+						. "<table class=\"breakdown_table\">";
+			
+			foreach ($boundary_data as $key => $value)
+			{
+				$html_str .= "<tr>"
+						. "<td class=\"header\">".$key."</td>"
+						. "<td>".$value."</td>"
+						. "</tr>";
+			}
+			
+			$html_str .= "</table></div>";
 			
 			// Garbage collection
 			unset($result, $columns, $data);
 			
 			// Return content
-			print $content_view;
+			print json_encode(array(
+				"success" => TRUE, 
+				"content" => $html_str,
+				"piechartData" => array("Female" => $boundary_data["Female"], "Male" => $boundary_data["Male"])
+			));
 		}
 	}
-	
+
+    /**
+     * Gets the facilities for the specified category and echoes a HTML response
+     * which is then rendered via AJAX on the client side
+     * 
+     * @param int $category_id Database id the category to be used for fetching the data
+     * @return void
+     */
 	public function get_facilities($category_id)
 	{
 		$this->template = '';
