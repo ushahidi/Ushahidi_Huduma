@@ -165,7 +165,8 @@ class Opendata_Controller extends Frontend_Controller {
 			}
 			
 			// Build the boundary name
-			$boundary_name = $data[0]->boundary_name.' '.$data[0]->get_boundary_type_name();
+			$type_name = ($data[0]->boundary_type == 1) ? Kohana::lang('ui_huduma.county') : Kohana::lang('ui_huduma.constituency');
+			$boundary_name = $data[0]->boundary_name.' '.$type_name;
 			
 			// HTML string to return via JSON
 			$html_str = "<div class=\"opendata-analytics\">"
