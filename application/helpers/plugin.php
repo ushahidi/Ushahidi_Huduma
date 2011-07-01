@@ -74,12 +74,21 @@ class plugin_Core {
 					$html .= '<link rel="stylesheet" type="text/css" href="'.url::base()."plugins/".$file.'" />';
 					break;
 				case 'javascript':
-					if (substr_compare($file, '.js', -3, 3, FALSE) !== 0)
+				
+					// Check if the file contains http/https/ftp
+					if (preg_match("@/(^(http|https|ftp):\/\/)?/@", $file) == 0)
 					{
-						// Add the javascript suffix
-						$file .= '.js';
+						$file = url::base().'plugins/'.$file;
+						
+						// Check if a file extension has been specified - Only for local files
+						if (substr_compare($file, '.js', -3, 3, FALSE) !== 0)
+						{
+							// Add the javascript suffix
+							$file .= '.js';
+						}
+						
 					}
-					$html .= '<script type="text/javascript" src="'.url::base()."plugins/".$file.'"></script>';
+					$html .= '<script type="text/javascript" src="'.$file.'"></script>';
 					break;
 			}
 		}

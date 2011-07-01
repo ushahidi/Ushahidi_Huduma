@@ -143,59 +143,61 @@ class Overlays_Controller extends Template_Controller {
         $filter = "";
 
         // Get the selected category and filter by entities for that category
-        $category_id = (isset($_GET['c']) AND !empty($_GET['c']) &&
-            is_numeric($_GET['c']) AND $_GET['c'] != 0) ?
-            (int) $_GET['c'] : 0;
-
+		$category_id = (isset($_GET['c'] AND (int)$_GET['c'] > 0)? (int) $_GET['c'] : 0;
+		
+		// Get the entity type id
+		$entity_type_id = (isset($_GET['e']) AND (int)$_GET['e'] > 0) ? (int)$_GET['e'] : 0;
+		
         // Check if the category id is non zero, change the color to match that of the category
         if ($category_id > 0)
         {
             $color = ORM::factory('category', $category_id)->category_color;
         }
 
-        $filter = ($category_id > 0)? ' AND se.category_id = '.$category_id : '';
+		$filter = ($category_id > 0)? ' AND se.category_id = '.$category_id.' ' : '';
+		
+		$filter =  ($entity_type_id > 0) ? $filter.'AND se.id = '.$entity_type_id : $filter;
 
+		// Build SQL to fetch the entities from the database
+		$sql = 'SELECT e.id, e.static_entity_type_id, se.category_id, e.entity_name, e.latitude, e.longitude ';
+		$sql .= 'FROM '.$this->table_prefix.'static_entity e ';
+		$sql .= 'INNER JOIN '.$this->table_prefix.'static_entity_type se ON (e.static_entity_type_id = se.id) ';
+		$sql .= 'INNER JOIN '.$this->table_prefix.'category c ON (se.category_id = c.id) ';
+		$sql .= 'WHERE c.category_visible = 1 ';
+		$sql .= 'AND 1=1 ';
+		$sql .= $filter;
+		
+		// Execute query
+		$entities = $db->query($sql);
 
-        // Build SQL to fetch the entities from the database
-        $sql = 'SELECT e.id, e.static_entity_type_id, se.category_id, e.entity_name, e.latitude, e.longitude ';
-        $sql .= 'FROM '.$this->table_prefix.'static_entity e ';
-        $sql .= 'INNER JOIN '.$this->table_prefix.'static_entity_type se ON (e.static_entity_type_id = se.id) ';
-        $sql .= 'INNER JOIN '.$this->table_prefix.'category c ON (se.category_id = c.id) ';
-        $sql .= 'WHERE c.category_visible = 1 ';
-        $sql .= 'AND 1=1 ';
-        $sql .= $filter;
+		$entities = $entities->result_array(FALSE);
 
-        // Execute query
-        $entities = $db->query($sql);
+		// Create markers for the entities
+		$markers = array();
+		foreach ($entities as $entity)
+		{
+			$markers[] = array(
+				'id' => $entity['id'],
+				'entity_name' => $entity['entity_name'],
+				'latitude' => $entity['latitude'],
+				'longitude' => $entity['longitude'],
+				'static_entity_type_id' => $entity['static_entity_type_id'],
+				'category_id' => $entity['category_id']
+			);
+		}
 
-        $entities = $entities->result_array(FALSE);
+		$clusters = array();    // Clustered
+		$singles = array();     // Non clustered
 
-        // Create markers for the entities
-        $markers = array();
-        foreach ($entities as $entity)
-        {
-            $markers[] = array(
-                'id' => $entity['id'],
-                'entity_name' => $entity['entity_name'],
-                'latitude' => $entity['latitude'],
-                'longitude' => $entity['longitude'],
-                'static_entity_type_id' => $entity['static_entity_type_id'],
-                'category_id' => $entity['category_id']
-            );
-        }
+		// Compare each marker to every other
+		while (count($markers))
+		{
+			$marker = array_pop($markers);
+			$cluster = array();
 
-        $clusters = array();    // Clustered
-        $singles = array();     // Non clustered
-
-        // Compare each marker to every other
-        while (count($markers))
-        {
-            $marker = array_pop($markers);
-            $cluster = array();
-
-            // Compare $maker to each of the elements in $markers
-            foreach ($markers as $key => $target)
-            {
+			// Compare $maker to each of the elements in $markers
+			foreach ($markers as $key => $target)
+			{
                 // Get the distance of the markets from each other - K-means clustering
                 $pixels = abs($marker['latitude'] - $target['latitude']) + abs($marker['longitude'] - $target['longitude']);
 
@@ -223,66 +225,63 @@ class Overlays_Controller extends Template_Controller {
             }
         }
 
-        // Generate the JSON for the clusters
-        $json_array = array();
-        $json_item = "";
-        $icon = "";
-        foreach ($clusters as $cluster)
-        {
-            // Calculate the cluster center
-            $bounds = cluster::calculate_cluster_center($cluster);
-            $cluster_center = $bounds['center'];
-			Kohana::log('info', sprintf('Cluster center: %s -- %d', $cluster_center, count($cluster)));
-            // Number of items in cluster
-            $cluster_count = count($cluster);
-            $cluster_info = cluster::get_entity_cluster_info($cluster, $bounds);
-            $json_item = "{";
-            $json_item .= "\"type\":\"Feature\",";
-            $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', $cluster_info))."\",";
-//            $json_item .= "\"link\": \"".url::base()."entities/index/?c=".$entity_id."&sw=".$southwest."&ne=".$northeast."\", ";
-            $json_item .= "\"entity\":[0], ";
-            $json_item .= "\"color\": \"".$color."\", ";
-            $json_item .= "\"icon\": \"".$icon."\", ";
-            $json_item .= "\"timestamp\": \"0\", ";
-            $json_item .= "\"count\": \"" . $cluster_count . "\"";
-            $json_item .= "},";
-            $json_item .= "\"geometry\": {";
-            $json_item .= "\"type\":\"Point\", ";
-            $json_item .= "\"coordinates\":[" . $cluster_center . "]";
-            $json_item .= "}";
-            $json_item .= "}";
+		// Generate the JSON for the clusters
+		$json_array = array();
+		$json_item = "";
+		$icon = "";
+		foreach ($clusters as $cluster)
+		{
+			// Calculate the cluster center
+			$bounds = cluster::calculate_cluster_center($cluster);
+			$cluster_center = $bounds['center'];
+			// Number of items in cluster
+			$cluster_count = count($cluster);
+			$cluster_info = cluster::get_entity_cluster_info($cluster, $bounds);
+			
+			$json_item = "{";
+			$json_item .= "\"type\":\"Feature\",";
+			$json_item .= "\"properties\": {";
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', $cluster_info))."\",";
+			$json_item .= "\"entity\":[0], ";
+			$json_item .= "\"color\": \"".$color."\", ";
+			$json_item .= "\"icon\": \"".$icon."\", ";
+			$json_item .= "\"timestamp\": \"0\", ";
+			$json_item .= "\"count\": \"" . $cluster_count . "\"";
+			$json_item .= "},";
+			$json_item .= "\"geometry\": {";
+			$json_item .= "\"type\":\"Point\", ";
+			$json_item .= "\"coordinates\":[" . $cluster_center . "]";
+			$json_item .= "}";
+			$json_item .= "}";
 
-            array_push($json_array, $json_item);
-        }
+			array_push($json_array, $json_item);
+		}
 
-        foreach ($singles as $single)
-        {
-            $json_item = "{";
-            $json_item .= "\"type\":\"Feature\",";
-            $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "entities/view/" . $single['id'] . "/>".str_replace('"','\"',$single['entity_name'])."</a>")) . "\",";
-            $json_item .= "\"link\": \"".url::base()."entities/view/".$single['id']."\", ";
-            $json_item .= "\"entity\":[0], ";
-            $json_item .= "\"color\": \"".$color."\", ";
-            $json_item .= "\"icon\": \"".$icon."\", ";
-            $json_item .= "\"timestamp\": \"0\", ";
-            $json_item .= "\"count\": \"" . 1 . "\"";
-            $json_item .= "},";
-            $json_item .= "\"geometry\": {";
-            $json_item .= "\"type\":\"Point\", ";
-            $json_item .= "\"coordinates\":[" . $single['longitude'] . ", " . $single['latitude'] . "]";
-            $json_item .= "}";
-            $json_item .= "}";
+		foreach ($singles as $single)
+		{
+			$json_item = "{";
+			$json_item .= "\"type\":\"Feature\",";
+			$json_item .= "\"properties\": {";
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "entities/view/" . $single['id'] . "/>".str_replace('"','\"',$single['entity_name'])."</a>")) . "\",";
+			$json_item .= "\"link\": \"".url::base()."entities/view/".$single['id']."\", ";
+			$json_item .= "\"entity\":[0], ";
+			$json_item .= "\"color\": \"".$color."\", ";
+			$json_item .= "\"icon\": \"".$icon."\", ";
+			$json_item .= "\"timestamp\": \"0\", ";
+			$json_item .= "\"count\": \"" . 1 . "\"";
+			$json_item .= "},";
+			$json_item .= "\"geometry\": {";
+			$json_item .= "\"type\":\"Point\", ";
+			$json_item .= "\"coordinates\":[" . $single['longitude'] . ", " . $single['latitude'] . "]";
+			$json_item .= "}";
+			$json_item .= "}";
 
-            array_push($json_array, $json_item);
-        }
+			array_push($json_array, $json_item);
+		}
 
-        $json = implode(",", $json_array);
+		$json = implode(",", $json_array);
 
-        header('Content-type: application/json; charst=utf-8');
-        $this->template->json = $json;
-
-    }
-    
+		header('Content-type: application/json; charst=utf-8');
+		$this->template->json = $json;
+	}
 }

@@ -28,7 +28,10 @@
 										</tr>
 										<tr>
 											<td><input type="radio" name="overlay_option" id="heatmap_overlay"><span class="overlay_option">Heatmap</span></td>
-											<td><input type="radio" name="overlay_option" id="cluster_overlay" checked="true"><span class="overlay_option">Clusters</span></td>
+											<td>
+												<input type="radio" name="overlay_option" id="cluster_overlay" checked="true">
+												<span class="overlay_option">Clusters</span>
+											</td>
 										</tr>
 									</table>
 									<div style="padding-bottom: 20px;"><input type="button" name="apply" id="apply_overlay" class="btn_submit" value="Apply"></div>
@@ -48,8 +51,10 @@
 						</ul>
 					</div>
 				</div>
+				<div id="piechart_div" style="display: none;"></div>	
 			</div>
 			<div style="float: right;">
+				<div class="basemap_title"><h3><?php echo $basemap_title; ?></h3></div>
 				<div id="opendataMap" class="opendata-map" style="width:720px; height: 550px; border:1px solid #CCCCCC;">
 				</div>
 			</div>

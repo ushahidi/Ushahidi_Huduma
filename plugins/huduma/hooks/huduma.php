@@ -105,6 +105,7 @@ class huduma
 		{
 			plugin::add_stylesheet('huduma/views/css/opendata');
 			plugin::add_javascript('huduma/views/js/HeatmapLayer');
+			// plugin::add_javascript('https://www.google.com/jsapi');
 		}
 	}
 

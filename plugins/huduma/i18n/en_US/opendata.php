@@ -1,5 +1,10 @@
 <?php
 $lang = array(
+	'basemap' => 'Basemap',
+	'basemap_options' => array(
+		1 => 'Population Distribution Per County',
+		2 => '',
+	),
 	'category_sector' => 'Category/Sector',
 	'opendata' => 'Opendata Dashboard',
 	'overlays' => 'Overlays',
