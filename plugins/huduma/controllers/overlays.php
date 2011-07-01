@@ -143,7 +143,7 @@ class Overlays_Controller extends Template_Controller {
         $filter = "";
 
         // Get the selected category and filter by entities for that category
-		$category_id = (isset($_GET['c'] AND (int)$_GET['c'] > 0)? (int) $_GET['c'] : 0;
+		$category_id = (isset($_GET['c']) AND (int)$_GET['c'] > 0)? (int)$_GET['c'] : 0;
 		
 		// Get the entity type id
 		$entity_type_id = (isset($_GET['e']) AND (int)$_GET['e'] > 0) ? (int)$_GET['e'] : 0;
