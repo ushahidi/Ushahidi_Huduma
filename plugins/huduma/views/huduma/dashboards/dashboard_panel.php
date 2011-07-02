@@ -14,12 +14,20 @@
 
 		<!-- panel items for static entity role only -->
 		<?php if ($static_entity_panel): ?>
+		<?
+		/*
 		<li><a href="<?php echo url::site().'dashboards/home/entity_profile'; ?>"><?php echo Kohana::lang('ui_huduma.entity_profile'); ?></a></li>
+		*/
+		?>
 		<?php endif; ?>
 		
 		<!-- menu items for boundary level role -->
 		<?php if ($boundary_panel): ?>
+		<?php
+		/*
 		<li><a href="<?php echo url::site().'dashboards/home/boundary_profile'; ?>"><?php echo $boundary_type_name.' '.Kohana::lang('ui_huduma.profile'); ?></a></li>
+		*/
+		?>
 		<?php endif; ?>
 		
 		<!-- menu items for category-level role-->

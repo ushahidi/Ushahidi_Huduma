@@ -123,7 +123,7 @@
 			myPoint.transform(proj_4326, map.getProjectionObject());
 
 			// display the map centered on a latitude and longitude (Google zoom levels)
-			map.setCenter(myPoint, <?php echo ($default_zoom) ? $default_zoom : 10; ?>);
+			map.setCenter(myPoint, 11);
 			
 			// Event handlers for the content filters
 			$(".top-content-filters li a").click(function(){
