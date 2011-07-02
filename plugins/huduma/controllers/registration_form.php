@@ -30,6 +30,7 @@ class Registration_Form_Controller extends Frontend_Controller {
 		
 		$registration_form->facility_types = array('0' => "---".Kohana::lang('ui_huduma.select_facility_type')."---");
 		$registration_form->facilities = array('0' => "---".Kohana::lang('ui_huduma.select_facility')."---");
+		$registration_form->agency_types = Agency_Type_Model::get_agency_types_dropdown();
 		
 		// Display the reigstration form
 		print $registration_form;
@@ -48,7 +49,7 @@ class Registration_Form_Controller extends Frontend_Controller {
 		if ($_POST)
 		{
 			// Manually extract the data to be validated
-			$username_data = arr::extract($_POST, 'name', 'email', 'phone_number');
+			$username_data = arr::extract($_POST, 'name', 'email', 'phone_number', 'agency_type_id');
 			
 			// Exrtact the data for the role
 			$role_data = arr::extract($_POST, 'category_id', 'boundary_id', 'static_entity_id');

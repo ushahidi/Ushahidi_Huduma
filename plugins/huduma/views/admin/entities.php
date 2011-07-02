@@ -22,9 +22,9 @@
                 <div class="tabs">
                     <!-- tabset -->
                     <ul class="tabset">
-                        <li><a href="<?php echo url::site() ?>admin/entities" class="active"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/entities/types"><?php echo Kohana::lang('ui_huduma.entity_types');?></a></li>
-                        <li><a href="<?php echo url::site() ?>admin/entities/edit"><?php echo Kohana::lang('ui_huduma.add_edit_entity');?></a></li>
+						<li><a href="<?php echo url::site() ?>admin/entities" class="active"><?php echo Kohana::lang('ui_main.show_all'); ?></a></li>
+						<li><a href="<?php echo url::site() ?>admin/entities/types"><?php echo Kohana::lang('ui_huduma.entity_types');?></a></li>
+						<li><a href="<?php echo url::site() ?>admin/entities/edit"><?php echo Kohana::lang('ui_huduma.add_edit_entity');?></a></li>
                     </ul>
                     <!-- /tabset -->
 

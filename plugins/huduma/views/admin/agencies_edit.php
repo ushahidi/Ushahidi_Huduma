@@ -25,10 +25,11 @@
                     <!-- tabs -->
                     <div class="tabs">
                         <!-- tabset -->
-                        <ul class="tabset">
-                            <li><a href="<?php echo url::site() ?>admin/agencies"><?php echo Kohana::lang('ui_huduma.view_agencies'); ?></a></li>
-                            <li><a href="<?php echo url::site() ?>admin/agencies/edit" class="active"><?php echo Kohana::lang('ui_huduma.add_edit_agency');?></a></li>
-                        </ul>
+						<ul class="tabset">
+							<li><a href="<?php echo url::site() ?>admin/agencies"><?php echo Kohana::lang('ui_huduma.view_agencies'); ?></a></li>
+							<li><a href="<?php echo url::site() ?>admin/agencies/edit" class="active"><?php echo Kohana::lang('ui_huduma.add_edit_agency');?></a></li>
+							<li><a href="<?php echo url::site() ?>admin/agencies/types"><?php echo Kohana::lang('ui_huduma.agency_types');?></a></li>
+						</ul>
                         <!-- /tabset -->
 
                         <div class="tab">

@@ -301,5 +301,125 @@ class Agencies_Controller extends Admin_Controller {
         // Javascript header
         $this->template->js = new View("js/agency_tickets_js");
     }
+
+	/**
+	 * Displays the landing page for this controller
+	 */
+	public function types()
+	{
+		$this->template->content = new View('admin/agency_types');
+		$this->template->content->title = Kohana::lang('ui_huduma.agency_types');
+
+		// setup and initialize form field names
+		$form = array(
+			'agency_type_id' => '',
+			'type_name' => '',
+			'short_name' => '',
+		);
+
+		// Copy the form as errors, so the errors will be stored with keys corresponding to the form field names
+		$errors = $form;
+		$form_error = FALSE;
+		$form_saved = FALSE;
+		$form_action = "";
+		$boundary_array = array();
+
+		$agency_type_id = "";
+
+		// check, has the form been submitted, if so, setup validation
+		if ($_POST)
+		{
+			// Check actions
+			if ($_POST['action'] == 'a')	// Add/Update
+			{
+				// Manually extract the $_POST data
+				$agency_data = arr::extract($_POST, 'type_name', 'short_name');
+				
+				Kohana::log('debug', Kohana::debug($agency_data));
+				
+				// Boundary model instance for the operation
+				$agency_type = (isset($_POST['agency_type_id']) AND Agency_Type_Model::is_valid_agency_type($_POST['agency_type_id']))
+						? ORM::factory('agency_type', $_POST['agency_type_id'])
+						: new Agency_Type_Model();
+														
+				// TODO: Check for upload file
+				if ($agency_type->validate($agency_data))
+				{
+					// Success! SAVE
+					$agency_type->save();
+					
+					$form_saved = TRUE;
+					$form_action = Kohana::lang('ui_admin.added_edited');
+					
+					// Clear the errors and form fields
+					array_fill_keys($form, '');
+					$errors = $form;
+				}
+				else
+				{
+					Kohana::log('debug', 'Validation failed');
+					
+					// Overwrite forms and errors
+					$form = arr::overwrite($form, $agency_data->as_array());;
+					$errors = arr::overwrite($errors, $agency_data->errors());
+					
+					// Turn on form error
+					$form_error = TRUE;
+					$form_saved = FALSE;
+				}
+			}
+			elseif ($_POST['action'] == 'd')	// Delete
+			{
+				foreach($_POST['agency_type_id'] as $agency_type_id)
+				{
+					// Delete the boundary item
+					ORM::factory('agency_type', $agency_type_id)->delete();
+
+					// TODO: Purge uploads too
+				}
+
+				// Success
+				$form_saved = TRUE;
+
+				$form_action = Kohana::lang('ui_admin.deleted');
+			}
+		}	// END if $_POST
+
+		// No. of items to display per page
+		$items_per_page = (int)Kohana::config('settings.items_per_page_admin');
+		
+		// Setup pagination
+		$pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => $items_per_page,
+			'total_items'    => ORM::factory('agency_type')->count_all()
+		));
+
+		// agency_types
+		$agency_types = ORM::factory('agency_type')
+						->orderby('id', 'asc')
+						->find_all($items_per_page, $pagination->sql_offset);
+
+		
+		$this->template->colorpicker_enabled = TRUE;
+		
+		// Set content view
+		$this->template->content->form = $form;
+		$this->template->content->errors = $errors;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->form_saved = $form_saved;
+		$this->template->content->form_action = $form_action;
+		$this->template->content->pagination = $pagination;
+		$this->template->content->total_items = $pagination->total_items;
+
+		$this->template->content->agency_types = $agency_types;
+
+		// Locale (Language) Array
+		$this->template->content->locale_array = Kohana::config('locale.all_languages');
+
+		// Javascript Header
+		$this->template->js = new View('js/agency_types_js');
+	}	
 }
+
 ?>

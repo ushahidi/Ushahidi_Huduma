@@ -235,6 +235,7 @@ ALTER TABLE `comment` ADD COLUMN `dashboard_user_id` INT;
 ALTER TABLE `incident` ADD COLUMN `boundary_id` INT NOT NULL;
 ALTER TABLE `incident` ADD COLUMN `static_entity_id` INT;
 ALTER TABLE `dashboard_user` ADD COLUMN `phone_number` VARCHAR(25);
+ALTER TABLE `dashboard_user` ADD COLUMN `agency_type_id` INT;
 ALTER TABLE `dashboard_role` ADD COLUMN `in_charge` TINYINT;
 ALTER TABLE `agency` ADD COLUMN `agency_type_id` INT;
 --

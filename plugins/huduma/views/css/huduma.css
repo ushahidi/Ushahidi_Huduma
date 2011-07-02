@@ -404,7 +404,7 @@ div.dash-snapshots { margin-top: -10px; }
 .registration_form h1 { color: #00ADE4 !important; }
 .registration_form td { padding: 3px; margin: 3px 0;}
 .registration_form select { border: 1px solid #CCCCCC; height: 25px; padding: 0 !important; margin: 0 !important;}
-td.label { text-align: right; }
+.registration_form td.label { text-align: right; }
 .registration_form .cancel { color: #FF0000; text-decoration: underline !important; }
 
 input.mainpage_search { 
@@ -434,3 +434,6 @@ div#livesearch_results {
 }
 #livesearch_results ul { list-style: none; padding:0 10px;}
 #livesearch_results li a { font-size: 95% !important; padding: 5px 3px; display: block; }
+
+span.radio_label { padding-right: 10px; }
+.radio_label label { position: relative; top: -4px;}

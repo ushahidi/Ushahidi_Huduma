@@ -42,6 +42,19 @@
 						</td>
 					</tr>
 					<tr>
+						<td class="label">* <?php echo Kohana::lang('ui_huduma.agency_type'); ?>:</td>
+						<td>
+							<div class="field_container">
+							<?php foreach ($agency_types as $key => $value): ?>
+								<span class="radio_label">
+								<input type="radio" name="agency_type_id" id="agency_type_<?php echo $key; ?>" value="<?php echo $key; ?>">
+								<label for="agency_type_<?php echo $key;?>"><?php echo $value; ?></label>
+								</span>
+							<?php endforeach; ?>
+							</div>
+						</td>
+					</tr>
+					<tr>
 						<td class="label"><?php echo Kohana::lang('ui_huduma.county'); ?>:</td>
 						<td>
 							<div class="field_container">
