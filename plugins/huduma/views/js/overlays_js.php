@@ -144,7 +144,7 @@
 							name : $("#first_name").val() + " " + $("#last_name").val(),
 							phone_number : $("#phone_number").val(),
 							email : $("#email").val(),
-							agency_type_id = $("[name=agency_type_id]").val(),
+							agency_type_id : $("[name=agency_type_id]").val(),
 							category_id : $("#category_id").val(),
 							boundary_id : boundary_id,
 							static_entity_id: $("#facility_id").val(),

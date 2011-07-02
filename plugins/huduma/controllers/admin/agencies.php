@@ -335,8 +335,6 @@ class Agencies_Controller extends Admin_Controller {
 				// Manually extract the $_POST data
 				$agency_data = arr::extract($_POST, 'type_name', 'short_name');
 				
-				Kohana::log('debug', Kohana::debug($agency_data));
-				
 				// Boundary model instance for the operation
 				$agency_type = (isset($_POST['agency_type_id']) AND Agency_Type_Model::is_valid_agency_type($_POST['agency_type_id']))
 						? ORM::factory('agency_type', $_POST['agency_type_id'])
