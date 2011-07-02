@@ -6,6 +6,12 @@
  * @copyright Ushahidi - http://ushahidi.com
  */
 ?>
+	// Marker radius
+	var markerRadius = 4;
+
+	// Marker opacity
+	var markerOpacity = 0.8;
+	
 	<?php @require_once(PLUGINPATH.'huduma/views/js/map_common_js.php'); ?>
 
 	/**

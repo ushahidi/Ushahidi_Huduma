@@ -1209,8 +1209,11 @@ class Reports_Controller extends Frontend_Controller {
 			return TRUE;
 		}
 	}
-
-	public function constituencies()
+	
+	/**
+	 * Gets the boundary data for the specified boundary
+	 */
+	public function get_boundary_data()
 	{
 		$this->template = "";
 		$this->auto_render = FALSE;
@@ -1219,12 +1222,10 @@ class Reports_Controller extends Frontend_Controller {
 		if ($_POST)
 		{
 			// Get the county id
-			$county_id = $_POST['county_id'];
+			$boundary_id = $_POST['boundary_id'];
 
-			Kohana::log('debug', sprintf('Fetched county id: %s', $county_id));
-			
 			// Get the layer file
-			$boundary = new Boundary_Model($county_id);
+			$boundary = new Boundary_Model($boundary_id);
 			$layer_file = $boundary->boundary_layer_file;
 			if ( ! empty($layer_file))
 			{
@@ -1235,8 +1236,8 @@ class Reports_Controller extends Frontend_Controller {
 			// Build output JSON
 			$json_output  = json_encode(array(
 				'success' => TRUE,
-				'data' => Boundary_Model::get_child_boundaries($county_id),
-				'layer_name' => $boundary->boundary_name.' County',
+				'data' => Boundary_Model::get_child_boundaries($boundary_id),
+				'layer_name' => $boundary->boundary_name.' '.$boundary->get_boundary_type_name(),
 				'layer_url' => $layer_file,
 				'layer_color' => $boundary->boundary_color
 			));

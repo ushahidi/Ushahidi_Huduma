@@ -28,231 +28,6 @@
         // Currently selected category
         var categoryId = (currentCat == null)? 0: currentCat;
 
-        /*
-         * Overlay Style
-         */
-        overlayMarkerStyle = function()
-        {
-            // Set Feature Styles
-            style = new OpenLayers.Style({
-                'externalGraphic': "${icon}",
-                'graphicTitle': "${cluster_count}",
-                pointRadius: "${radius}",
-                fillColor: "${color}",
-                fillOpacity: "${opacity}",
-                strokeColor: "${color}",
-                strokeWidth: "${strokeWidth}",
-                strokeOpacity: "0.3",
-                label:"${clusterCount}",
-                //labelAlign: "${labelalign}", // IE doesn't like this for some reason
-                fontWeight: "${fontweight}",
-                fontColor: "#ffffff",
-                fontSize: "${fontsize}"
-            },
-            {
-                context:
-                {
-                    count: function(feature)
-                    {
-                        if (feature.attributes.count < 2)
-                        {
-                            return 2 * markerRadius;
-                        }
-                        else if (feature.attributes.count == 2)
-                        {
-                            return (Math.min(feature.attributes.count, 7) + 1) *
-                            (markerRadius * 0.8);
-                        }
-                        else
-                        {
-                            return (Math.min(feature.attributes.count, 7) + 1) *
-                            (markerRadius * 0.6);
-                        }
-                    },
-                    fontsize: function(feature)
-                    {
-                        feature_icon = feature.attributes.icon;
-                        if (feature_icon!=="")
-                        {
-                            return "9px";
-                        }
-                        else
-                        {
-                            feature_count = feature.attributes.count;
-                            if (feature_count > 1000)
-                            {
-                                return "20px";
-                            }
-                            else if (feature_count > 500)
-                            {
-                                return "18px";
-                            }
-                            else if (feature_count > 100)
-                            {
-                                return "14px";
-                            }
-                            else if (feature_count > 10)
-                            {
-                                return "12px";
-                            }
-                            else if (feature_count >= 2)
-                            {
-                                return "10px";
-                            }
-                            else
-                            {
-                                return "";
-                            }
-                        }
-                    },
-                    fontweight: function(feature)
-                    {
-                        feature_icon = feature.attributes.icon;
-                        if (feature_icon!=="")
-                        {
-                            return "normal";
-                        }
-                        else
-                        {
-                            return "bold";
-                        }
-                    },
-                    radius: function(feature)
-                    {
-                        feature_count = feature.attributes.count;
-                        if (feature_count > 10000)
-                        {
-                            return markerRadius * 17;
-                        }
-                        else if (feature_count > 5000)
-                        {
-                            return markerRadius * 10;
-                        }
-                        else if (feature_count > 1000)
-                        {
-                            return markerRadius * 8;
-                        }
-                        else if (feature_count > 500)
-                        {
-                            return markerRadius * 7;
-                        }
-                        else if (feature_count > 100)
-                        {
-                            return markerRadius * 6;
-                        }
-                        else if (feature_count > 10)
-                        {
-                            return markerRadius * 5;
-                        }
-                        else if (feature_count >= 2)
-                        {
-                            return markerRadius * 3;
-                        }
-                        else
-                        {
-                            return markerRadius * 2;
-                        }
-                    },
-                    strokeWidth: function(feature)
-                    {
-                        feature_count = feature.attributes.count;
-                        if (feature_count > 10000)
-                        {
-                            return 45;
-                        }
-                        else if (feature_count > 5000)
-                        {
-                            return 30;
-                        }
-                        else if (feature_count > 1000)
-                        {
-                            return 22;
-                        }
-                        else if (feature_count > 100)
-                        {
-                            return 15;
-                        }
-                        else if (feature_count > 10)
-                        {
-                            return 10;
-                        }
-                        else if (feature_count >= 2)
-                        {
-                            return 5;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    },
-                    color: function(feature)
-                    {
-                        return "#" + feature.attributes.color;
-                    },
-                    icon: function(feature)
-                    {
-                        feature_icon = feature.attributes.icon;
-                        if (feature_icon!=="")
-                        {
-                            return baseUrl + feature_icon;
-                        }
-                        else
-                        {
-                            return "";
-                        }
-                    },
-                    clusterCount: function(feature)
-                    {
-                        if (feature.attributes.count > 1)
-                        {
-                            if(jQuery.browser.msie && $.browser.version=="6.0")
-                            { // IE6 Bug with Labels
-                                return "";
-                            }
-
-                            feature_icon = feature.attributes.icon;
-                            if (feature_icon!=="")
-                            {
-                                return "> " + feature.attributes.count;
-                            }
-                            else
-                            {
-                                return feature.attributes.count;
-                            }
-                        }
-                        else
-                        {
-                            return "";
-                        }
-                    },
-                    opacity: function(feature)
-                    {
-                        feature_icon = feature.attributes.icon;
-                        if (feature_icon!=="")
-                        {
-                            return "1";
-                        }
-                        else
-                        {
-                            return markerOpacity;
-                        }
-                    },
-                    labelalign: function(feature)
-                    {
-                        feature_icon = feature.attributes.icon;
-                        if (feature_icon!=="")
-                        {
-                            return "c";
-                        }
-                        else
-                        {
-                            return "c";
-                        }
-                    }
-                }
-            });
-            return style;
-        };
 
         // Check if the layer contained in o_layerName already exists, remove and redraw
         overlayMarkers = map.getLayersByName(o_layerName);
@@ -266,7 +41,7 @@
         }
 
         // Get the styling for the markers
-        var m_style = overlayMarkerStyle();
+        var m_style = getOverlaysMarkerStyle();
 
         // Transform feature point coordinate to Spherical Mercator
         preFeatureInsert = function(feature)
@@ -416,15 +191,22 @@
 					// County selection change
 					$("#county_id").change(function(){
 						boundary_id = $(this).val();
-						$.get('<?php echo url::site().'registration_form/get_constituencies/'?>'+boundary_id,
-							function(data)
-							{
-								if (data != null && data != "")
+						if (boundary_id == 0)
+						{
+							$("#constituency_id").html("<option value=\"0\">---<?php echo Kohana::lang('ui_huduma.select_constituency');?>--</option>");
+						}
+						else
+						{
+							$.get('<?php echo url::site().'registration_form/get_constituencies/'?>'+boundary_id,
+								function(data)
 								{
-									$("#constituency_id").html(data);
+									if (data != null && data != "")
+									{
+										$("#constituency_id").html(data);
+									}
 								}
-							}
-						);
+							);
+						}
 					});
 					
 					// Constituency selection change

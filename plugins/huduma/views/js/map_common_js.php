@@ -8,12 +8,6 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 ?>
-		// Marker radius
-		var markerRadius = 4;
-
-		// Marker opacity
-		var markerOpacity = 0.8;
-
 		/**
 		 * Display popup when feature selected
 		 */
