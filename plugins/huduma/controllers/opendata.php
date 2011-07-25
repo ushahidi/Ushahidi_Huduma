@@ -89,7 +89,13 @@ class Opendata_Controller extends Frontend_Controller {
 		unset ($i, $color_gradient, $metadata_items, $tmp_breakdown_data, $county_data);
 		
 		// Calculate the interval for the chart
-		$interval = (int) $total/(count($choropleth_data) * 60);
+
+        $chloropleth_divisor = (count($choropleth_data) * 60);
+
+        if($chloropleth_divisor == 0)
+            $chloropleth_divisor = 1;
+
+		$interval = (int) $total/$chloropleth_divisor;
 		
 		// Display the data
 		$categories = Category_Model::get_dropdown_categories();

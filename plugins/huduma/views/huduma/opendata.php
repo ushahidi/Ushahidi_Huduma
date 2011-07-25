@@ -55,7 +55,7 @@
 			</div>
 			<div style="float: right;">
 				<div class="basemap_title"><h3><?php echo $basemap_title; ?></h3></div>
-				<div id="opendataMap" class="opendata-map" style="width:720px; height: 550px; border:1px solid #CCCCCC;">
+				<div id="opendataMap" class="opendata-map" style="width:720px; height: 850px; border:1px solid #CCCCCC;">
 				</div>
 			</div>
 			<div style="clear:both;"></div>
