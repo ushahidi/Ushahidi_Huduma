@@ -422,7 +422,7 @@
 		
 		// Transform the geometry and render it on the map
 		layerFeature.geometry.transform(proj_4326, proj_900913);
-		countyLayer.addFeatures(layerFeature);
+		layerObject.addFeatures(layerFeature);
 		map.addLayer(layerObject);
 		map.addControl(new OpenLayers.Control.SelectFeature(layerObject, {hover: true} ));
 		
