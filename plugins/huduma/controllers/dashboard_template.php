@@ -94,6 +94,12 @@ class Dashboard_Template_Controller extends Frontend_Controller {
 	 * @var int
 	 */
 	protected $category_id = 0;
+	
+	/**
+	 * No. of items to display per page
+	 * @var int
+	 */
+	protected $report_items_per_view = 3;
 
     /**
      * Constructor

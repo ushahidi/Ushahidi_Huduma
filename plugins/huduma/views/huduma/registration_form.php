@@ -88,6 +88,15 @@
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<td class="label"><?php echo Kohana::lang('ui_main.security_code'); ?>:</td>
+						<td>
+							<div class="field_container">
+								<div style="padding: 3px 0;"><?php echo $captcha; ?></div>
+								<?php print form::input('security_code', NULL, ' class="text small" placeholder="'.Kohana::lang('ui_main.security_code').'"'); ?>
+							</div>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 			<div class="row">

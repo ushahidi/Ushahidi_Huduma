@@ -77,32 +77,23 @@ class Static_Entity_Model extends ORM {
 		if (Boundary_Model::is_valid_boundary($boundary_id))
 		{
 			// Fetch the database IDs for all boundaries with $boundary_id as parent
-			$table_prefix = Kohana::config('database.table_prefix');
-			$db = new Database();
-			$query = 'SELECT id FROM '.$table_prefix.'boundary WHERE id = %d OR parent_id = %d';
-			$result = $db->query(sprintf($query, $boundary_id, $boundary_id));
-			unset($db);
-			
-			$boundary_ids = array();
-			foreach ($result as $item)
-			{
-				$boundary_ids[] = $item->id;
-			}
-			
-			return (Static_Entity_Type_Model::is_valid_static_entity_type($type_id))
-				? ORM::factory('static_entity')
-						->where('static_entity_type_id', $type_id)
-						->in('id', $boundary_ids)
-						->select_list('id', 'entity_name')
-				: FALSE;
-			
+			$table_prefix = Kohana::config('database.default.table_prefix');
+			$query = "SELECT se.id, se.entity_name "
+				. "FROM ".$table_prefix."boundary b, ".$table_prefix."static_entity se "
+				. "INNER JOIN ".$table_prefix."static_entity_type t ON (se.static_entity_type_id = t.id) "
+				. "WHERE (se.boundary_id = b.id OR se.boundary_id = b.parent_id) "
+				. "AND (b.id = %d OR b.parent_id = %d) "
+				. "AND t.id = %d";
+				
+			return Database::instance()
+					->query(sprintf($query, $boundary_id, $boundary_id, $type_id));
 		}
 		else
 		{
 			return (Static_Entity_Type_Model::is_valid_static_entity_type($type_id))
 				? ORM::factory('static_entity')
 						->where('static_entity_type_id', $type_id)
-						->select_list('id', 'entity_name')
+						->select('id', 'entity_name')
 				: FALSE;
 		}
 		

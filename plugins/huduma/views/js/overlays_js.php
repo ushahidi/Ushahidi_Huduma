@@ -52,23 +52,26 @@
         
         // Set the zoom level
         zoomLevel = (map.getZoom() == 0 || activeZoom == null || activeZoom == '')? defaultZoom : activeZoom;
+		fetchUrl = overlayURL + '?z=' + zoomLevel + '&c=' + categoryId;
 
         // Create the overlay markers
-        overlayMarkers = new OpenLayers.Layer.GML(o_layerName, overlayURL + '?z=' + zoomLevel + '&c=' + categoryId,
-            {
-                preFeatureInsert: preFeatureInsert,
-                format: OpenLayers.Format.GeoJSON,
-                projection: proj_4326,
-                formatOptions: {
-                    extractStyles: true,
-                    extractAttributes: true
-                },
-                styleMap : new OpenLayers.StyleMap({
-                    "default": m_style,
-                    "select": m_style
-                })
-            }
-        );
+		overlayMarkers = new OpenLayers.Layer.Vector(o_layerName, {
+			preFeatureInsert: preFeatureInsert,
+			projection: proj_4326,
+			formatOptions: {
+				extractStyles: true,
+				extractAttributes: true
+			},
+			styleMap : new OpenLayers.StyleMap({
+				"default": m_style,
+				"select": m_style
+			}),
+			strategies: [new OpenLayers.Strategy.Fixed()],
+			protocol: new OpenLayers.Protocol.HTTP({
+				url: fetchUrl,
+				format: new OpenLayers.Format.GeoJSON()
+			})
+		});
 
         // Add the markers layer to the map
         map.addLayer(overlayMarkers);
@@ -148,7 +151,8 @@
 							category_id : $("#category_id").val(),
 							boundary_id : boundary_id,
 							static_entity_id: $("#facility_id").val(),
-							in_charge : (! $("#in_charge").attr("disabled") && $("#in_charge").attr("checked"))? 1 : 0
+							in_charge : (! $("#in_charge").attr("disabled") && $("#in_charge").attr("checked"))? 1 : 0,
+							security_code: $("#security_code").val()
 						};
         			    
         			    // Post the provided information

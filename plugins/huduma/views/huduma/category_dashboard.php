@@ -20,6 +20,7 @@
 		<div class="bg">
 			<div class="dashboard-title">
 				<h1 style="color: #<?php echo $category->category_color; ?>">
+					<?php if (isset($boundary_name)) echo $boundary_name." - "; ?>
 					<?php echo ucfirst(strtolower($category->category_title)).' '.Kohana::lang('ui_huduma.dashboard'); ?>
 				</h1>
 			</div>

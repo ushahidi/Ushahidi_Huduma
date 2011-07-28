@@ -35,6 +35,12 @@
 									onclick="loadEntityReportForm('<?php echo urlencode($entity_id); ?>')">
 							</div>
 							<div style="clear: both;"></div>
+							<?php if ($show_dashboard_panel): ?>
+								<?php echo $dashboard_panel; ?>
+							<?php else: ?>
+								<div class="row">&nbsp;</div>
+							<?php endif; ?>
+							<div style="clear: both;"></div>
 							<?php if ($neighbour_facilities): ?>
 							<div class="report-additional-reports">
 								<h4><?php echo strtoupper(Kohana::lang('ui_huduma.neighbour_facilities')); ?></h4>
@@ -49,11 +55,6 @@
 									</div>
 								<?php endforeach; ?>
 							</div>
-							<?php endif; ?>
-							<?php if ($show_dashboard_panel): ?>
-								<?php echo $dashboard_panel; ?>
-							<?php else: ?>
-								<div class="row">&nbsp;</div>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -102,3 +103,4 @@
 					</div>
 				</div>
 			</div>
+		</div>

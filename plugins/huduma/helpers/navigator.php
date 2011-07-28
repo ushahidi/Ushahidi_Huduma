@@ -304,7 +304,7 @@ class navigator_Core {
 	/**
 	 * @return Result
 	 */
-	public static function get_category_stats($category_id = FALSE)
+	public static function get_category_stats($category_id = FALSE, $boundary_id = FALSE)
 	{
 		// Database instance for the fetch
 		$db = new Database();
@@ -319,10 +319,21 @@ class navigator_Core {
 			. 'INNER JOIN incident i on (ic.incident_id = i.id) '
 			. 'WHERE i.incident_active = 1 '
 			. 'AND c.category_visible = 1 ';
-			
-		$sql .= (Category_Model::is_valid_category($category_id))? 'AND c.id = '.$category_id.' ' : '';
+		
+		// 	Check if the category is valud
+		if (Category_Model::is_valid_category($category_id))
+		{
+			$sql .= 'AND c.id = '.$category_id.' ';
+		}
+		
+		// Check if the boundary id is valid
+		if (Boundary_Model::is_valid_boundary($boundary_id))
+		{
+			$sql .= 'AND (i.boundary_id = '.$boundary_id.' OR i.boundary_id IN (SELECT id FROM boundary WHERE parent_id = '.$boundary_id.')) ';
+		}
 		$sql .= 'GROUP BY c.id';
 		
+		// Kohana::log('debug', $sql);
 		// Return
 		return $db->query($sql);
 	}
@@ -442,6 +453,47 @@ class navigator_Core {
 		elseif ($seconds > 0)
 		{
 			return sprintf('%d second%s ago', $seconds, (($seconds > 1)? 's' : ''));
+		}
+	}
+	
+	public static function get_category_reports_paginator($category_id, $status_filter = FALSE)
+	{
+		$report_items_per_view = 3;
+		
+		// Ticket status values
+		$report_filters = array('unresolved' => 1, 'resolved' => 2);
+		
+		$db = new Database();
+		
+		if ($status_filter AND array_key_exists($status_filter, $report_filters))
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $report_items_per_view,
+				'total_items' => $db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->join('incident_ticket', 'incident.id', 'incident_ticket.incident_id')
+									->where(array(
+										'incident.incident_active' => 1, 
+										'incident_category.category_id' => $category_id,
+										'incident_ticket.report_status_id' => $report_filters[$status_filter]))
+									->get()
+									->count()
+			));
+		}
+		else
+		{
+			return new Pagination(array(
+				'style' => 'huduma',
+				'query_string' => 'page',
+				'items_per_page' => $report_items_per_view,
+				'total_items' => $db->from('incident')
+									->join('incident_category', 'incident.id', 'incident_category.incident_id')
+									->where(array('incident.incident_active' => 1, 'incident_category.category_id' => $category_id))
+									->get()
+									->count()
+			));
 		}
 	}
 }

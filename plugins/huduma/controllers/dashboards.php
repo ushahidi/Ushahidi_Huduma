@@ -50,7 +50,7 @@ class Dashboards_Controller extends Frontend_Controller {
 			$category_id  = $_GET['id'];
 			
 			// Set up pagination
-			$pagination = $this->_get_report_paginator($category_id, $_GET['filter']);
+			$pagination = navigator::get_category_reports_paginator($category_id, $_GET['filter']);
 			
 			// To hold the reports view
 			$reports = "";
@@ -131,7 +131,7 @@ class Dashboards_Controller extends Frontend_Controller {
 			);
 			
 			$this->template->content->category_stats = $stats;
-			$pagination = $this->_get_report_paginator($category_id);
+			$pagination = navigator::get_category_reports_paginator($category_id);
 			$this->template->content->category = ORM::factory('category', $category_id);
 			// Get the reports for the category
 			$reports = Category_Model::get_category_reports($category_id, 'all', $pagination->sql_offset, $this->report_items_per_view);
@@ -144,44 +144,5 @@ class Dashboards_Controller extends Frontend_Controller {
 			$this->template->header->header_block = $this->themes->header_block();
 		}
 	}
-	
-	// Gets the paginator for the incidents
-	private function _get_report_paginator($category_id, $status_filter = FALSE)
-	{
-		// Ticket status values
-		$report_filters = array('unresolved' => 1, 'resolved' => 2);
 		
-		if ($status_filter AND array_key_exists($status_filter, $report_filters))
-		{
-			return new Pagination(array(
-				'style' => 'huduma',
-				'query_string' => 'page',
-				'items_per_page' => $this->report_items_per_view,
-				'total_items' => $this->db->from('incident')
-									->join('incident_category', 'incident.id', 'incident_category.incident_id')
-									->join('incident_ticket', 'incident.id', 'incident_ticket.incident_id')
-									->where(array(
-										'incident.incident_active' => 1, 
-										'incident_category.category_id' => $category_id,
-										'incident_ticket.report_status_id' => $report_filters[$status_filter]))
-									->get()
-									->count()
-			));
-		}
-		else
-		{
-			return new Pagination(array(
-				'style' => 'huduma',
-				'query_string' => 'page',
-				'items_per_page' => $this->report_items_per_view,
-				'total_items' => $this->db->from('incident')
-									->join('incident_category', 'incident.id', 'incident_category.incident_id')
-									->where(array('incident.incident_active' => 1, 'incident_category.category_id' => $category_id))
-									->get()
-									->count()
-			));
-		}
-		
-	}
-	
 }

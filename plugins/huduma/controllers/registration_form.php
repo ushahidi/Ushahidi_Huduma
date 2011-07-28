@@ -8,6 +8,13 @@
  */
 class Registration_Form_Controller extends Frontend_Controller {
 	
+	
+	public function __construct()
+	{
+		// Parent constructor
+		parent::__construct();
+	}
+	
 	public function index()
 	{
 		$this->template = '';
@@ -28,9 +35,13 @@ class Registration_Form_Controller extends Frontend_Controller {
 		ksort($counties);
 		$registration_form->counties = $counties;
 		
+		// Initialize captcha
+		$this->captcha = Captcha::factory();
+		
 		$registration_form->facility_types = array('0' => "---".Kohana::lang('ui_huduma.select_facility_type')."---");
 		$registration_form->facilities = array('0' => "---".Kohana::lang('ui_huduma.select_facility')."---");
 		$registration_form->agency_types = Agency_Type_Model::get_agency_types_dropdown();
+		$registration_form->captcha = $this->captcha->render();
 		
 		// Display the reigstration form
 		print $registration_form;
@@ -90,12 +101,9 @@ class Registration_Form_Controller extends Frontend_Controller {
 					'in_charge' => $_POST['in_charge']
 				));
 				
-				// Debug
-				// Kohana::log('debug', Kohana::debug($role_data));
-				
 				// Create a new role
 				$role = new Dashboard_Role_Model();
-				if ($role->validate($role_data))
+				if ($role->validate($role_data) AND Captcha::valid($_POST['security_code']))
 				{
 					// Save the role
 					$role->save();
@@ -194,9 +202,9 @@ class Registration_Form_Controller extends Frontend_Controller {
 		if ($facilities)
 		{
 			$html_str = "<option value=\"0\">---".Kohana::lang('ui_huduma.select_facility')."---</option>";
-			foreach ($facilities as $key => $value)
+			foreach ($facilities as $facility)
 			{
-				$html_str .= "<option value=\"".$key."\">".$value."</option>";
+				$html_str .= "<option value=\"".$facility->id."\">".$facility->entity_name."</option>";
 			}
 			print $html_str;
 		}

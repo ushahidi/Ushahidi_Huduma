@@ -50,6 +50,10 @@ class Home_Controller extends Dashboard_Template_Controller {
 			$this->template->content->show_dashboard_panel = TRUE;
 			$this->template->content->dashboard_panel = $this->__get_dashboard_panel();
 			
+			// Show the neighbouring facilities
+			$this->template->content->neighbour_facilities = Static_Entity_Model::get_neighbour_entities($this->static_entity_id);
+			$this->template->content->fetch_url = url::site().'entities/get_reports/?id='.$this->static_entity_id;
+			
 			// Metadata viewer
 			$metadata_pagination = new Pagination(array(
 				'query_string' => 'page',
@@ -111,8 +115,53 @@ class Home_Controller extends Dashboard_Template_Controller {
 		elseif ($this->category_role)
 		{
 			// Role for specific category
-
-			// Check if categoruy role is location bound
+			$this->template->content = new View('huduma/category_dashboard');
+			
+			// Statistics array
+			$stats = array(
+				'total_reports' => 0,
+				'resolved' => 0,
+				'unresolved' => 0,
+				'unassigned' => 0
+			);
+			
+			// Get the category stats
+			$category_stats = navigator::get_category_stats($this->category_id, $this->boundary_id);
+			
+			// Check if any stats have been returned
+			if ($category_stats->count() > 0)
+			{
+				$stats_record = $category_stats[0];
+				$stats = array(
+					'total_reports' => $stats_record->total_reports,
+					'resolved' => ($stats_record->resolved > 0)? round(($stats_record->resolved/$stats_record->total_reports) * 100, 2) : 0,
+					'unresolved' => ($stats_record->unresolved > 0)? round(($stats_record->unresolved/$stats_record->total_reports) * 100, 2) : 0,
+					'unassigned' => $stats_record->total_reports - ($stats_record->resolved + $stats_record->unresolved)
+				);
+			}
+			
+			$this->template->content->category_stats = $stats;
+			
+			$pagination = navigator::get_category_reports_paginator($this->category_id);
+			
+			// Set the boundary name
+			if (Boundary_Model::is_valid_boundary($this->boundary_id))
+			{
+				$boundary = new Boundary_Model($this->boundary_id);
+				$this->template->content->boundary_name = $boundary->boundary_name." ".$boundary->get_boundary_type_name();
+			}
+			
+			$this->template->content->category = ORM::factory('category', $this->category_id);
+			
+			// Get the reports for the category
+			$reports = Category_Model::get_category_reports($this->category_id, 'all', $pagination->sql_offset, $this->report_items_per_view);
+			$this->template->content->category_reports_view = navigator::get_reports_view($reports, 'reports/view/', $pagination);
+			
+			// Javascript
+			$this->themes->js = new View('js/category_dashboard_js');
+			
+			// Header block
+			$this->template->header->header_block = $this->themes->header_block();
 		}
 		elseif ($this->boundary_role)
 		{

@@ -14,7 +14,7 @@
 
 		<!-- panel items for static entity role only -->
 		<?php if ($static_entity_panel): ?>
-		<?
+		<?php
 		/*
 		<li><a href="<?php echo url::site().'dashboards/home/entity_profile'; ?>"><?php echo Kohana::lang('ui_huduma.entity_profile'); ?></a></li>
 		*/
